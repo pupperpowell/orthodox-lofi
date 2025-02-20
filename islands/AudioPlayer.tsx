@@ -1,12 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { AudioProcessor } from "./AudioProcessor.ts";
-import FilterControls from "./Controls.tsx";
-
-interface Track {
-  id: number;
-  title: string;
-  url: string;
-}
+import Controls from "./Controls.tsx";
+import { Track } from "../utils/track.ts";
 
 export default function AudioPlayer({ tracks }: { tracks: Track[] }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -33,6 +28,7 @@ export default function AudioPlayer({ tracks }: { tracks: Track[] }) {
       <div class="space-y-4">
         {tracks.map((track) => (
           <button
+            type="button"
             key={track.id}
             onClick={() => handlePlay(track)}
             class="px-4 py-2 bg-blue-500 text-white rounded"
@@ -43,7 +39,7 @@ export default function AudioPlayer({ tracks }: { tracks: Track[] }) {
       </div>
 
       {/* FilterControls always shows if processor exists */}
-      {processor && <FilterControls processor={processor} />}
+      {processor && <Controls processor={processor} />}
     </div>
   );
 }

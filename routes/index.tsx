@@ -1,12 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import AudioPlayer from "../islands/AudioPlayer.tsx";
-
-interface Track {
-  id: number;
-  title: string;
-  url: string;
-}
+import { Track } from "../utils/track.ts";
 
 export const handler: Handlers<Track[]> = {
   GET(_, ctx) {

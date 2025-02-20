@@ -25,7 +25,7 @@ export class AudioProcessor {
     this.lowpassFilter = this.context.createBiquadFilter();
 
     this.highpassFilter.type = "highpass";
-    this.highpassFilter.frequency.value = 20;
+    this.highpassFilter.frequency.value = 200;
 
     this.lowpassFilter.type = "lowpass";
     this.lowpassFilter.frequency.value = 2250;

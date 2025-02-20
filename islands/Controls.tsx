@@ -1,16 +1,16 @@
 import { useState } from "preact/hooks";
 import { AudioProcessor } from "./AudioProcessor.ts";
 
-interface FilterControlsProps {
+interface ControlsProps {
   processor: AudioProcessor;
 }
 
-export default function FilterControls({ processor }: FilterControlsProps) {
+export default function Controls({ processor }: ControlsProps) {
   const [filtersEnabled, setFiltersEnabled] = useState(true);
   const [distortionEnabled, setDistortionEnabled] = useState(true);
   const [saturationEnabled, setSaturationEnabled] = useState(true);
 
-  const [highpass, setHighpass] = useState(20);
+  const [highpass, setHighpass] = useState(200);
   const [lowpass, setLowpass] = useState(2250);
   const [saturation, setSaturation] = useState(1);
   const [distortion, setDistortion] = useState(1);
@@ -58,6 +58,7 @@ export default function FilterControls({ processor }: FilterControlsProps) {
     <div class="space-y-4">
       <hr></hr>
       <button
+        type="button"
         onClick={handleToggleFilters}
         class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
@@ -101,6 +102,7 @@ export default function FilterControls({ processor }: FilterControlsProps) {
       <hr></hr>
       <div>
         <button
+          type="button"
           onClick={handleToggleSaturation}
           class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
         >
@@ -120,6 +122,7 @@ export default function FilterControls({ processor }: FilterControlsProps) {
         </label>
       </div>
       <button
+        type="button"
         onClick={handleToggleDistortion}
         class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
