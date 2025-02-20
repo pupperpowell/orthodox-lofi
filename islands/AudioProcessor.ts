@@ -2,6 +2,8 @@ export class AudioProcessor {
   private context: AudioContext;
   private source: AudioBufferSourceNode | null = null;
 
+  private gainNode: GainNode;
+
   private highpassFilter: BiquadFilterNode;
   private lowpassFilter: BiquadFilterNode;
 
@@ -15,15 +17,18 @@ export class AudioProcessor {
   constructor() {
     this.context = new AudioContext();
 
+    this.gainNode = this.context.createGain();
+    this.gainNode.gain.value = 0.5;
+
     // Initial filter setup
     this.highpassFilter = this.context.createBiquadFilter();
     this.lowpassFilter = this.context.createBiquadFilter();
 
     this.highpassFilter.type = "highpass";
-    this.highpassFilter.frequency.value = 200;
+    this.highpassFilter.frequency.value = 20;
 
     this.lowpassFilter.type = "lowpass";
-    this.lowpassFilter.frequency.value = 5000;
+    this.lowpassFilter.frequency.value = 2250;
 
     // Distortion and saturation setup
     this.distortion = this.context.createWaveShaper();
@@ -31,12 +36,12 @@ export class AudioProcessor {
   }
 
   // Hard clipping for distortion
-  private createDistortionCurve(amount: number): Float32Array {
-    const samples = 44100;
-    const curve = new Float32Array(samples);
-    for (let i = 0; i < samples; ++i) {
-      const x = (i * 2) / samples - 1;
-      curve[i] = Math.tanh(amount * x); // Hard clipping
+  private createDistortionCurve(amount = 20) {
+    const n_samples = 256;
+    const curve = new Float32Array(n_samples);
+    for (let i = 0; i < n_samples; ++i) {
+      const x = i * 2 / n_samples - 1;
+      curve[i] = (Math.PI + amount) * x / (Math.PI + amount * Math.abs(x));
     }
     return curve;
   }
@@ -61,59 +66,53 @@ export class AudioProcessor {
     this.source = this.context.createBufferSource();
     this.source.buffer = audioBuffer;
 
-    // Connect the audio chain
-    this.source
-      .connect(this.highpassFilter)
-      .connect(this.lowpassFilter)
-      .connect(this.context.destination);
+    this.connectProcessingChain();
+  }
+
+  private connectProcessingChain() {
+    if (!this.source) return;
+
+    this.source.disconnect();
+    let currentNode: AudioNode = this.source;
+
+    if (this.filtersEnabled) {
+      currentNode.connect(this.highpassFilter);
+      currentNode = this.highpassFilter;
+      currentNode.connect(this.lowpassFilter);
+      currentNode = this.lowpassFilter;
+    }
+
+    if (this.distortionEnabled) {
+      currentNode.connect(this.distortion);
+      currentNode = this.distortion;
+    }
+
+    if (this.saturationEnabled) {
+      currentNode.connect(this.saturation);
+      currentNode = this.saturation;
+    }
+
+    currentNode.connect(this.context.destination);
   }
 
   toggleFilters() {
-    // Toggle filters on/off
     this.filtersEnabled = !this.filtersEnabled;
-
-    if (this.source) {
-      this.source.disconnect();
-
-      if (this.filtersEnabled) {
-        this.source
-          .connect(this.highpassFilter)
-          .connect(this.lowpassFilter)
-          .connect(this.context.destination);
-      } else {
-        this.source.connect(this.context.destination);
-      }
-    }
+    this.connectProcessingChain();
+    console.log("Filters set to ", this.filtersEnabled);
   }
 
   toggleDistortion() {
     this.distortionEnabled = !this.distortionEnabled;
-
-    if (this.source) {
-      this.source.disconnect();
-      if (this.distortionEnabled) {
-        this.source
-          .connect(this.distortion)
-          .connect(this.context.destination);
-      } else {
-        this.source.connect(this.context.destination);
-      }
-    }
+    this.distortion.curve = this.createDistortionCurve(0.5);
+    this.connectProcessingChain();
+    console.log("Distortion set to ", this.filtersEnabled);
   }
 
   toggleSaturation() {
     this.saturationEnabled = !this.saturationEnabled;
-
-    if (this.source) {
-      this.source.disconnect();
-      if (this.saturationEnabled) {
-        this.source
-          .connect(this.saturation)
-          .connect(this.context.destination);
-      } else {
-        this.source.connect(this.context.destination);
-      }
-    }
+    this.saturation.curve = this.createSaturationCurve(0.5);
+    this.connectProcessingChain();
+    console.log("Saturation set to ", this.filtersEnabled);
   }
 
   setHighpassFrequency(freq: number) {

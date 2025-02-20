@@ -10,10 +10,10 @@ export default function FilterControls({ processor }: FilterControlsProps) {
   const [distortionEnabled, setDistortionEnabled] = useState(true);
   const [saturationEnabled, setSaturationEnabled] = useState(true);
 
-  const [highpass, setHighpass] = useState(200);
-  const [lowpass, setLowpass] = useState(5000);
+  const [highpass, setHighpass] = useState(20);
+  const [lowpass, setLowpass] = useState(2250);
   const [saturation, setSaturation] = useState(1);
-  const [distortion, setDistortion] = useState(0);
+  const [distortion, setDistortion] = useState(1);
 
   const handleHighpassChange = (e: Event) => {
     const value = Number((e.target as HTMLInputElement).value);
@@ -131,7 +131,8 @@ export default function FilterControls({ processor }: FilterControlsProps) {
           <input
             type="range"
             min="0"
-            max="50"
+            max="5"
+            step="0.1"
             value={distortion}
             onInput={handleDistortionChange}
             class="w-full mt-2"
