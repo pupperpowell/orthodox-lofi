@@ -5,6 +5,7 @@ import { Track } from "../utils/track.ts";
 
 export default function AudioPlayer({ tracks }: { tracks: Track[] }) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [processor, setProcessor] = useState<AudioProcessor | null>(null);
 
   // Create processor on mount
@@ -13,13 +14,17 @@ export default function AudioPlayer({ tracks }: { tracks: Track[] }) {
   }, []);
 
   const handlePlay = async (track: Track) => {
-    if (!isPlaying && processor) {
+    if (!processor) return;
+    if (!isPlaying) { // if nothing's loaded, start it up
       await processor.loadTrack(track.url);
       processor.play();
       setIsPlaying(true);
-    } else if (isPlaying && processor) {
-      processor.stop();
-      setIsPlaying(false);
+    } else if (isPaused) { // if paused, resume,
+      processor.resume();
+      setIsPaused(false);
+    } else if (!isPaused) { // if playing, pause
+      processor.pause();
+      setIsPaused(true);
     }
   };
 

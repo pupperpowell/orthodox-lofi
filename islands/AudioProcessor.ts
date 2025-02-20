@@ -2,35 +2,43 @@ export class AudioProcessor {
   private context: AudioContext;
   private source: AudioBufferSourceNode | null = null;
 
-  private gainNode: GainNode;
+  // GAIN, to control volume of each effect!
+  private sourceGainNode: GainNode; // takes source input. controls source volume
+  private filtersGainNode: GainNode; // takes source, highpass, lowpass, and controls overall volume?!
+  private distortionGainNode: GainNode; //
 
-  private highpassFilter: BiquadFilterNode;
-  private lowpassFilter: BiquadFilterNode;
+  // FILTERS
+  private highpassFilter: BiquadFilterNode; // allows frequencies greater than 'x' hz to "pass over"
+  private lowpassFilter: BiquadFilterNode; // allows frequencies less than 'x' hertz to "pass under"
 
+  // DISTORTION
   private distortion: WaveShaperNode;
-  private saturation: WaveShaperNode;
-
-  private filtersEnabled: boolean = true;
-  private distortionEnabled: boolean = true;
-  private saturationEnabled: boolean = true;
+  private saturation: WaveShaperNode; // basically the same thing as distortion. fix later
 
   constructor() {
     this.context = new AudioContext();
 
-    this.gainNode = this.context.createGain();
-    this.gainNode.gain.value = 0.5;
+    // Gain node setup
+    this.sourceGainNode = this.context.createGain();
+    this.filtersGainNode = this.context.createGain();
+    this.distortionGainNode = this.context.createGain();
 
-    // Initial filter setup
+    // initial mix
+    this.sourceGainNode.gain.value = 0.5;
+    this.filtersGainNode.gain.value = 0.5;
+    this.distortionGainNode.gain.value = 0.5;
+
+    // Filter node(s) setup
     this.highpassFilter = this.context.createBiquadFilter();
     this.lowpassFilter = this.context.createBiquadFilter();
 
-    this.highpassFilter.type = "highpass";
-    this.highpassFilter.frequency.value = 200;
+    this.highpassFilter.type = "highpass"; // to disable, value should be 0
+    this.highpassFilter.frequency.value = 200; // starts at 200hz
 
-    this.lowpassFilter.type = "lowpass";
-    this.lowpassFilter.frequency.value = 2250;
+    this.lowpassFilter.type = "lowpass"; // to disable, value should be as high as posible
+    this.lowpassFilter.frequency.value = 2250; // starts at 2250hz
 
-    // Distortion and saturation setup
+    // Distortion and saturation nodes setup
     this.distortion = this.context.createWaveShaper();
     this.saturation = this.context.createWaveShaper();
   }
@@ -48,7 +56,7 @@ export class AudioProcessor {
 
   // Tube-style saturation curve
   private createSaturationCurve(amount: number): Float32Array {
-    const samples = 44100;
+    const samples = 256;
     const curve = new Float32Array(samples);
     for (let i = 0; i < samples; ++i) {
       const x = (i * 2) / samples - 1;
@@ -56,6 +64,31 @@ export class AudioProcessor {
       curve[i] = x >= 0 ? Math.tanh(amount * x) : Math.tanh(amount * x * 0.8); // Less compression on negative values
     }
     return curve;
+  }
+
+  // Called when a new track is loaded
+  // Literally chains each node to the next
+  private connectProcessingChain() {
+    if (!this.source) return;
+
+    this.source.disconnect();
+    let currentNode: AudioNode = this.source; // audio source
+
+    // connect filters...
+    currentNode.connect(this.highpassFilter);
+    currentNode = this.highpassFilter;
+    currentNode.connect(this.lowpassFilter);
+    currentNode = this.lowpassFilter;
+
+    // connect distortion...
+    currentNode.connect(this.distortion);
+    currentNode = this.distortion;
+
+    // connect saturation...
+    currentNode.connect(this.saturation);
+    currentNode = this.saturation;
+
+    currentNode.connect(this.context.destination); // output
   }
 
   async loadTrack(url: string) {
@@ -69,50 +102,16 @@ export class AudioProcessor {
     this.connectProcessingChain();
   }
 
-  private connectProcessingChain() {
-    if (!this.source) return;
-
-    this.source.disconnect();
-    let currentNode: AudioNode = this.source;
-
-    if (this.filtersEnabled) {
-      currentNode.connect(this.highpassFilter);
-      currentNode = this.highpassFilter;
-      currentNode.connect(this.lowpassFilter);
-      currentNode = this.lowpassFilter;
-    }
-
-    if (this.distortionEnabled) {
-      currentNode.connect(this.distortion);
-      currentNode = this.distortion;
-    }
-
-    if (this.saturationEnabled) {
-      currentNode.connect(this.saturation);
-      currentNode = this.saturation;
-    }
-
-    currentNode.connect(this.context.destination);
-  }
-
   toggleFilters() {
-    this.filtersEnabled = !this.filtersEnabled;
-    this.connectProcessingChain();
-    console.log("Filters set to ", this.filtersEnabled);
+    // set filter gains to 0
   }
 
   toggleDistortion() {
-    this.distortionEnabled = !this.distortionEnabled;
-    this.distortion.curve = this.createDistortionCurve(0.5);
-    this.connectProcessingChain();
-    console.log("Distortion set to ", this.filtersEnabled);
+    // set the distortion amount to 0. This will disable the distortion effect
   }
 
   toggleSaturation() {
-    this.saturationEnabled = !this.saturationEnabled;
-    this.saturation.curve = this.createSaturationCurve(0.5);
-    this.connectProcessingChain();
-    console.log("Saturation set to ", this.filtersEnabled);
+    // set the saturation amount to 1. This will disable the saturation effect
   }
 
   setHighpassFrequency(freq: number) {
@@ -137,5 +136,13 @@ export class AudioProcessor {
 
   stop() {
     this.source?.stop();
+  }
+
+  pause() {
+    this.context.suspend();
+  }
+
+  resume() {
+    this.context.resume();
   }
 }
