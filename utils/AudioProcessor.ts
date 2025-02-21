@@ -5,7 +5,7 @@ export class AudioProcessor {
   // GAIN, to control volume of each effect!
   private sourceGainNode: GainNode; // takes source input. controls source volume
   private filtersGainNode: GainNode; // takes source, highpass, lowpass, and controls overall volume?!
-  private distortionGainNode: GainNode; //
+  private distortionGainNode: GainNode; // how do i split this up?
 
   // FILTERS
   private highpassFilter: BiquadFilterNode; // allows frequencies greater than 'x' hz to "pass over"
@@ -32,10 +32,10 @@ export class AudioProcessor {
     this.highpassFilter = this.context.createBiquadFilter();
     this.lowpassFilter = this.context.createBiquadFilter();
 
-    this.highpassFilter.type = "highpass"; // to disable, value should be 0
+    this.highpassFilter.type = "highpass";
     this.highpassFilter.frequency.value = 200; // starts at 200hz
 
-    this.lowpassFilter.type = "lowpass"; // to disable, value should be as high as posible
+    this.lowpassFilter.type = "lowpass";
     this.lowpassFilter.frequency.value = 2250; // starts at 2250hz
 
     // Distortion and saturation nodes setup
@@ -79,14 +79,6 @@ export class AudioProcessor {
     currentNode = this.highpassFilter;
     currentNode.connect(this.lowpassFilter);
     currentNode = this.lowpassFilter;
-
-    // connect distortion...
-    currentNode.connect(this.distortion);
-    currentNode = this.distortion;
-
-    // connect saturation...
-    currentNode.connect(this.saturation);
-    currentNode = this.saturation;
 
     currentNode.connect(this.context.destination); // output
   }

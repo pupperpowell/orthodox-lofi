@@ -1,4 +1,4 @@
-# lofi orthodox byzantine chants to relax or study to
+# lofi byzantine chants to relax/study to
 
 This project was made to parody the "lofi hip hop radio beats to relax/study to" genre, and honor the music of the Eastern Orthodox Church — not the other way around.
 
@@ -15,7 +15,8 @@ This project was made to parody the "lofi hip hop radio beats to relax/study to"
 
 # database
 
-1. due to large amount of audio (several GB), it will need to be stored in a central database and streamed from the server.
+1. the audio is actually being streamed by a icecast server.
+2. for interactive elements, database options are being considered
 
 # ui/ux design
 

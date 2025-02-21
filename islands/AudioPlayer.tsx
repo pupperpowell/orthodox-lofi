@@ -1,7 +1,8 @@
 import { useEffect, useState } from "preact/hooks";
-import { AudioProcessor } from "./AudioProcessor.ts";
+
 import Controls from "./Controls.tsx";
 import { Track } from "../utils/track.ts";
+import { AudioProcessor } from "../utils/AudioProcessor.ts";
 
 export default function AudioPlayer({ tracks }: { tracks: Track[] }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -38,7 +39,7 @@ export default function AudioPlayer({ tracks }: { tracks: Track[] }) {
             onClick={() => handlePlay(track)}
             class="px-4 py-2 bg-blue-500 text-white rounded"
           >
-            {isPlaying ? "Stop" : "Play"} {track.title}
+            {isPlaying ? (isPaused ? "Resume" : "Pause") : "Play"} {track.title}
           </button>
         ))}
       </div>

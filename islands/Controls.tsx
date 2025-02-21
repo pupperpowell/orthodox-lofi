@@ -1,5 +1,5 @@
 import { useState } from "preact/hooks";
-import { AudioProcessor } from "./AudioProcessor.ts";
+import { AudioProcessor } from "../utils/AudioProcessor.ts";
 
 interface ControlsProps {
   processor: AudioProcessor;
@@ -7,13 +7,11 @@ interface ControlsProps {
 
 export default function Controls({ processor }: ControlsProps) {
   const [filtersEnabled, setFiltersEnabled] = useState(true);
-  const [distortionEnabled, setDistortionEnabled] = useState(true);
   const [saturationEnabled, setSaturationEnabled] = useState(true);
 
   const [highpass, setHighpass] = useState(200);
   const [lowpass, setLowpass] = useState(2250);
   const [saturation, setSaturation] = useState(1);
-  const [distortion, setDistortion] = useState(1);
 
   const handleHighpassChange = (e: Event) => {
     const value = Number((e.target as HTMLInputElement).value);
@@ -36,17 +34,6 @@ export default function Controls({ processor }: ControlsProps) {
     const value = Number((e.target as HTMLInputElement).value);
     setSaturation(value);
     processor.setSaturation(value);
-  };
-
-  const handleDistortionChange = (e: Event) => {
-    const value = Number((e.target as HTMLInputElement).value);
-    setDistortion(value);
-    processor.setDistortion(value);
-  };
-
-  const handleToggleDistortion = () => {
-    setDistortionEnabled(!distortionEnabled);
-    processor.toggleDistortion();
   };
 
   const handleToggleSaturation = () => {
@@ -100,7 +87,7 @@ export default function Controls({ processor }: ControlsProps) {
         </div>
       </div>
       <hr></hr>
-      <div>
+      <div class="opacity-50 pointer-events-none select-none">
         <button
           type="button"
           onClick={handleToggleSaturation}
@@ -117,27 +104,6 @@ export default function Controls({ processor }: ControlsProps) {
             step="0.1"
             value={saturation}
             onInput={handleSaturationChange}
-            class="w-full mt-2"
-          />
-        </label>
-      </div>
-      <button
-        type="button"
-        onClick={handleToggleDistortion}
-        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        {distortionEnabled ? "Disable Distortion" : "Enable Distortion"}
-      </button>
-      <div>
-        <label class="block text-sm font-medium">
-          Distortion: {distortion}
-          <input
-            type="range"
-            min="0"
-            max="5"
-            step="0.1"
-            value={distortion}
-            onInput={handleDistortionChange}
             class="w-full mt-2"
           />
         </label>
