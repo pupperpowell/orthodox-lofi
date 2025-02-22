@@ -4,24 +4,26 @@ This project was made to parody the "lofi hip hop radio beats to relax/study to"
 
 # Features
 
-1. many hours of public domain byzantine chanting from archive.org.
+1. many hours of public domain byzantine chanting.
 2. 'lofi' filter (highpass and lowpass). will continue to add layers and effects in the future.
 3. in order for the lofi effect to be more pronounced, the strength of the filters and effects need to change noticeably at defined points in the music.
-4. solution: for each track, note specific "breakpoints" where the effect of the filters can slide. for example,
+4. possible solution: for each track, note specific "breakpoints" where the effect of the filters can slide. for example,
    1. key change(s) in psalm 135,
    2. verse changes in Agni Parthene,
    3. breaks of silence,
    4. changes from reading to chanting, etc.
+      (this might be too much work! will create a "lofiSlide" function that randomly changes the lofi effect every 10 seconds or so)
 
 # database
 
-1. the audio is actually being streamed by a icecast server.
-2. for interactive elements, database options are being considered
+1. the audio is streamed from my icecast server.
+2. visitors are given a random "handle" for anonymous authentication, and will keep track of how many candles they light. this is stored in localStorage
+3. a visitor can only light 1 candle every 3 hours (check "last updated" on the visitor's 'lofi' row in the database).
 
 # ui/ux design
 
 1. The background of the entire webpage will be a church iconostasis landscape, but it will be pitch dark with just a light in the corner showing some people chanting at the chant stand. As people view the webpage, candles will be lit that gradually illuminate the church
-2. There won’t be any instructions or explanation. Just:
+2. There won't be any instructions or explanation. Just:
    1. the title of the hymn playing, name of album, year recorded.
    2. Amount of people listening. (corresponds to amt of candles)
 
@@ -33,6 +35,10 @@ This project was made to parody the "lofi hip hop radio beats to relax/study to"
 
 ## Audio
 
+- [ ] Add censer effect
+- [ ] Add bell effect
+- [ ] Add rain on roof effect
+- [ ] Add people talking / shuffling effect
 - [ ] Clean up the audio processing graph
 - [ ] Break out each audio effect into its own file
 - [ ] Add effects like reverb, delay, etc.
@@ -43,7 +49,7 @@ This project was made to parody the "lofi hip hop radio beats to relax/study to"
 
 - [ ] Move mp3 file collection to a database
 - [ ] Figure out how to stream audio from db instead of hosting static files
-- [ ] Active user count
+- [ ] Active user count (number of recently updated rows in the db?)
 - [ ] Parse mp3s for breakpoints (lofi effect changes)
 
 ## UI and Shaders
