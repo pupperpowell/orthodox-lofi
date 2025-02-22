@@ -1,5 +1,9 @@
 import { type PageProps } from "$fresh/server.ts";
+import { VisitorAuth } from "../utils/VisitorAuth.ts";
 export default function App({ Component }: PageProps) {
+  const visitorAuth = new VisitorAuth();
+  visitorAuth.initializeVisitor();
+
   return (
     <html>
       <head>
