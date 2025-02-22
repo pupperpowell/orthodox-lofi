@@ -46,15 +46,25 @@ This project was made to parody the "lofi hip hop radio beats to relax/study to"
 - [ ] Active user count
 - [ ] Parse mp3s for breakpoints (lofi effect changes)
 
-## UI and Shaders
+## Overall design / UX
 
-- [ ] Orthodox church background image
-- [ ] "X others are here" counter
 - [ ] Darkening shader
 - [ ] Lamp shader (local brightness)
 - [ ] Candle shader (flickering, moving flame)
-- [ ] Logarithmic brightness shader (scales with # of active users)
-- [ ] Candle zones and fade in placement
+- [ ] Local brightness shader (surrounds candlse, scales with # of active users)
+- [ ] Candle placement zones
+
+---
+
+1. Building this design has quickly become more complicated than I expected. There are no easy options that also look good.
+2. The most reasonable option is to manually draw the interior of an orthodox church at night - perhaps by coloring over a real image, using a limited color palette and drawing our own
+
+## UI
+
+- [ ] Orthodox church background image
+- [ ] "X others are here" counter
+
+---
 
 ## Fresh project
 
