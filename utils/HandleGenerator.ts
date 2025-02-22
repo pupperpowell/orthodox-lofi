@@ -25,6 +25,42 @@ export class HandleGenerator {
     "chant",
     "ison",
     "humility",
+    "pascha",
+    "epiphany",
+    "epistle",
+    "vespers",
+    "orthros",
+    "compline",
+    "paraklesis",
+    "vigil",
+    "hours",
+    "ekklesia",
+    "synaxis",
+    "theosis",
+    "saint",
+    "martyr",
+    "farmer",
+    "elder",
+    "monastic",
+    "abbot",
+    "archimandrite",
+    "archpriest",
+    "protopresbyter",
+    "hermit",
+    "deacon",
+    "priest",
+    "bishop",
+    "archbishop",
+    "patriarch",
+    "father",
+    "son",
+    "brother",
+    "sister",
+    "monastery",
+    "hermitage",
+    "skete",
+    "psalter",
+    "triodion",
   ];
 
   private readonly adjectives = [
@@ -51,9 +87,28 @@ export class HandleGenerator {
     "eternal",
     "sacred",
     "celestial",
-    "mystical",
     "ascetic",
     "prayerful",
+    "liturgical",
+    "hesychastic",
+    "iconographic",
+    "monastic",
+    "theological",
+    "mystical",
+    "apostolic",
+    "patristic",
+    "sacramental",
+    "chanting",
+    "ascetical",
+    "canonical",
+    "ecclesiastical",
+    "noetic",
+    "transcendent",
+    "paschal",
+    "dogmatic",
+    "eucharistic",
+    "incarnate",
+    "contemplative",
   ];
 
   public generateHandle(): string {
@@ -63,8 +118,14 @@ export class HandleGenerator {
       this.getRandomWord(this.adjectives),
       this.getRandomWord(this.nouns),
     ].join("-");
+    console.log(
+      `generated 1 handle out of ${
+        (this.adjectives.length *
+          this.nouns.length) ** 2
+      } possible handles: ${handle}`,
+    );
 
-    return handle;
+    return handle.toLowerCase();
   }
 
   private getRandomWord(array: string[]): string {

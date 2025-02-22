@@ -3,6 +3,7 @@ import { useEffect, useState } from "preact/hooks";
 import Controls from "./Controls.tsx";
 import { Track } from "../utils/track.ts";
 import { AudioProcessor } from "../utils/AudioProcessor.ts";
+import { VisitorAuth } from "../utils/VisitorAuth.ts";
 
 export default function AudioPlayer({ tracks }: { tracks: Track[] }) {
   const [isPlaying, setIsPlaying] = useState(false);
