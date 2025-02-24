@@ -2,11 +2,16 @@ import { JSX } from "preact";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 
 export function Button(props: JSX.HTMLAttributes<HTMLButtonElement>) {
+  const { class: className, ...rest } = props;
+
   return (
     <button
-      {...props}
+      {...rest}
       disabled={!IS_BROWSER || props.disabled}
-      class="px-2 py-1 border-gray-500 border-2 rounded bg-white hover:bg-gray-200 transition-colors"
+      class={`btn uppercase font-inter  
+              hover:bg-gray-300 transition-colors duration-200 ${
+        className || ""
+      }`}
     />
   );
 }

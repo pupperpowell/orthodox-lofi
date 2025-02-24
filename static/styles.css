@@ -1,3 +1,49 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Font definitions */
+@font-face {
+  font-family: 'Triodion';
+  src: url('/fonts/Triodion-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Base styles */
+@layer base {
+  body {
+    @apply font-triodion;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-inter;
+  }
+  
+  p {
+    @apply font-triodion;
+  }
+}
+
+/* Component styles */
+@layer components {
+  /* Link styles */
+  .link {
+    @apply lowercase font-inter text-black border-b border-dotted pb-0.5 
+           hover:border-solid transition-all duration-200;
+  }
+  
+  /* Button styles */
+  .btn {
+    @apply uppercase font-inter font-medium px-4 py-2 
+           hover:bg-gray-100 transition-colors duration-200;
+  }
+  
+  /* Descriptive text */
+  .text-description {
+    @apply text-gray-500 font-triodion;
+  }
+}

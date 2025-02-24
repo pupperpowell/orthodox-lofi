@@ -12,8 +12,9 @@ export default function App({ Component }: PageProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>orthodox-lofi</title>
         <link rel="stylesheet" href="/styles.css" />
+        <link rel="preload" href="/fonts/Triodion-Regular.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
       </head>
-      <body>
+      <body class="font-sans">
         <Component />
       </body>
     </html>

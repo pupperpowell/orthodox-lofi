@@ -1,5 +1,7 @@
 import { useState } from "preact/hooks";
 import { AudioProcessor } from "../utils/AudioProcessor.ts";
+import { Button } from "../components/Button.tsx";
+import { Description } from "../components/Description.tsx";
 
 interface ControlsProps {
   processor: AudioProcessor;
@@ -44,13 +46,13 @@ export default function Controls({ processor }: ControlsProps) {
   return (
     <div class="space-y-4">
       <hr></hr>
-      <button
+      <Button
         type="button"
         onClick={handleToggleFilters}
-        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        class="bg-white"
       >
-        {filtersEnabled ? "Disable Filters" : "Enable Filters"}
-      </button>
+        {filtersEnabled ? "DISABLE FILTERS" : "ENABLE FILTERS"}
+      </Button>
 
       <div
         class={filtersEnabled
@@ -59,8 +61,8 @@ export default function Controls({ processor }: ControlsProps) {
       >
         {/* Existing filter controls */}
         <div>
-          <label class="block text-sm font-medium">
-            Highpass Filter: {highpass}Hz
+          <label class="block text-sm font-medium font-inter">
+            <Description>Highpass Filter: {highpass}Hz</Description>
             <input
               type="range"
               min="20"
@@ -73,8 +75,8 @@ export default function Controls({ processor }: ControlsProps) {
         </div>
 
         <div>
-          <label class="block text-sm font-medium">
-            Lowpass Filter: {lowpass}Hz
+          <label class="block text-sm font-medium font-inter">
+            <Description>Lowpass Filter: {lowpass}Hz</Description>
             <input
               type="range"
               min="2000"
@@ -88,15 +90,15 @@ export default function Controls({ processor }: ControlsProps) {
       </div>
       <hr></hr>
       <div class="opacity-50 pointer-events-none select-none">
-        <button
+        <Button
           type="button"
           onClick={handleToggleSaturation}
-          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          class="bg-white"
         >
-          {saturationEnabled ? "Disable Saturation" : "Enable Saturation"}
-        </button>
-        <label class="block text-sm font-medium">
-          Saturation: {saturation}x
+          {saturationEnabled ? "DISABLE SATURATION" : "ENABLE SATURATION"}
+        </Button>
+        <label class="block text-sm font-medium font-inter">
+          <Description>Saturation: {saturation}x</Description>
           <input
             type="range"
             min="1"
