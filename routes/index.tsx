@@ -1,5 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
-import { Handlers, PageProps } from "$fresh/server.ts";
+import { Handlers } from "$fresh/server.ts";
 import AudioPlayer from "../islands/AudioPlayer.tsx";
 import { Track } from "../utils/track.ts";
 
@@ -14,7 +14,7 @@ export const handler: Handlers<Track[]> = {
   },
 };
 
-export default function Home({ data: tracks }: PageProps<Track[]>) {
+export default function Home() {
   return (
     <>
       <Head>
@@ -22,7 +22,7 @@ export default function Home({ data: tracks }: PageProps<Track[]>) {
       </Head>
       <div class="p-4 mx-auto max-w-screen-md">
         <h1 class="text-4xl font-bold mb-8 p-2">Orthodox Lo-fi</h1>
-        <AudioPlayer tracks={tracks} />
+        <AudioPlayer />
       </div>
     </>
   );
