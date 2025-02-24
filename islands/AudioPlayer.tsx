@@ -1,30 +1,27 @@
 import { useEffect, useState } from "preact/hooks";
 
 import Controls from "./Controls.tsx";
-import { Track } from "../utils/track.ts";
+// import { Track } from "../utils/track.ts";
 import { AudioProcessor } from "../utils/AudioProcessor.ts";
-import { VisitorAuth } from "../utils/VisitorAuth.ts";
 
-export default function AudioPlayer({ tracks }: { tracks: Track[] }) {
+export default function AudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [processor, setProcessor] = useState<AudioProcessor | null>(null);
 
-  // Create processor on mount
-  useEffect(() => {
-    setProcessor(new AudioProcessor());
-  }, []);
-
-  const handlePlay = async (track: Track) => {
-    if (!processor) return;
-    if (!isPlaying) { // if nothing's loaded, start it up
-      await processor.loadTrack(track.url);
-      processor.play();
+  const handlePlay = async () => {
+    if (!processor) {
+      const newProcessor = new AudioProcessor();
+      setProcessor(newProcessor);
+      await newProcessor.play();
       setIsPlaying(true);
-    } else if (isPaused) { // if paused, resume,
-      processor.resume();
+      return;
+    }
+
+    if (isPaused) {
+      processor.play();
       setIsPaused(false);
-    } else if (!isPaused) { // if playing, pause
+    } else {
       processor.pause();
       setIsPaused(true);
     }
@@ -33,16 +30,13 @@ export default function AudioPlayer({ tracks }: { tracks: Track[] }) {
   return (
     <div class="space-y-8">
       <div class="space-y-4">
-        {tracks.map((track) => (
-          <button
-            type="button"
-            key={track.id}
-            onClick={() => handlePlay(track)}
-            class="px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            {isPlaying ? (isPaused ? "Resume" : "Pause") : "Play"} {track.title}
-          </button>
-        ))}
+        <button
+          type="button"
+          onClick={() => handlePlay()}
+          class="px-4 py-2 bg-blue-500 text-white rounded"
+        >
+          {isPlaying ? (isPaused ? "Resume" : "Pause") : "Play"}
+        </button>
       </div>
 
       {/* FilterControls always shows if processor exists */}

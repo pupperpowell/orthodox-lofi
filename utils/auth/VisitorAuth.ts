@@ -14,11 +14,12 @@ export class VisitorAuth {
 
   public async initializeVisitor() {
     // Check localStorage for existing handle
-    const existingHandle = this.getVisitorHandle();
+    const existingHandle: string | null = this.getVisitorHandle();
 
     // If it exists,
-    if (existingHandle) {
+    if (existingHandle != null) {
       console.log(`Existing localStorage handle found: ${existingHandle}`);
+
       try {
         // See if it already exists in Pocketbase
         const record = await this.pb.collection("lofi").getFirstListItem(
@@ -26,7 +27,6 @@ export class VisitorAuth {
         );
         // Assuming it exists:
         try {
-          // See how many active sessions there are
           const sessions = record.active;
 
           // Try to increment the active count
@@ -43,14 +43,14 @@ export class VisitorAuth {
           );
         }
       } catch (error) {
-        // If there's no Pocketbase record, create one
-        // @request.headers.origin = "https://nightbreak.app"
+        // If there's no Pocketbase record, create one?
+        // @request.headers.origin = "https://orthodox.cafe"
         try {
           await this.pb.collection("lofi").create({
             handle: existingHandle,
             candles: 0,
           });
-          console.log(
+          console.log( // this is bad code, it will not always be true when it prints
             `New visitor record created in Pocketbase for existing handle: ${existingHandle}`,
           );
         } catch {
@@ -60,9 +60,9 @@ export class VisitorAuth {
           );
         }
 
-        console.error(
-          `Error fetching existing record from Pocketbase: ${error}`,
-        );
+        // console.error( // This will print if there's no Pocketbase record
+        //   `Error fetching existing record from Pocketbase: ${error}`,
+        // );
       }
     } else {
       // If there's no localStorage handle,
@@ -71,7 +71,6 @@ export class VisitorAuth {
       const newHandle = this.handleGenerator.generateHandle();
       try {
         // And create a record for it in Pocketbase
-        // @request.headers.origin = "https://nightbreak.app"
         await this.pb.collection("lofi").create({
           handle: newHandle,
           candles: 0,

@@ -1,6 +1,9 @@
+import { AudioStreamer } from "./AudioStreamer.ts";
+
 export class AudioProcessor {
   private context: AudioContext;
-  private source: AudioBufferSourceNode | null = null;
+  private streamer: AudioStreamer;
+  private streamSource: MediaElementAudioSourceNode | null = null;
 
   // GAIN, to control volume of each effect!
   private sourceGainNode: GainNode; // takes source input. controls source volume
@@ -17,6 +20,7 @@ export class AudioProcessor {
 
   constructor() {
     this.context = new AudioContext();
+    this.streamer = new AudioStreamer();
 
     // Gain node setup
     this.sourceGainNode = this.context.createGain();
@@ -41,6 +45,14 @@ export class AudioProcessor {
     // Distortion and saturation nodes setup
     this.distortion = this.context.createWaveShaper();
     this.saturation = this.context.createWaveShaper();
+
+    this.setupStreamSource();
+  }
+
+  private setupStreamSource() {
+    const audioElement = this.streamer.getAudioElement();
+    this.streamSource = this.context.createMediaElementSource(audioElement);
+    this.connectProcessingChain();
   }
 
   // Hard clipping for distortion
@@ -69,10 +81,10 @@ export class AudioProcessor {
   // Called when a new track is loaded
   // Literally chains each node to the next
   private connectProcessingChain() {
-    if (!this.source) return;
+    if (!this.streamSource) return;
 
-    this.source.disconnect();
-    let currentNode: AudioNode = this.source; // audio source
+    this.streamSource.disconnect();
+    let currentNode: AudioNode = this.streamSource; // audio source
 
     // connect filters...
     currentNode.connect(this.highpassFilter);
@@ -81,17 +93,7 @@ export class AudioProcessor {
     currentNode = this.lowpassFilter;
 
     currentNode.connect(this.context.destination); // output
-  }
-
-  async loadTrack(url: string) {
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await this.context.decodeAudioData(arrayBuffer);
-
-    this.source = this.context.createBufferSource();
-    this.source.buffer = audioBuffer;
-
-    this.connectProcessingChain();
+    console.log("Connected processing chain, including filters");
   }
 
   toggleFilters() {
@@ -122,19 +124,17 @@ export class AudioProcessor {
     this.saturation.curve = this.createSaturationCurve(amount);
   }
 
-  play() {
-    this.source?.start();
+  async play() {
+    await this.context.resume();
+    await this.streamer.startStream();
   }
 
-  stop() {
-    this.source?.stop();
+  async pause() {
+    this.streamer.pauseStream();
+    await this.context.suspend();
   }
 
-  pause() {
-    this.context.suspend();
-  }
-
-  resume() {
-    this.context.resume();
+  setVolume(value: number) {
+    this.streamer.setVolume(value);
   }
 }
