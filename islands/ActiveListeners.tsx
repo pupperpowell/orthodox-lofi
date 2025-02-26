@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import PocketBase from "pocketbase";
 
-export default function ActiveUsers() {
+export default function ActiveListeners() {
   const [activeUsers, setActiveUsers] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -9,18 +9,14 @@ export default function ActiveUsers() {
   useEffect(() => {
     const pb = new PocketBase("https://nightbreak.app/");
 
-    const calculateActiveUsers = async () => {
+    const calculateActiveListeners = async () => {
       try {
-        const fifteenMinutesAgo = new Date(Date.UTC(
-          new Date().getUTCFullYear(),
-          new Date().getUTCMonth(),
-          new Date().getUTCDay(),
-          new Date().getUTCHours(),
-          new Date().getUTCMinutes() - 15,
-        ));
+        const fifteenMinutesAgo = new Date(
+          new Date().getTime() - 15 * 60 * 1000,
+        ).toISOString().slice(0, 19).replace("T", " ");
 
         const records = await pb.collection("lofi").getList(1, 100, {
-          filter: `updated >= "${fifteenMinutesAgo.toISOString()}"`,
+          filter: `updated >= "${fifteenMinutesAgo}"`,
         });
 
         setActiveUsers(records.totalItems);
@@ -35,11 +31,11 @@ export default function ActiveUsers() {
     };
 
     // Initial calculation
-    calculateActiveUsers();
+    calculateActiveListeners();
 
     // Subscribe to realtime updates
     pb.collection("lofi").subscribe("*", () => {
-      calculateActiveUsers();
+      calculateActiveListeners();
     }).then(() => {
       // Store the unsubscribe function for cleanup
       return () => {
