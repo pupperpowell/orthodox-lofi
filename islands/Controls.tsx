@@ -1,7 +1,6 @@
 import { useState } from "preact/hooks";
 import { AudioProcessor } from "../utils/AudioProcessor.ts";
 import { Button } from "../components/Button.tsx";
-import { Description } from "../components/Description.tsx";
 
 interface ControlsProps {
   processor: AudioProcessor;
@@ -62,7 +61,7 @@ export default function Controls({ processor }: ControlsProps) {
         {/* Existing filter controls */}
         <div>
           <label class="block text-sm font-medium font-inter">
-            <Description>Highpass Filter: {highpass}Hz</Description>
+            <span>Highpass Filter: {highpass}Hz</span>
             <input
               type="range"
               min="20"
@@ -76,7 +75,7 @@ export default function Controls({ processor }: ControlsProps) {
 
         <div>
           <label class="block text-sm font-medium font-inter">
-            <Description>Lowpass Filter: {lowpass}Hz</Description>
+            <span>Lowpass Filter: {lowpass}Hz</span>
             <input
               type="range"
               min="2000"
@@ -98,7 +97,7 @@ export default function Controls({ processor }: ControlsProps) {
           {saturationEnabled ? "DISABLE SATURATION" : "ENABLE SATURATION"}
         </Button>
         <label class="block text-sm font-medium font-inter">
-          <Description>Saturation: {saturation}x</Description>
+          <span>Saturation: {saturation}x</span>
           <input
             type="range"
             min="1"

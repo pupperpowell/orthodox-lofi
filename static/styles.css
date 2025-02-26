@@ -11,18 +11,34 @@
   font-display: swap;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* Base styles */
 @layer base {
+
+  body {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.15'/%3E%3C/svg%3E");
+  }
+
   body {
     @apply font-triodion;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-inter;
   }
-  
+
   p {
     @apply font-triodion;
   }
@@ -30,20 +46,19 @@
 
 /* Component styles */
 @layer components {
+
   /* Link styles */
   .link {
-    @apply lowercase font-inter text-black border-b border-dotted pb-0.5 
-           hover:border-solid transition-all duration-200;
+    @apply lowercase font-inter underline decoration-dotted hover:border-solid transition-all duration-100;
   }
-  
+
   /* Button styles */
   .btn {
-    @apply uppercase font-inter font-medium px-4 py-2 
-           hover:bg-gray-100 transition-colors duration-200;
+    @apply uppercase font-inter font-medium transition-colors duration-100;
   }
-  
+
   /* Descriptive text */
   .text-description {
-    @apply text-gray-500 font-triodion;
+    @apply text-gray-100 font-triodion;
   }
 }
