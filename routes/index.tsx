@@ -10,27 +10,30 @@ export default function Home() {
       <Head>
         <title>orthodox.cafe</title>
       </Head>
-      <div class="p-4 mx-auto max-w-screen-md">
-        <h1 class="text-4xl font-bold mb-8 font-triodion">orthodox.cafe</h1>
-        <Status />
 
-        <div class="mt-4">
-          <Link href="/about" class="mr-4">about</Link>
-          <Link
-            href="https://github.com/pupperpowell/orthodox-lofi"
-            target="_blank"
-          >
-            github
-          </Link>
-        </div>
+      <h1 class="text-4xl font-bold font-triodion">
+        orthodox.cafe
+        <span class="left-1 bottom-4 relative">
+          <Status />
+        </span>
+      </h1>
 
-        <div class="mt-8">
-          <AudioPlayer />
-        </div>
+      <div class="mt-4">
+        <Link href="/about" class="mr-4">about</Link>
+        <Link
+          href="https://github.com/pupperpowell/orthodox-lofi"
+          target="_blank"
+        >
+          github
+        </Link>
+      </div>
 
-        <div class="mt-4">
-          <ActiveListeners />
-        </div>
+      <div class="mt-8">
+        <AudioPlayer />
+      </div>
+
+      <div class="mt-4">
+        <ActiveListeners />
       </div>
     </>
   );
