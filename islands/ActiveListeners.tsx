@@ -30,14 +30,11 @@ export default function ActiveListeners() {
       }
     };
 
-    // Initial calculation
     calculateActiveListeners();
 
-    // Subscribe to realtime updates
     pb.collection("lofi").subscribe("*", () => {
       calculateActiveListeners();
     }).then(() => {
-      // Store the unsubscribe function for cleanup
       return () => {
         console.log("Unsubscribing from realtime updates");
         pb.collection("lofi").unsubscribe("*");
@@ -45,26 +42,29 @@ export default function ActiveListeners() {
     });
   }, []);
 
-  if (loading && activeUsers === null) {
-    return <div class="text-gray-300 font-triodion">loading...</div>;
-  }
-
   if (error) {
     return null;
   }
 
-  if (activeUsers === 1) {
-    return (
+  const content = activeUsers === 1
+    ? (
       <div class="font-triodion">
         you are the only one here
       </div>
+    )
+    : (
+      <div class="font-triodion">
+        <span class="font-medium">{activeUsers}</span>{" "}
+        {activeUsers === 1 ? "person is" : "people are"} listening now
+      </div>
     );
-  }
 
   return (
-    <div class="font-triodion">
-      <span class="font-medium">{activeUsers}</span>{" "}
-      {activeUsers === 1 ? "person is" : "people are"} listening now
+    <div
+      class="transition-opacity duration-1000"
+      style={{ opacity: loading ? 0 : 1 }}
+    >
+      {content}
     </div>
   );
 }
