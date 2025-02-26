@@ -2,6 +2,7 @@ import { Head } from "$fresh/runtime.ts";
 import AudioPlayer from "../islands/AudioPlayer.tsx";
 import { Link } from "../components/Link.tsx";
 import ActiveListeners from "../islands/ActiveListeners.tsx";
+import { Status } from "../islands/Status.tsx";
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
       </Head>
       <div class="p-4 mx-auto max-w-screen-md">
         <h1 class="text-4xl font-bold mb-8 font-triodion">orthodox.cafe</h1>
+        <Status />
 
         <div class="mt-4">
           <Link href="/about" class="mr-4">about</Link>

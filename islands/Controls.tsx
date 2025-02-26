@@ -48,7 +48,6 @@ export default function Controls({ processor }: ControlsProps) {
       <Button
         type="button"
         onClick={handleToggleFilters}
-        class="bg-white"
       >
         {filtersEnabled ? "DISABLE FILTERS" : "ENABLE FILTERS"}
       </Button>
@@ -92,7 +91,6 @@ export default function Controls({ processor }: ControlsProps) {
         <Button
           type="button"
           onClick={handleToggleSaturation}
-          class="bg-white"
         >
           {saturationEnabled ? "DISABLE SATURATION" : "ENABLE SATURATION"}
         </Button>

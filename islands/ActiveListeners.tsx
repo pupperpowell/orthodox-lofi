@@ -53,7 +53,7 @@ export default function ActiveListeners() {
     return null;
   }
 
-  if (activeUsers === 0) {
+  if (activeUsers === 1) {
     return (
       <div class="font-triodion">
         you are the only one here

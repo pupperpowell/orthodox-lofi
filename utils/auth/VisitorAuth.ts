@@ -18,7 +18,7 @@ export class VisitorAuth {
 
     // If it exists,
     if (existingHandle != null) {
-      console.log(`Existing localStorage handle found: ${existingHandle}`);
+      // console.log(`Existing localStorage handle found: ${existingHandle}`);
 
       try {
         // See if it already exists in Pocketbase
@@ -33,9 +33,9 @@ export class VisitorAuth {
           await this.pb.collection("lofi").update(record.id, {
             "active": sessions + 1,
           });
-          console.log(
-            `${existingHandle} has been active ${sessions + 1} times`,
-          );
+          // console.log(
+          //   `${existingHandle} has been active ${sessions + 1} times`,
+          // );
         } catch (error) {
           console.error(
             "Couldn't update the existing record in Pocketbase: ",

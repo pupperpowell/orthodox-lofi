@@ -9,6 +9,7 @@ import * as $index from "./routes/index.tsx";
 import * as $ActiveListeners from "./islands/ActiveListeners.tsx";
 import * as $AudioPlayer from "./islands/AudioPlayer.tsx";
 import * as $Controls from "./islands/Controls.tsx";
+import * as $Status from "./islands/Status.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -22,6 +23,7 @@ const manifest = {
     "./islands/ActiveListeners.tsx": $ActiveListeners,
     "./islands/AudioPlayer.tsx": $AudioPlayer,
     "./islands/Controls.tsx": $Controls,
+    "./islands/Status.tsx": $Status,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;
