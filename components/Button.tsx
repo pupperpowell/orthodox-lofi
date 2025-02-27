@@ -9,7 +9,10 @@ export function Button(props: JSX.HTMLAttributes<HTMLButtonElement>) {
       {...rest}
       role="button"
       disabled={!IS_BROWSER || props.disabled}
-      class={`btn uppercase font-inter touch-manipulation`}
+      style={{
+        touchAction: "manipulation",
+      }}
+      class={`btn px-2 uppercase font-inter border-2 border-white`}
     >
       {props.children}
     </button>
