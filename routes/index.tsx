@@ -4,6 +4,7 @@ import { Link } from "../components/Link.tsx";
 import ActiveListeners from "../islands/ActiveListeners.tsx";
 import { Status } from "../islands/Status.tsx";
 import { Button } from "../components/Button.tsx";
+import LatestCommit from "../islands/LatestCommit.tsx";
 
 export default function Home() {
   return (
@@ -24,6 +25,8 @@ export default function Home() {
           <Status />
         </span>
       </h1>
+
+      <LatestCommit />
 
       <div class="mt-4">
         <Link href="/about" class="mr-4">about</Link>

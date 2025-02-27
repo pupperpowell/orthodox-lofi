@@ -5,10 +5,12 @@
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $_layout from "./routes/_layout.tsx";
+import * as $api_latest_commit from "./routes/api/latest-commit.ts";
 import * as $index from "./routes/index.tsx";
 import * as $ActiveListeners from "./islands/ActiveListeners.tsx";
 import * as $AudioPlayer from "./islands/AudioPlayer.tsx";
 import * as $Controls from "./islands/Controls.tsx";
+import * as $LatestCommit from "./islands/LatestCommit.tsx";
 import * as $Status from "./islands/Status.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
@@ -17,12 +19,14 @@ const manifest = {
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
     "./routes/_layout.tsx": $_layout,
+    "./routes/api/latest-commit.ts": $api_latest_commit,
     "./routes/index.tsx": $index,
   },
   islands: {
     "./islands/ActiveListeners.tsx": $ActiveListeners,
     "./islands/AudioPlayer.tsx": $AudioPlayer,
     "./islands/Controls.tsx": $Controls,
+    "./islands/LatestCommit.tsx": $LatestCommit,
     "./islands/Status.tsx": $Status,
   },
   baseUrl: import.meta.url,
