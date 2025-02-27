@@ -20,7 +20,7 @@ export class AudioProcessor {
 
   constructor() {
     // Mobile browsers require context creation during user interaction
-    this.context = new (window.AudioContext || window.webkitAudioContext)();
+    this.context = new AudioContext();
     this.streamer = new AudioStreamer();
 
     // Gain node setup
@@ -144,16 +144,16 @@ export class AudioProcessor {
       this.context = new AudioContext();
       this.setupStreamSource();
     }
-    
+
     if (this.context.state === "suspended") {
       await this.context.resume();
     }
-    
+
     // Required for iOS Safari
     if (this.streamSource === null) {
       this.setupStreamSource();
     }
-    
+
     console.log("Resumed audio context");
   }
 }

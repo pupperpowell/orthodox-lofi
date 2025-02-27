@@ -29,7 +29,7 @@ export default function AudioPlayer() {
   const handlePlay = async () => {
     try {
       setIsLoading(true);
-      
+
       if (!processor) {
         const newProcessor = new AudioProcessor();
         setProcessor(newProcessor);
@@ -40,9 +40,6 @@ export default function AudioPlayer() {
         await newProcessor.play();
 
         setIsPlaying(true);
-      } catch (error) {
-        console.error("Error initializing audio:", error);
-      } finally {
         setIsLoading(false);
       }
     } catch (error) {
