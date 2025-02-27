@@ -32,7 +32,6 @@ export default function Home() {
         >
           github
         </Link>
-        <span>If you're reading this, the scrappy CI/CD works!</span>
       </div>
 
       <div class="mt-8">
@@ -41,6 +40,9 @@ export default function Home() {
 
       <div class="mt-4">
         <ActiveListeners />
+        <p class="text-sm">
+          Another silly little test of the automatic CI/CD setup.
+        </p>
       </div>
     </>
   );
