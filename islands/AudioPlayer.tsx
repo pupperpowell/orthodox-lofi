@@ -56,13 +56,13 @@ export default function AudioPlayer() {
           type="button"
           onClick={() => handlePlay()}
           disabled={isLoading}
-          class="md:pr-6 flex items-center justify-center"
+          class="inline"
         >
           {isLoading
             ? (
               <>
                 <svg
-                  class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-300"
+                  class="inline animate-spin -ml-1 mr-2 h-4 w-4 text-gray-300"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
