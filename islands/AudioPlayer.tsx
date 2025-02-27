@@ -52,7 +52,7 @@ export default function AudioPlayer() {
   return (
     <div class="space-y-8">
       <div class="flex items-center space-x-4">
-        <Button
+        <button
           type="button"
           onClick={() => handlePlay()}
           disabled={isLoading}
@@ -89,7 +89,7 @@ export default function AudioPlayer() {
             : (
               isPlaying ? (isPaused ? "RESUME" : "PAUSE") : "PLAY"
             )}
-        </Button>
+        </button>
 
         <div class="flex items-center space-x-2">
           <svg
