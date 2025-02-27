@@ -2,7 +2,9 @@ import { useEffect, useState } from "preact/hooks";
 
 import Controls from "./Controls.tsx";
 import { AudioProcessor } from "../utils/AudioProcessor.ts";
-import { Button } from "../components/Button.tsx";
+// import { Button } from "../components/Button.tsx";
+import { IS_BROWSER } from "$fresh/runtime.ts";
+import { JSX } from "preact/jsx-runtime";
 
 export default function AudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -52,7 +54,7 @@ export default function AudioPlayer() {
   return (
     <div class="space-y-8">
       <div class="flex items-center space-x-4">
-        <Button
+        <PlayButton
           type="button"
           onClick={() => handlePlay()}
           disabled={isLoading}
@@ -89,7 +91,7 @@ export default function AudioPlayer() {
             : (
               isPlaying ? (isPaused ? "RESUME" : "PAUSE") : "PLAY"
             )}
-        </Button>
+        </PlayButton>
 
         <div class="flex items-center space-x-2">
           <svg
@@ -122,5 +124,20 @@ export default function AudioPlayer() {
       {/* FilterControls always shows if processor exists */}
       {processor && <Controls processor={processor} />}
     </div>
+  );
+}
+
+function PlayButton(props: JSX.HTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      style={{
+        touchAction: "manipulation",
+      }}
+      {...props}
+      disabled={!IS_BROWSER || props.disabled}
+      class={`btn px-2 uppercase font-inter border-2 border-white`}
+    >
+      {props.children}
+    </button>
   );
 }
