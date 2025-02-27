@@ -56,7 +56,7 @@ export default function AudioPlayer() {
           type="button"
           onClick={() => handlePlay()}
           disabled={isLoading}
-          class="flex items-center justify-center"
+          class="md:pr-6 flex items-center justify-center"
         >
           {isLoading
             ? (

@@ -40,9 +40,6 @@ export default function Home() {
 
       <div class="mt-4">
         <ActiveListeners />
-        <p class="text-sm">
-          The eigth (and last?) test of the automatic CI/CD setup.
-        </p>
       </div>
     </>
   );
