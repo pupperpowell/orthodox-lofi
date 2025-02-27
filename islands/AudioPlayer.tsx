@@ -55,6 +55,7 @@ export default function AudioPlayer() {
         <button
           type="button"
           onClick={() => handlePlay()}
+          onTouchEnd={() => handlePlay()}
           disabled={isLoading}
           class="btn"
         >
