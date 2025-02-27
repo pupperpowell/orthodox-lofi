@@ -1,5 +1,4 @@
 import { useEffect, useState } from "preact/hooks";
-import PocketBase from "pocketbase";
 
 export default function ActiveListeners() {
   const [activeUsers, setActiveUsers] = useState<number | null>(null);
@@ -7,49 +6,71 @@ export default function ActiveListeners() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const pb = new PocketBase("https://nightbreak.app/");
-
-    const calculateActiveListeners = async () => {
+    const checkStreamListneners = async (url: string): Promise<number> => {
       try {
-        const fifteenMinutesAgo = new Date(
-          new Date().getTime() - 15 * 60 * 1000,
-        ).toISOString().slice(0, 19).replace("T", " ");
+        const response = await fetch(url);
 
-        const records = await pb.collection("lofi").getList(1, 100, {
-          filter: `updated >= "${fifteenMinutesAgo}"`,
-        });
+        if (!response.ok) {
+          console.error(
+            `Error: Server responded with status ${response.status}`,
+          );
+          setError("Could not load active users");
+          return -1;
+        }
 
-        setActiveUsers(records.totalItems);
-        console.log("Active users:", records.totalItems);
-        setError(null);
-      } catch (err) {
-        console.error("Error fetching active users:", err);
-        setError("Could not load active users");
+        const data = await response.text();
+
+        try {
+          const jsonData = JSON.parse(data);
+
+          // Check if source exists and is not null
+          if (
+            !!jsonData.icestats &&
+            !!jsonData.icestats.source &&
+            jsonData.icestats.source !== null
+          ) {
+            setError(null);
+            return jsonData.icestats.source.listeners;
+          }
+        } catch (parseError) {
+          console.error("Error parsing JSON:", parseError);
+          setError("Error parsing JSON");
+        }
+      } catch (error) {
+        console.error("Error fetching stream status:", error);
+        setError("Error fetching stream status");
       } finally {
         setLoading(false);
       }
+      return -1;
     };
 
-    calculateActiveListeners();
+    // Initial fetch moved inside useEffect to avoid unnecessary delay
+    const fetchInitialData = async () => {
+      const initialActiveUsers = await checkStreamListneners(
+        "https://lofi.george.wiki/status-json.xsl",
+      );
+      setActiveUsers(initialActiveUsers);
+    };
 
-    pb.collection("lofi").subscribe("*", () => {
-      calculateActiveListeners();
-    }).then(() => {
-      return () => {
-        console.log("Unsubscribing from realtime updates");
-        pb.collection("lofi").unsubscribe("*");
-      };
-    });
+    fetchInitialData();
+
+    setInterval(async () => {
+      const activeUsers = await checkStreamListneners(
+        "https://lofi.george.wiki/status-json.xsl",
+      );
+      setActiveUsers(activeUsers);
+    }, 15000);
   }, []);
 
   if (error) {
     return null;
   }
 
-  const content = activeUsers === 1
+  const content = activeUsers === 0
     ? (
       <div class="font-triodion">
-        you are the only one here
+        there's nobody listening right now
       </div>
     )
     : (
