@@ -10,6 +10,8 @@ export function Button(props: JSX.HTMLAttributes<HTMLButtonElement>) {
       role="button"
       disabled={!IS_BROWSER || props.disabled}
       class={`btn uppercase font-inter touch-manipulation`}
-    />
+    >
+      {props.children}
+    </button>
   );
 }
