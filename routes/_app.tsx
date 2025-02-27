@@ -1,9 +1,9 @@
 import { type PageProps } from "$fresh/server.ts";
-import { VisitorAuth } from "../utils/auth/VisitorAuth.ts";
+// import { VisitorAuth } from "../utils/auth/VisitorAuth.ts";
 export default function App({ Component }: PageProps) {
   // Try to sign the user in anonymously
-  const visitorAuth = new VisitorAuth();
-  visitorAuth.initializeVisitor();
+  // const visitorAuth = new VisitorAuth();
+  // visitorAuth.initializeVisitor();
 
   return (
     <html>
