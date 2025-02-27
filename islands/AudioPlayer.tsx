@@ -33,6 +33,7 @@ export default function AudioPlayer() {
       if (!processor) {
         const newProcessor = new AudioProcessor();
         setProcessor(newProcessor);
+
         // Mobile browsers require both resume and play to be in the gesture handler
         await newProcessor.resume(); // Ensure we await context resume
         newProcessor.setVolume(volume);
