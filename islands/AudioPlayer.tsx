@@ -18,6 +18,14 @@ export default function AudioPlayer() {
     }
   }, [volume, processor]);
 
+  // Clean up audio resources when component unmounts
+  useEffect(() => {
+    return () => {
+      processor?.pause();
+      setProcessor(null);
+    };
+  }, []);
+
   const handlePlay = async () => {
     try {
       setIsLoading(true);
@@ -25,21 +33,17 @@ export default function AudioPlayer() {
       if (!processor) {
         const newProcessor = new AudioProcessor();
         setProcessor(newProcessor);
-        
-        // Mobile-first activation flow
-        await newProcessor.resume();
+
+        // Mobile browsers require both resume and play to be in the gesture handler
+        await newProcessor.resume(); // Ensure we await context resume
+        newProcessor.setVolume(volume);
         await newProcessor.play();
 
         setIsPlaying(true);
-      } else {
-        if (isPaused) {
-          await processor.resume();
-          await processor.play();
-          setIsPaused(false);
-        } else {
-          await processor.pause();
-          setIsPaused(true);
-        }
+      } catch (error) {
+        console.error("Error initializing audio:", error);
+      } finally {
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Playback failed:", error);
@@ -63,8 +67,8 @@ export default function AudioPlayer() {
         <Button
           type="button"
           onClick={handlePlay}
-          onTouchStart={(e) => {
-            e.preventDefault();
+          onTouchEnd={(e) => {
+            e.preventDefault(); // Prevent default touch behavior
             handlePlay();
           }}
           disabled={isLoading}
