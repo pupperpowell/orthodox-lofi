@@ -137,4 +137,9 @@ export class AudioProcessor {
   setVolume(value: number) {
     this.streamer.setVolume(value);
   }
+
+  async resume() {
+    await this.context.resume();
+    console.log("Resumed audio context");
+  }
 }

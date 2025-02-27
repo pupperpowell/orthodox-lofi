@@ -2,9 +2,8 @@ import { useEffect, useState } from "preact/hooks";
 
 import Controls from "./Controls.tsx";
 import { AudioProcessor } from "../utils/AudioProcessor.ts";
-// import { Button } from "../components/Button.tsx";
-import { IS_BROWSER } from "$fresh/runtime.ts";
-import { JSX } from "preact/jsx-runtime";
+// import { JSX } from "preact/jsx-runtime";
+import { Button } from "../components/Button.tsx";
 
 export default function AudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -27,6 +26,7 @@ export default function AudioPlayer() {
         setProcessor(newProcessor);
         newProcessor.setVolume(volume);
         await newProcessor.play();
+        await newProcessor.resume(); // for mobile browsers?
         setIsPlaying(true);
       } catch (error) {
         console.error("Failed to load audio:", error);
@@ -54,9 +54,10 @@ export default function AudioPlayer() {
   return (
     <div class="space-y-8">
       <div class="flex items-center space-x-4">
-        <PlayButton
+        <Button
           type="button"
           onClick={() => handlePlay()}
+          onTouchEnd={() => handlePlay()}
           disabled={isLoading}
           class="btn"
         >
@@ -91,7 +92,7 @@ export default function AudioPlayer() {
             : (
               isPlaying ? (isPaused ? "RESUME" : "PAUSE") : "PLAY"
             )}
-        </PlayButton>
+        </Button>
 
         <div class="flex items-center space-x-2">
           <svg
@@ -127,14 +128,14 @@ export default function AudioPlayer() {
   );
 }
 
-function PlayButton(props: JSX.HTMLAttributes<HTMLButtonElement>) {
-  return (
-    <button
-      style={{
-        touchAction: "manipulation",
-      }}
-      {...props}
-      class="px-2 uppercase font-inter border-2 border-white"
-    />
-  );
-}
+// function PlayButton(props: JSX.HTMLAttributes<HTMLButtonElement>) {
+//   return (
+//     <button
+//       style={{
+//         touchAction: "manipulation",
+//       }}
+//       {...props}
+//       class="px-2 uppercase font-inter border-2 border-white"
+//     />
+//   );
+// }
