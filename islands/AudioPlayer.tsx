@@ -23,10 +23,12 @@ export default function AudioPlayer() {
       try {
         setIsLoading(true);
         const newProcessor = new AudioProcessor();
+
         setProcessor(newProcessor);
+        newProcessor.resume(); // for mobile browsers?
         newProcessor.setVolume(volume);
         await newProcessor.play();
-        await newProcessor.resume(); // for mobile browsers?
+
         setIsPlaying(true);
       } catch (error) {
         console.error("Failed to load audio:", error);
