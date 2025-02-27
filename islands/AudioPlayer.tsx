@@ -27,11 +27,11 @@ export default function AudioPlayer() {
   }, []);
 
   const handlePlay = async () => {
-    if (!processor) {
-      try {
-        setIsLoading(true);
+    try {
+      setIsLoading(true);
+      
+      if (!processor) {
         const newProcessor = new AudioProcessor();
-
         setProcessor(newProcessor);
         // Mobile browsers require both resume and play to be in the gesture handler
         await newProcessor.resume(); // Ensure we await context resume
@@ -44,15 +44,13 @@ export default function AudioPlayer() {
       } finally {
         setIsLoading(false);
       }
-      return;
-    }
-
-    if (isPaused) {
-      processor.play();
+    } catch (error) {
+      console.error("Playback failed:", error);
+      setProcessor(null);
+      setIsPlaying(false);
       setIsPaused(false);
-    } else {
-      processor.pause();
-      setIsPaused(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,7 +71,7 @@ export default function AudioPlayer() {
             handlePlay();
           }}
           disabled={isLoading}
-          class="btn"
+          class="btn touch-manipulation active:scale-95"
         >
           {isLoading
             ? (
