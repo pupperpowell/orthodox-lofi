@@ -57,6 +57,10 @@
   /* Button styles */
   .btn {
     @apply uppercase font-inter font-medium transition-colors duration-100;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    cursor: pointer;
+    user-select: none;
   }
 
   /* Descriptive text */
