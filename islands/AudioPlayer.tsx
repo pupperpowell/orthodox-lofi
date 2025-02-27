@@ -19,31 +19,35 @@ export default function AudioPlayer() {
   }, [volume, processor]);
 
   const handlePlay = async () => {
-    if (!processor) {
-      try {
-        setIsLoading(true);
+    try {
+      setIsLoading(true);
+      
+      if (!processor) {
         const newProcessor = new AudioProcessor();
-
         setProcessor(newProcessor);
-        newProcessor.resume(); // for mobile browsers?
-        newProcessor.setVolume(volume);
+        
+        // Mobile-first activation flow
+        await newProcessor.resume();
         await newProcessor.play();
 
         setIsPlaying(true);
-      } catch (error) {
-        console.error("Failed to load audio:", error);
-      } finally {
-        setIsLoading(false);
+      } else {
+        if (isPaused) {
+          await processor.resume();
+          await processor.play();
+          setIsPaused(false);
+        } else {
+          await processor.pause();
+          setIsPaused(true);
+        }
       }
-      return;
-    }
-
-    if (isPaused) {
-      processor.play();
+    } catch (error) {
+      console.error("Playback failed:", error);
+      setProcessor(null);
+      setIsPlaying(false);
       setIsPaused(false);
-    } else {
-      processor.pause();
-      setIsPaused(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -58,10 +62,13 @@ export default function AudioPlayer() {
       <div class="flex items-center space-x-4">
         <Button
           type="button"
-          onClick={() => handlePlay()}
-          onTouchEnd={() => handlePlay()}
+          onClick={handlePlay}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            handlePlay();
+          }}
           disabled={isLoading}
-          class="btn"
+          class="btn touch-manipulation active:scale-95"
         >
           {isLoading
             ? (

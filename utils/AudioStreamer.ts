@@ -6,6 +6,7 @@ export class AudioStreamer {
   constructor() {
     this.mediaSource = new MediaSource();
     this.audioElement = new Audio();
+    this.audioElement.setAttribute("playsinline", "true"); // Add playsinline attribute for iOS
     this.audioElement.crossOrigin = "anonymous";
     this.audioElement.src = this.streamUrl;
   }

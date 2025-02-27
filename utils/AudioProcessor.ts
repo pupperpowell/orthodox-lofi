@@ -138,8 +138,21 @@ export class AudioProcessor {
     this.streamer.setVolume(value);
   }
 
-  async resume() {
-    await this.context.resume();
+  public async resume(): Promise<void> {
+    if (this.context.state === "closed") {
+      this.context = new AudioContext();
+      this.setupStreamSource();
+    }
+    
+    if (this.context.state === "suspended") {
+      await this.context.resume();
+    }
+    
+    // Required for iOS Safari
+    if (this.streamSource === null) {
+      this.setupStreamSource();
+    }
+    
     console.log("Resumed audio context");
   }
 }
