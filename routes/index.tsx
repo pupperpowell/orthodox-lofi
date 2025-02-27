@@ -9,6 +9,12 @@ export default function Home() {
     <>
       <Head>
         <title>orthodox.cafe</title>
+        <script
+          defer
+          src="https://umami.pw1.xyz/script.js"
+          data-website-id="1d621ad0-c522-45e0-b890-70854b34a3fc"
+        >
+        </script>
       </Head>
 
       <h1 class="text-4xl font-bold font-triodion">
@@ -26,6 +32,7 @@ export default function Home() {
         >
           github
         </Link>
+        <span>If you're reading this, the scrappy CI/CD works!</span>
       </div>
 
       <div class="mt-8">
