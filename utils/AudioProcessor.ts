@@ -19,7 +19,8 @@ export class AudioProcessor {
   private saturation: WaveShaperNode; // basically the same thing as distortion. fix later
 
   constructor() {
-    this.context = new AudioContext();
+    // Mobile browsers require context creation during user interaction
+    this.context = new (window.AudioContext || window.webkitAudioContext)();
     this.streamer = new AudioStreamer();
 
     // Gain node setup
