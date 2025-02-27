@@ -8,7 +8,7 @@ export function Button(props: JSX.HTMLAttributes<HTMLButtonElement>) {
     <button
       {...rest}
       role="button"
-      disabled={!IS_BROWSER || props.disabled}
+      disabled={props.disabled}
       class={`btn uppercase font-inter hover:bg-gray-700 active:bg-gray-700 touch-action-manipulation ${
         className || ""
       }`}
