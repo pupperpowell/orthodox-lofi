@@ -8,8 +8,8 @@ import { start } from "$fresh/server.ts";
 import manifest from "./fresh.gen.ts";
 import config from "./fresh.config.ts";
 
-// Get the port from environment variable or use 8000 as default
-const port = parseInt(Deno.env.get("PORT") || "1026");
+// Get the port from environment variable or use 1054 as default
+const port = parseInt(Deno.env.get("PORT") || "1054");
 
 // Add the port to the config
 await start(manifest, { ...config, port });
