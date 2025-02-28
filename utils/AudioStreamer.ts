@@ -1,6 +1,6 @@
 export class AudioStreamer {
   private audioElement: HTMLAudioElement;
-  private streamUrl: string = "https://lofi.george.wiki/stream.ogg";
+  private streamUrl: string = "https://lofi.george.wiki/stream.mp3";
 
   constructor() {
     this.audioElement = new Audio();
