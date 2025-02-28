@@ -50,6 +50,12 @@ export class AudioProcessor {
     this.setupStreamSource();
   }
 
+  public async connectToElement(audioElement: HTMLAudioElement): Promise<void> {
+    await this.context.resume();
+    this.streamSource = this.context.createMediaElementSource(audioElement);
+    this.connectProcessingChain();
+  }
+
   private setupStreamSource() {
     const audioElement = this.streamer.getAudioElement();
     this.streamSource = this.context.createMediaElementSource(audioElement);
