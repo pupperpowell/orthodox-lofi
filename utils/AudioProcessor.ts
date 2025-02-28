@@ -19,7 +19,6 @@ export class AudioProcessor {
   private saturation: WaveShaperNode; // basically the same thing as distortion. fix later
 
   constructor() {
-    // Mobile browsers require context creation during user interaction
     this.context = new AudioContext();
     this.streamer = new AudioStreamer();
 
@@ -58,6 +57,9 @@ export class AudioProcessor {
 
   private setupStreamSource() {
     const audioElement = this.streamer.getAudioElement();
+    audioElement.currentTime = 0;
+    audioElement.load();
+    console.log("Audio element (re?)loaded");
     this.streamSource = this.context.createMediaElementSource(audioElement);
     this.connectProcessingChain();
   }
@@ -132,12 +134,12 @@ export class AudioProcessor {
   }
 
   async play() {
-    await this.context.resume();
+    // await this.context.resume();
     await this.streamer.startStream();
   }
 
   async pause() {
-    this.streamer.pauseStream();
+    // this.streamer.pauseStream();
     await this.context.suspend();
   }
 

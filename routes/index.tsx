@@ -39,7 +39,7 @@ export default function Home() {
       </div>
 
       <div class="mt-8">
-        <SimpleAudioPlayer />
+        <AudioPlayer />
       </div>
 
       <div class="mt-4">

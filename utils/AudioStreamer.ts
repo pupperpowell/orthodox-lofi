@@ -1,10 +1,8 @@
 export class AudioStreamer {
-  private mediaSource: MediaSource;
   private audioElement: HTMLAudioElement;
   private streamUrl: string = "https://lofi.george.wiki/stream.ogg";
 
   constructor() {
-    this.mediaSource = new MediaSource();
     this.audioElement = new Audio();
     this.audioElement.setAttribute("playsinline", "true"); // Add playsinline attribute for iOS
     this.audioElement.crossOrigin = "anonymous";
@@ -25,6 +23,7 @@ export class AudioStreamer {
   }
 
   public getAudioElement(): HTMLAudioElement {
+    console.log("Getting audio element");
     return this.audioElement;
   }
 
