@@ -59,7 +59,6 @@ export class AudioProcessor {
     const audioElement = this.streamer.getAudioElement();
     audioElement.currentTime = 0;
     audioElement.load();
-    console.log("Audio element (re?)loaded");
     this.streamSource = this.context.createMediaElementSource(audioElement);
     this.connectProcessingChain();
   }
@@ -102,7 +101,7 @@ export class AudioProcessor {
     currentNode = this.lowpassFilter;
 
     currentNode.connect(this.context.destination); // output
-    console.log("Connected processing chain, including filters");
+    console.log("Connected processing chain");
   }
 
   toggleFilters() {

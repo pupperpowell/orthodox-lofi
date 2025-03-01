@@ -30,7 +30,8 @@ export default function ActiveListeners() {
             jsonData.icestats.source !== null
           ) {
             setError(null);
-            return jsonData.icestats.source.listeners;
+            return jsonData.icestats.source[0].listeners +
+              jsonData.icestats.source[1].listeners;
           }
         } catch (parseError) {
           console.error("Error parsing JSON:", parseError);

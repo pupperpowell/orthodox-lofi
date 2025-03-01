@@ -26,7 +26,7 @@ export default function Home() {
         </span>
       </h1>
 
-      <LatestCommit />
+      <LatestCommit className="font-triodion" />
 
       <div class="mt-4">
         <Link href="/about" class="mr-4">about</Link>

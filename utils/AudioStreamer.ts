@@ -18,8 +18,9 @@ export class AudioStreamer {
     }
   }
 
-  public pauseStream(): void {
-    this.audioElement.pause();
+  // Stop the stream
+  public stopStream(): void {
+    this.audioElement.remove;
   }
 
   public getAudioElement(): HTMLAudioElement {
