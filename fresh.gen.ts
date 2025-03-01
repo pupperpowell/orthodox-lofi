@@ -12,7 +12,6 @@ import * as $AudioPlayer from "./islands/AudioPlayer.tsx";
 import * as $Controls from "./islands/Controls.tsx";
 import * as $Dashboard from "./islands/Dashboard.tsx";
 import * as $LatestCommit from "./islands/LatestCommit.tsx";
-import * as $SimpleAudioPlayer from "./islands/SimpleAudioPlayer.tsx";
 import * as $Status from "./islands/Status.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
@@ -30,7 +29,6 @@ const manifest = {
     "./islands/Controls.tsx": $Controls,
     "./islands/Dashboard.tsx": $Dashboard,
     "./islands/LatestCommit.tsx": $LatestCommit,
-    "./islands/SimpleAudioPlayer.tsx": $SimpleAudioPlayer,
     "./islands/Status.tsx": $Status,
   },
   baseUrl: import.meta.url,

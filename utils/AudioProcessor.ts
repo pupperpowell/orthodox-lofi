@@ -56,8 +56,8 @@ export class AudioProcessor {
   }
 
   private setupStreamSource() {
+    // what does this do exactly...???
     const audioElement = this.streamer.getAudioElement();
-    audioElement.currentTime = 0;
     audioElement.load();
     this.streamSource = this.context.createMediaElementSource(audioElement);
     this.connectProcessingChain();
@@ -89,19 +89,24 @@ export class AudioProcessor {
   // Called when a new track is loaded
   // Literally chains each node to the next
   private connectProcessingChain() {
-    if (!this.streamSource) return;
+    if (!this.streamSource) {
+      console.error(
+        "Stream source is not set. Cannot connect processing chain.",
+      );
+      return;
+    } else {
+      this.streamSource.disconnect();
+      let currentNode: AudioNode = this.streamSource; // audio source
 
-    this.streamSource.disconnect();
-    let currentNode: AudioNode = this.streamSource; // audio source
+      // connect filters...
+      currentNode.connect(this.highpassFilter);
+      currentNode = this.highpassFilter;
+      currentNode.connect(this.lowpassFilter);
+      currentNode = this.lowpassFilter;
 
-    // connect filters...
-    currentNode.connect(this.highpassFilter);
-    currentNode = this.highpassFilter;
-    currentNode.connect(this.lowpassFilter);
-    currentNode = this.lowpassFilter;
-
-    currentNode.connect(this.context.destination); // output
-    console.log("Connected processing chain");
+      currentNode.connect(this.context.destination); // output
+      console.log("Connected processing chain");
+    }
   }
 
   toggleFilters() {

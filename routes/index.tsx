@@ -4,7 +4,6 @@ import { Link } from "../components/Link.tsx";
 import ActiveListeners from "../islands/ActiveListeners.tsx";
 import { Status } from "../islands/Status.tsx";
 import LatestCommit from "../islands/LatestCommit.tsx";
-import SimpleAudioPlayer from "../islands/SimpleAudioPlayer.tsx";
 
 export default function Home() {
   return (
