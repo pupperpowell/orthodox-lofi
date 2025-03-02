@@ -1,49 +1,25 @@
-import { useEffect, useState } from "preact/hooks";
+import { useState } from "preact/hooks";
 
-import Controls from "./Controls.tsx";
-import { AudioProcessor } from "../utils/AudioProcessor.ts";
-// import { JSX } from "preact/jsx-runtime";
 import { Button } from "../components/Button.tsx";
 
 export default function AudioPlayer() {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false); // in case playback hasn't started yet
   const [isPaused, setIsPaused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [volume, setVolume] = useState(0.7);
-  const [processor, setProcessor] = useState<AudioProcessor | null>(null);
+  const [volume, setVolume] = useState(0.5);
 
-  useEffect(() => {
-    if (processor) {
-      processor.setVolume(volume);
-    }
-  }, [volume, processor]);
-
-  const handlePlay = async () => {
+  const handlePlay = () => {
     try {
       setIsLoading(true);
 
-      if (!processor) {
-        const newProcessor = new AudioProcessor();
-        setProcessor(newProcessor);
-
-        // Mobile-first activation flow
-        await newProcessor.resume();
-        await newProcessor.play();
-
-        setIsPlaying(true);
+      if (isPaused) {
+        setIsPaused(false);
       } else {
-        if (isPaused) {
-          await processor.resume();
-          await processor.play();
-          setIsPaused(false);
-        } else {
-          await processor.pause();
-          setIsPaused(true);
-        }
+        setIsPaused(true);
       }
     } catch (error) {
       console.error("Playback failed:", error);
-      setProcessor(null);
+
       setIsPlaying(false);
       setIsPaused(false);
     } finally {
@@ -130,9 +106,6 @@ export default function AudioPlayer() {
           </span>
         </div>
       </div>
-
-      {/* FilterControls always shows if processor exists */}
-      {processor && <Controls processor={processor} />}
     </div>
   );
 }

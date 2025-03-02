@@ -1,12 +1,12 @@
 import { AudioStreamer } from "./AudioStreamer.ts";
 
-export class AudioProcessor {
+// deno-lint-ignore no-unused-vars
+class AudioProcessor {
   private context: AudioContext;
   private streamer: AudioStreamer;
   private streamSource: MediaElementAudioSourceNode | null = null;
 
-  // GAIN, to control volume of each effect!
-  private sourceGainNode: GainNode; // takes source input. controls source volume
+  private sourceGainNode: GainNode;
 
   // FILTERS
   private highpassFilter: BiquadFilterNode; // allows frequencies greater than 'x' hz to "pass over"
@@ -19,32 +19,36 @@ export class AudioProcessor {
     // Gain node setup
     this.sourceGainNode = this.context.createGain();
 
-    // initial mix
-    this.sourceGainNode.gain.value = 0.5;
+    // initial volume
+    this.sourceGainNode.gain.value = 0.25;
 
     // Filter node(s) setup
     this.highpassFilter = this.context.createBiquadFilter();
     this.lowpassFilter = this.context.createBiquadFilter();
 
+    // original filters: 200, 2250
+    // alanna suggested: 100, 10000
     this.highpassFilter.type = "highpass";
-    this.highpassFilter.frequency.value = 200; // starts at 200hz
+    this.highpassFilter.frequency.value = 100; // starts at 100hz
 
     this.lowpassFilter.type = "lowpass";
-    this.lowpassFilter.frequency.value = 2250; // starts at 2250hz
+    this.lowpassFilter.frequency.value = 5250; // starts at 5250hz
 
     this.setupStreamSource();
   }
 
+  /**
+   * Sets up the stream source for the audio processing chain.
+   * Loads the audio element, creates a media element source node from it,
+   * and then connects the processing chain to the source.
+   */
   private setupStreamSource() {
-    // what does this do exactly...???
     const audioElement = this.streamer.getAudioElement();
     audioElement.load();
     this.streamSource = this.context.createMediaElementSource(audioElement);
     this.connectProcessingChain();
   }
 
-  // Called when a new track is loaded
-  // Literally chains each node to the next
   private connectProcessingChain() {
     if (!this.streamSource) {
       console.error(
@@ -53,29 +57,13 @@ export class AudioProcessor {
       return;
     } else {
       this.streamSource.disconnect();
-      let currentNode: AudioNode = this.streamSource; // audio source
 
-      // connect filters...
-      currentNode.connect(this.highpassFilter);
-      currentNode = this.highpassFilter;
-      currentNode.connect(this.lowpassFilter);
-      currentNode = this.lowpassFilter;
-
-      currentNode.connect(this.context.destination); // output
+      this.streamSource.connect(this.highpassFilter)
+        .connect(this.lowpassFilter)
+        .connect(this.sourceGainNode)
+        .connect(this.context.destination);
       console.log("Connected processing chain");
     }
-  }
-
-  toggleFilters() {
-    // set filter gains to 0
-  }
-
-  toggleDistortion() {
-    // set the distortion amount to 0. This will disable the distortion effect
-  }
-
-  toggleSaturation() {
-    // set the saturation amount to 1. This will disable the saturation effect
   }
 
   setHighpassFrequency(freq: number) {
@@ -88,15 +76,13 @@ export class AudioProcessor {
 
   async play() {
     await this.context.resume();
-    this.streamer.startStream();
   }
 
   async pause() {
-    this.streamer.stopStream();
     await this.context.suspend();
   }
 
   setVolume(value: number) {
-    this.streamer.setVolume(value);
+    this.sourceGainNode.gain.value = value;
   }
 }
