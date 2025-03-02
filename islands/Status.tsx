@@ -29,16 +29,15 @@ const checkStreamStatus = async (url: string): Promise<boolean> => {
 };
 
 export function Status() {
-  const [isOnline, setIsOnline] = useState<boolean>(true);
+  const [isOnline, setIsOnline] = useState<boolean>(false);
 
   useEffect(() => {
-    // Example usage
     checkStreamStatus("https://lofi.george.wiki/status-json.xsl")
-      .then((isUp) => console.log("Stream is up:", isUp));
+      .then((isUp) => setIsOnline(isUp));
     const interval = setInterval(() => {
       checkStreamStatus("https://lofi.george.wiki/status-json.xsl")
         .then((isUp) => setIsOnline(isUp));
-    }, 10000);
+    }, 15000);
     return () => clearInterval(interval);
   }, []);
 
