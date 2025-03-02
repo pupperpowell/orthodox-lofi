@@ -8,11 +8,9 @@ interface ControlsProps {
 
 export default function Controls({ processor }: ControlsProps) {
   const [filtersEnabled, setFiltersEnabled] = useState(true);
-  const [saturationEnabled, setSaturationEnabled] = useState(true);
 
   const [highpass, setHighpass] = useState(200);
   const [lowpass, setLowpass] = useState(2250);
-  const [saturation, setSaturation] = useState(1);
 
   const handleHighpassChange = (e: Event) => {
     const value = Number((e.target as HTMLInputElement).value);
@@ -29,17 +27,6 @@ export default function Controls({ processor }: ControlsProps) {
   const handleToggleFilters = () => {
     setFiltersEnabled(!filtersEnabled);
     processor.toggleFilters();
-  };
-
-  const handleSaturationChange = (e: Event) => {
-    const value = Number((e.target as HTMLInputElement).value);
-    setSaturation(value);
-    processor.setSaturation(value);
-  };
-
-  const handleToggleSaturation = () => {
-    setSaturationEnabled(!saturationEnabled);
-    processor.toggleSaturation();
   };
 
   return (
@@ -87,26 +74,6 @@ export default function Controls({ processor }: ControlsProps) {
         </div>
       </div>
       <hr></hr>
-      <div class="opacity-50 pointer-events-none select-none">
-        <Button
-          type="button"
-          onClick={handleToggleSaturation}
-        >
-          {saturationEnabled ? "DISABLE SATURATION" : "ENABLE SATURATION"}
-        </Button>
-        <label class="block text-sm font-medium font-inter">
-          <span>Saturation: {saturation}x</span>
-          <input
-            type="range"
-            min="1"
-            max="10"
-            step="0.1"
-            value={saturation}
-            onInput={handleSaturationChange}
-            class="w-full mt-2"
-          />
-        </label>
-      </div>
     </div>
   );
 }
