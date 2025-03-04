@@ -1,25 +1,41 @@
-import { useState } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 
 import { Button } from "../components/Button.tsx";
+import { AudioStreamer } from "../utils/AudioStreamer.ts";
 
 export default function AudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false); // in case playback hasn't started yet
   const [isPaused, setIsPaused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [volume, setVolume] = useState(0.5);
+  const [streamer, setStreamer] = useState<AudioStreamer | null>(null);
+  const [lofiActive, setLofiActive] = useState(true);
 
-  const handlePlay = () => {
+  const handlePlay = async () => {
     try {
       setIsLoading(true);
 
-      if (isPaused) {
+      if (!streamer) {
+        // Initialize the streamer if it doesn't exist
+        const audioStreamer = new AudioStreamer();
+        setStreamer(audioStreamer);
+        // Set the streamer lofi status as well
+        audioStreamer.setLofi(lofiActive);
+        await audioStreamer.startStream();
+        setIsPlaying(true);
+      } else if (!isPlaying) {
+        await streamer.startStream();
+        setIsPlaying(true);
+        setIsPaused(false);
+      } else if (isPaused) {
+        await streamer.startStream();
         setIsPaused(false);
       } else {
+        streamer.pauseStream();
         setIsPaused(true);
       }
     } catch (error) {
       console.error("Playback failed:", error);
-
       setIsPlaying(false);
       setIsPaused(false);
     } finally {
@@ -27,15 +43,38 @@ export default function AudioPlayer() {
     }
   };
 
+  useEffect(() => {
+    if (streamer) {
+      streamer.setVolume(volume);
+      streamer.setLofi(lofiActive);
+    }
+  }, [volume, streamer]);
+
+  // Clean up audio resources when component unmounts
+  useEffect(() => {
+    return () => {
+      streamer?.pauseStream();
+      setStreamer(null);
+    };
+  }, []);
+
   const handleVolumeChange = (e: Event) => {
     const target = e.target as HTMLInputElement;
     const newVolume = parseFloat(target.value);
     setVolume(newVolume);
   };
 
+  const handleLofiToggle = () => {
+    setLofiActive(!lofiActive);
+    if (streamer) {
+      streamer.setLofi(!lofiActive);
+    }
+  };
+
   return (
     <div class="space-y-8">
       <div class="flex items-center space-x-4">
+        {/* Play/pause button */}
         <Button
           type="button"
           onClick={handlePlay}
@@ -101,10 +140,28 @@ export default function AudioPlayer() {
             onInput={handleVolumeChange}
             class="w-24"
           />
-          <span class="text-description font-triodion min-w-[40px] text-sm">
+          <span class="text-description font-triodion min-w-[60px]">
             {Math.round(volume * 100)}%
           </span>
         </div>
+      </div>
+      {/* Lofi toggle */}
+      <div class="flex items-center space-x-2">
+        <Button
+          type="button"
+          onClick={handleLofiToggle}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            handleLofiToggle();
+          }}
+          class="btn touch-manipulation active:scale-95"
+        >
+          LOFI: <span class={lofiActive ? "text-green-500" : ""}>ON</span>/<span
+            class={!lofiActive ? "text-gray-300" : ""}
+          >
+            OFF
+          </span>
+        </Button>
       </div>
     </div>
   );
