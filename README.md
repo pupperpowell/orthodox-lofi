@@ -57,4 +57,6 @@ The [orthodox.cafe](https://orthodox.cafe) client (what you see when you visit t
 
 The music was sourced from archive.org and YouTube and plays on an Icecast web radio 24/7. The scripting language used to assemble playlists and scheduling is Liquidsoap. I pay roughly $10 a month in server costs, but this could be $0 if I hosted it on a laptop in my closet. I don't know how much bandwidth will cost because as of writing this, version 1 of the site has not been released yet.
 
+---
+
 _I'm currently looking for roles in product design or full-stack development — anything from contract work to full-time positions — and can be reached via [email](mailto:george@silentsummit.co)._
