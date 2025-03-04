@@ -46,7 +46,6 @@ export default function AudioPlayer() {
   useEffect(() => {
     if (streamer) {
       streamer.setVolume(volume);
-      streamer.setLofi(lofiActive);
     }
   }, [volume, streamer]);
 

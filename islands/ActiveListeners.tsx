@@ -23,15 +23,14 @@ export default function ActiveListeners() {
         try {
           const jsonData = JSON.parse(data);
 
-          // Check if source exists and is not null
-          if (
-            !!jsonData.icestats &&
-            !!jsonData.icestats.source &&
-            jsonData.icestats.source !== null
-          ) {
+          if (!!jsonData.icestats && !!jsonData.icestats.source) {
             setError(null);
-            return jsonData.icestats.source[0].listeners +
-              jsonData.icestats.source[1].listeners;
+            // Find the source with the specific listenurl
+            const mainStream = jsonData.icestats.source.find(
+              (source: any) =>
+                source.listenurl === "http://lofi.george.wiki:1025/stream.mp3",
+            );
+            return mainStream ? mainStream.listeners : -1;
           }
         } catch (parseError) {
           console.error("Error parsing JSON:", parseError);
