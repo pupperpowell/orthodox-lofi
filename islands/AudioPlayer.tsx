@@ -10,7 +10,7 @@ const disableVolumeControl = () => {
 export default function AudioPlayer() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [volume, setVolume] = useState(0.5);
+  const [volume, setVolume] = useState(1);
   const [streamer, setStreamer] = useState<AudioStreamer | null>(null);
   const [lofiActive, setLofiActive] = useState(true);
   const [disableVolume, setDisableVolume] = useState(true);
@@ -77,6 +77,7 @@ export default function AudioPlayer() {
     <div class="space-y-8">
       <div class="flex items-center space-x-4">
         <Button
+          data-umami-event="Play button clicked"
           type="button"
           onClick={handlePlay}
           onTouchStart={(e) => {
@@ -154,6 +155,7 @@ export default function AudioPlayer() {
 
       <div class="flex items-center space-x-2">
         <Button
+          data-umami-event="Lofi toggled"
           type="button"
           onClick={handleLofiToggle}
           onTouchStart={(e) => {
@@ -167,6 +169,7 @@ export default function AudioPlayer() {
         </Button>
         <div class={`${isPlaying ? "" : "opacity-15 pointer-events-none"}`}>
           <Button
+            data-umami-event="Stop button clicked"
             type="button"
             onClick={handleStop}
             onTouchStart={(e) => {
