@@ -4,7 +4,6 @@ import { AudioStreamer } from "../utils/AudioStreamer.ts";
 
 const disableVolumeControl = () => {
   const userAgent = navigator.userAgent;
-  console.log(userAgent);
   return userAgent.includes("iPhone");
 };
 
@@ -21,6 +20,7 @@ export default function AudioPlayer() {
       setIsLoading(true);
 
       if (!streamer) {
+        // Use the singleton instance
         const audioStreamer = new AudioStreamer();
         audioStreamer.setLofi(lofiActive);
         setStreamer(audioStreamer);
@@ -53,13 +53,6 @@ export default function AudioPlayer() {
     }
   }, [volume, streamer]);
 
-  useEffect(() => {
-    return () => {
-      streamer?.pauseStream();
-      setStreamer(null);
-    };
-  }, []);
-
   const handleVolumeChange = (e: Event) => {
     const target = e.target as HTMLInputElement;
     setVolume(parseFloat(target.value));
@@ -67,13 +60,16 @@ export default function AudioPlayer() {
 
   const handleLofiToggle = () => {
     if (streamer) {
-      setIsLoading(true);
       streamer.setLofi(!lofiActive);
       setLofiActive(!lofiActive);
-      // Once the new stream starts playing, we can remove the loading state
-      streamer.startStream().finally(() => {
-        setIsLoading(false);
-      });
+    }
+  };
+
+  const handleStop = () => {
+    if (streamer) {
+      streamer.stopStream();
+      setStreamer(null);
+      setIsPlaying(false);
     }
   };
 
@@ -168,6 +164,18 @@ export default function AudioPlayer() {
         >
           LOFI: <span class={lofiActive ? "text-green-500" : ""}>ON</span>/
           <span class={!lofiActive ? "text-gray-300" : ""}>OFF</span>
+        </Button>
+
+        <Button
+          type="button"
+          onClick={handleStop}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            handleStop();
+          }}
+          class="btn touch-manipulation active:scale-95"
+        >
+          STOP
         </Button>
       </div>
     </div>

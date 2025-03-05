@@ -7,24 +7,35 @@ export class AudioStreamer {
   public lofiActive: boolean = true;
 
   constructor() {
+    // Create the base stream audio element
     this.audioElement = new Audio();
-    this.lofiAudioElement = new Audio();
     this.audioElement.setAttribute("playsinline", "true");
-    this.lofiAudioElement.setAttribute("playsinline", "true");
     this.audioElement.crossOrigin = "anonymous";
-    this.lofiAudioElement.crossOrigin = "anonymous";
-
     this.audioElement.src = this.streamUrl;
+
+    // Create the lofi stream audio element
+    this.lofiAudioElement = new Audio();
+    this.lofiAudioElement.setAttribute("playsinline", "true");
+    this.lofiAudioElement.crossOrigin = "anonymous";
     this.lofiAudioElement.src = this.lofiUrl;
   }
 
   public async startStream(): Promise<void> {
     try {
-      const activeElement = this.lofiActive
-        ? this.lofiAudioElement
-        : this.audioElement;
-      await activeElement.play();
-      console.log(`${this.lofiActive ? "Lofi" : "Regular"} stream started`);
+      // Set initial mute states based on which stream should be active
+      this.audioElement.muted = this.lofiActive;
+      this.lofiAudioElement.muted = !this.lofiActive;
+
+      // Start both streams
+      const promises = [
+        this.audioElement.play(),
+        this.lofiAudioElement.play(),
+      ];
+
+      await Promise.all(promises);
+      console.log(
+        `Both streams started. Active: ${this.lofiActive ? "Lofi" : "Regular"}`,
+      );
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(`Failed to start stream: ${error}`);
@@ -39,39 +50,39 @@ export class AudioStreamer {
   public setLofi(lofi: boolean): void {
     if (lofi === this.lofiActive) return;
 
-    const wasPlaying = this.lofiActive
-      ? !this.lofiAudioElement.paused
-      : !this.audioElement.paused;
+    // Update which stream is muted
+    this.audioElement.muted = lofi;
+    this.lofiAudioElement.muted = !lofi;
 
-    // Pause current stream
-    this.pauseStream();
-
-    // Switch active stream
+    // Switch active stream flag
     this.lofiActive = lofi;
 
-    // If something was playing, start the new stream
-    if (wasPlaying) {
-      this.startStream();
-    }
+    console.log(`Switched to ${lofi ? "Lofi" : "Regular"} stream`);
   }
 
   public setVolume(value: number): void {
     const normalizedValue = Math.max(0, Math.min(1, value));
-    const activeElement = this.lofiActive
-      ? this.lofiAudioElement
-      : this.audioElement;
-    activeElement.volume = normalizedValue;
+    // Apply volume to both elements since both are playing
+    this.audioElement.volume = normalizedValue;
+    this.lofiAudioElement.volume = normalizedValue;
   }
 
   public isPlaying(): boolean {
-    return this.lofiActive
-      ? !this.lofiAudioElement.paused
-      : !this.audioElement.paused;
+    // Since both streams play together, we can check either one
+    // But for safety, we'll consider it playing if either is playing
+    return !this.audioElement.paused || !this.lofiAudioElement.paused;
   }
 
-  public reconnect(): Promise<void> {
-    this.audioElement.src = this.streamUrl;
-    this.lofiAudioElement.src = this.lofiUrl;
-    return this.startStream();
+  // Redundant
+  // public reconnect(): Promise<void> {
+  //   this.audioElement.src = this.streamUrl;
+  //   this.lofiAudioElement.src = this.lofiUrl;
+  //   return this.startStream();
+  // }
+
+  public stopStream(): void {
+    // Discards both audio elements?
+    this.audioElement.src = "";
+    this.lofiAudioElement.src = "";
   }
 }

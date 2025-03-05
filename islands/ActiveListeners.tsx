@@ -30,7 +30,6 @@ export default function ActiveListeners() {
               (source: any) =>
                 source.listenurl === "http://lofi.george.wiki:1025/stream.mp3",
             );
-            console.log(mainStream);
             return mainStream ? mainStream.listeners : -1;
           }
         } catch (parseError) {
