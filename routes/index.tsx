@@ -2,7 +2,6 @@ import { Head } from "$fresh/runtime.ts";
 import AudioPlayer from "../islands/AudioPlayer.tsx";
 import { Link } from "../components/Link.tsx";
 import ActiveListeners from "../islands/ActiveListeners.tsx";
-import { Status } from "../islands/Status.tsx";
 import LatestCommit from "../islands/LatestCommit.tsx";
 import CandleStand from "../islands/CandleStand.tsx";
 

@@ -163,20 +163,21 @@ export default function AudioPlayer() {
           class="btn touch-manipulation active:scale-95"
         >
           LOFI: <span class={lofiActive ? "text-green-500" : ""}>ON</span>/
-          <span class={!lofiActive ? "text-gray-300" : ""}>OFF</span>
+          <span class={!lofiActive ? "text-rose-300" : ""}>OFF</span>
         </Button>
-
-        <Button
-          type="button"
-          onClick={handleStop}
-          onTouchStart={(e) => {
-            e.preventDefault();
-            handleStop();
-          }}
-          class="btn touch-manipulation active:scale-95"
-        >
-          STOP
-        </Button>
+        <div class={`${isPlaying ? "" : "opacity-15 pointer-events-none"}`}>
+          <Button
+            type="button"
+            onClick={handleStop}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              handleStop();
+            }}
+            class={`btn touch-manipulation active:scale-95`}
+          >
+            STOP
+          </Button>
+        </div>
       </div>
     </div>
   );
