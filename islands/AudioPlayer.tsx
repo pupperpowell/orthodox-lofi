@@ -1,47 +1,51 @@
 import { useEffect, useState } from "preact/hooks";
-
 import { Button } from "../components/Button.tsx";
 import { AudioStreamer } from "../utils/AudioStreamer.ts";
 
+const disableVolumeControl = () => {
+  const userAgent = navigator.userAgent;
+  console.log(userAgent);
+  return userAgent.includes("iPhone");
+};
+
 export default function AudioPlayer() {
-  const [isPlaying, setIsPlaying] = useState(false); // in case playback hasn't started yet
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [volume, setVolume] = useState(0.5);
   const [streamer, setStreamer] = useState<AudioStreamer | null>(null);
   const [lofiActive, setLofiActive] = useState(true);
+  const [disableVolume, setDisableVolume] = useState(true);
 
   const handlePlay = async () => {
     try {
       setIsLoading(true);
 
       if (!streamer) {
-        // Initialize the streamer if it doesn't exist
         const audioStreamer = new AudioStreamer();
-        setStreamer(audioStreamer);
-        // Set the streamer lofi status as well
         audioStreamer.setLofi(lofiActive);
+        setStreamer(audioStreamer);
         await audioStreamer.startStream();
         setIsPlaying(true);
-      } else if (!isPlaying) {
-        await streamer.startStream();
-        setIsPlaying(true);
-        setIsPaused(false);
-      } else if (isPaused) {
-        await streamer.startStream();
-        setIsPaused(false);
       } else {
-        streamer.pauseStream();
-        setIsPaused(true);
+        if (isPlaying) {
+          streamer.pauseStream();
+          setIsPlaying(false);
+        } else {
+          await streamer.startStream();
+          setIsPlaying(true);
+        }
       }
     } catch (error) {
       console.error("Playback failed:", error);
       setIsPlaying(false);
-      setIsPaused(false);
     } finally {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    setDisableVolume(disableVolumeControl());
+  }, []);
 
   useEffect(() => {
     if (streamer) {
@@ -49,7 +53,6 @@ export default function AudioPlayer() {
     }
   }, [volume, streamer]);
 
-  // Clean up audio resources when component unmounts
   useEffect(() => {
     return () => {
       streamer?.pauseStream();
@@ -59,21 +62,24 @@ export default function AudioPlayer() {
 
   const handleVolumeChange = (e: Event) => {
     const target = e.target as HTMLInputElement;
-    const newVolume = parseFloat(target.value);
-    setVolume(newVolume);
+    setVolume(parseFloat(target.value));
   };
 
   const handleLofiToggle = () => {
-    setLofiActive(!lofiActive);
     if (streamer) {
+      setIsLoading(true);
       streamer.setLofi(!lofiActive);
+      setLofiActive(!lofiActive);
+      // Once the new stream starts playing, we can remove the loading state
+      streamer.startStream().finally(() => {
+        setIsLoading(false);
+      });
     }
   };
 
   return (
     <div class="space-y-8">
       <div class="flex items-center space-x-4">
-        {/* Play/pause button */}
         <Button
           type="button"
           onClick={handlePlay}
@@ -100,24 +106,22 @@ export default function AudioPlayer() {
                     r="10"
                     stroke="currentColor"
                     stroke-width="4"
-                  >
-                  </circle>
+                  />
                   <path
                     class="opacity-75"
                     fill="currentColor"
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  >
-                  </path>
+                  />
                 </svg>
                 LOADING
               </>
             )
-            : (
-              isPlaying ? (isPaused ? "RESUME" : "PAUSE") : "PLAY"
-            )}
+            : isPlaying
+            ? "PAUSE"
+            : "PLAY"}
         </Button>
 
-        <div class="flex items-center space-x-2">
+        <div class="w-full relative flex items-center space-x-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-5 w-5 text-gray-300"
@@ -137,14 +141,21 @@ export default function AudioPlayer() {
             step="0.01"
             value={volume}
             onInput={handleVolumeChange}
-            class="w-24"
+            class={`w-full ${
+              disableVolume ? "opacity-15 pointer-events-none" : ""
+            }`}
           />
+          {disableVolume && (
+            <div class="absolute right-0 w-full text-s text-white text-center">
+              Use iPhone volume buttons
+            </div>
+          )}
           <span class="text-description font-triodion min-w-[60px]">
             {Math.round(volume * 100)}%
           </span>
         </div>
       </div>
-      {/* Lofi toggle */}
+
       <div class="flex items-center space-x-2">
         <Button
           type="button"
@@ -155,11 +166,8 @@ export default function AudioPlayer() {
           }}
           class="btn touch-manipulation active:scale-95"
         >
-          LOFI: <span class={lofiActive ? "text-green-500" : ""}>ON</span>/<span
-            class={!lofiActive ? "text-gray-300" : ""}
-          >
-            OFF
-          </span>
+          LOFI: <span class={lofiActive ? "text-green-500" : ""}>ON</span>/
+          <span class={!lofiActive ? "text-gray-300" : ""}>OFF</span>
         </Button>
       </div>
     </div>

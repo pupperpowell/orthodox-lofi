@@ -4,6 +4,7 @@ import { Link } from "../components/Link.tsx";
 import ActiveListeners from "../islands/ActiveListeners.tsx";
 import { Status } from "../islands/Status.tsx";
 import LatestCommit from "../islands/LatestCommit.tsx";
+import CandleStand from "../islands/CandleStand.tsx";
 
 export default function Home() {
   return (
@@ -18,13 +19,6 @@ export default function Home() {
         </script>
       </Head>
 
-      <h1 class="text-4xl font-bold font-triodion">
-        orthodox.cafe
-        <span class="left-1 bottom-4 relative">
-          <Status />
-        </span>
-      </h1>
-
       <LatestCommit className="font-triodion" />
 
       <div class="mt-4">
@@ -36,6 +30,8 @@ export default function Home() {
           github
         </Link>
       </div>
+
+      <CandleStand />
 
       <div class="mt-8">
         <AudioPlayer />

@@ -9,72 +9,64 @@ export class AudioStreamer {
   constructor() {
     this.audioElement = new Audio();
     this.lofiAudioElement = new Audio();
-    this.audioElement.setAttribute("playsinline", "true"); // For iOS?
+    this.audioElement.setAttribute("playsinline", "true");
     this.lofiAudioElement.setAttribute("playsinline", "true");
     this.audioElement.crossOrigin = "anonymous";
     this.lofiAudioElement.crossOrigin = "anonymous";
 
-    // initialize the audio elements
     this.audioElement.src = this.streamUrl;
     this.lofiAudioElement.src = this.lofiUrl;
-    // but mute the regular audio element
-    this.audioElement.muted = true;
   }
 
   public async startStream(): Promise<void> {
     try {
-      await this.audioElement.play();
-      console.log("Stream started");
-      await this.lofiAudioElement.play();
-      console.log("Lofi stream started");
+      const activeElement = this.lofiActive
+        ? this.lofiAudioElement
+        : this.audioElement;
+      await activeElement.play();
+      console.log(`${this.lofiActive ? "Lofi" : "Regular"} stream started`);
       return Promise.resolve();
     } catch (error) {
       return Promise.reject(`Failed to start stream: ${error}`);
     }
   }
 
-  // Stop the stream
   public pauseStream(): void {
     this.audioElement.pause();
     this.lofiAudioElement.pause();
   }
 
-  public getAudioElement(): HTMLAudioElement {
-    console.log("Getting audio element");
-    return this.audioElement;
-  }
-
   public setLofi(lofi: boolean): void {
-    // Get the current volume
-    const currentVolume = this.lofiActive
-      ? this.lofiAudioElement.volume
-      : this.audioElement.volume;
+    if (lofi === this.lofiActive) return;
 
-    if (lofi) {
-      // Lofi mode ON
-      this.audioElement.muted = true;
-      this.lofiAudioElement.muted = false;
-      this.lofiAudioElement.volume = currentVolume;
-    } else {
-      // Lofi mode OFF
-      this.audioElement.muted = false;
-      this.lofiAudioElement.muted = true;
-      this.audioElement.volume = currentVolume;
-    }
+    const wasPlaying = this.lofiActive
+      ? !this.lofiAudioElement.paused
+      : !this.audioElement.paused;
 
+    // Pause current stream
+    this.pauseStream();
+
+    // Switch active stream
     this.lofiActive = lofi;
-    console.log("[AudioStreamer] Lofi active:", this.lofiActive);
+
+    // If something was playing, start the new stream
+    if (wasPlaying) {
+      this.startStream();
+    }
   }
 
   public setVolume(value: number): void {
     const normalizedValue = Math.max(0, Math.min(1, value));
-    // Set volume for both elements, only active one will be heard
-    this.audioElement.volume = normalizedValue;
-    this.lofiAudioElement.volume = normalizedValue;
+    const activeElement = this.lofiActive
+      ? this.lofiAudioElement
+      : this.audioElement;
+    activeElement.volume = normalizedValue;
   }
 
   public isPlaying(): boolean {
-    return !this.audioElement.paused;
+    return this.lofiActive
+      ? !this.lofiAudioElement.paused
+      : !this.audioElement.paused;
   }
 
   public reconnect(): Promise<void> {

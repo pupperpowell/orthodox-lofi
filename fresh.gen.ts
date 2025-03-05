@@ -9,7 +9,7 @@ import * as $api_latest_commit from "./routes/api/latest-commit.ts";
 import * as $index from "./routes/index.tsx";
 import * as $ActiveListeners from "./islands/ActiveListeners.tsx";
 import * as $AudioPlayer from "./islands/AudioPlayer.tsx";
-import * as $Dashboard from "./islands/Dashboard.tsx";
+import * as $CandleStand from "./islands/CandleStand.tsx";
 import * as $LatestCommit from "./islands/LatestCommit.tsx";
 import * as $Status from "./islands/Status.tsx";
 import type { Manifest } from "$fresh/server.ts";
@@ -25,7 +25,7 @@ const manifest = {
   islands: {
     "./islands/ActiveListeners.tsx": $ActiveListeners,
     "./islands/AudioPlayer.tsx": $AudioPlayer,
-    "./islands/Dashboard.tsx": $Dashboard,
+    "./islands/CandleStand.tsx": $CandleStand,
     "./islands/LatestCommit.tsx": $LatestCommit,
     "./islands/Status.tsx": $Status,
   },

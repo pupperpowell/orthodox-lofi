@@ -30,6 +30,7 @@ export default function ActiveListeners() {
               (source: any) =>
                 source.listenurl === "http://lofi.george.wiki:1025/stream.mp3",
             );
+            console.log(mainStream);
             return mainStream ? mainStream.listeners : -1;
           }
         } catch (parseError) {
@@ -60,7 +61,7 @@ export default function ActiveListeners() {
         "https://lofi.george.wiki/status-json.xsl",
       );
       setActiveUsers(activeUsers);
-    }, 15000);
+    }, 5000);
   }, []);
 
   if (error) {
