@@ -61,8 +61,8 @@ export default function AudioPlayer() {
   const handleLofiToggle = () => {
     if (streamer) {
       streamer.setLofi(!lofiActive);
-      setLofiActive(!lofiActive);
     }
+    setLofiActive(!lofiActive);
   };
 
   const handleStop = () => {
