@@ -11,6 +11,7 @@ import * as $ActiveListeners from "./islands/ActiveListeners.tsx";
 import * as $AudioPlayer from "./islands/AudioPlayer.tsx";
 import * as $CandleStand from "./islands/CandleStand.tsx";
 import * as $LatestCommit from "./islands/LatestCommit.tsx";
+import * as $RainPlayer from "./islands/RainPlayer.tsx";
 import * as $Status from "./islands/Status.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
@@ -27,6 +28,7 @@ const manifest = {
     "./islands/AudioPlayer.tsx": $AudioPlayer,
     "./islands/CandleStand.tsx": $CandleStand,
     "./islands/LatestCommit.tsx": $LatestCommit,
+    "./islands/RainPlayer.tsx": $RainPlayer,
     "./islands/Status.tsx": $Status,
   },
   baseUrl: import.meta.url,

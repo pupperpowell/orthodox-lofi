@@ -1,6 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { Button } from "../components/Button.tsx";
 import { AudioStreamer } from "../utils/AudioStreamer.ts";
+import RainPlayer from "./RainPlayer.tsx";
 
 const disableVolumeControl = () => {
   const userAgent = navigator.userAgent;
@@ -8,11 +9,14 @@ const disableVolumeControl = () => {
 };
 
 export default function AudioPlayer() {
+  // General state variables
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [volume, setVolume] = useState(1);
   const [streamer, setStreamer] = useState<AudioStreamer | null>(null);
   const [lofiActive, setLofiActive] = useState(true);
+
+  // Volume control state variables
+  const [volume, setVolume] = useState(1);
   const [disableVolume, setDisableVolume] = useState(true);
 
   const handlePlay = async () => {
@@ -20,18 +24,20 @@ export default function AudioPlayer() {
       setIsLoading(true);
 
       if (!streamer) {
-        // Use the singleton instance
         const audioStreamer = new AudioStreamer();
         audioStreamer.setLofi(lofiActive);
         setStreamer(audioStreamer);
         await audioStreamer.startStream();
+
         setIsPlaying(true);
       } else {
         if (isPlaying) {
           streamer.pauseStream();
+
           setIsPlaying(false);
         } else {
           await streamer.startStream();
+
           setIsPlaying(true);
         }
       }
@@ -43,10 +49,12 @@ export default function AudioPlayer() {
     }
   };
 
+  // Disable volume if iPhone
   useEffect(() => {
     setDisableVolume(disableVolumeControl());
   }, []);
 
+  // Update the streamer volume when the volume state changes
   useEffect(() => {
     if (streamer) {
       streamer.setVolume(volume);
@@ -58,6 +66,7 @@ export default function AudioPlayer() {
     setVolume(parseFloat(target.value));
   };
 
+  // Toggle lofi
   const handleLofiToggle = () => {
     if (streamer) {
       streamer.setLofi(!lofiActive);
@@ -182,6 +191,7 @@ export default function AudioPlayer() {
           </Button>
         </div>
       </div>
+      <RainPlayer />
     </div>
   );
 }
