@@ -37,11 +37,23 @@
   h4,
   h5,
   h6 {
-    @apply font-inter;
+    @apply font-triodion font-bold;
+  }
+
+  h1 {
+    @apply text-4xl mt-12;
+  }
+
+  h2 {
+    @apply text-3xl mt-8;
   }
 
   p {
-    @apply font-triodion;
+    @apply text-lg mt-1 text-gray-200;
+  }
+
+  blockquote {
+    @apply border-l-4 font-mono border-gray-300 pl-4 mt-4;
   }
 }
 
@@ -55,7 +67,7 @@
 
   /* Button styles */
   .btn {
-    @apply uppercase font-inter font-medium transition-colors duration-100;
+    @apply font-inter font-medium transition-colors duration-100;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     cursor: pointer;

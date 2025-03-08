@@ -1,6 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
 import AudioPlayer from "../islands/AudioPlayer.tsx";
-import { Link } from "../components/Link.tsx";
 import ActiveListeners from "../islands/ActiveListeners.tsx";
 import LatestCommit from "../islands/LatestCommit.tsx";
 import CandleStand from "../islands/CandleStand.tsx";
@@ -14,30 +13,22 @@ export default function Home() {
           defer
           src="https://umami.pw1.xyz/script.js"
           data-website-id="1d621ad0-c522-45e0-b890-70854b34a3fc"
+          data-domains="cafe.nightbreak.app,www.cafe.nightbreak.app"
         >
         </script>
       </Head>
 
-      <LatestCommit className="font-triodion" />
-
-      <div class="mt-4">
-        <Link href="/about" class="mr-4">about</Link>
-        <Link
-          href="https://github.com/pupperpowell/orthodox-lofi"
-          target="_blank"
-        >
-          github
-        </Link>
-      </div>
+      {Deno.env.get("ENVIRONMENT") == "DEV" &&
+        <LatestCommit className="font-triodion" />}
 
       <CandleStand />
 
-      <div class="mt-8">
-        <AudioPlayer />
-      </div>
-
       <div class="mt-4">
         <ActiveListeners />
+      </div>
+
+      <div class="mt-8">
+        <AudioPlayer />
       </div>
     </>
   );
