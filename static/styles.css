@@ -47,10 +47,10 @@
 
 /* Component styles */
 @layer components {
+
   /* Link styles */
   .link {
-    @apply lowercase font-inter underline decoration-dotted hover:border-solid
-      transition-all duration-100;
+    @apply lowercase font-inter underline decoration-dotted hover:border-solid transition-all duration-100;
   }
 
   /* Button styles */
@@ -65,5 +65,47 @@
   /* Descriptive text */
   .text-description {
     @apply text-gray-100 font-triodion;
+  }
+
+  /* Candle */
+  .candle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* height: 100vh; */
+  }
+
+  .candle {
+    width: 60px;
+    height: 200px;
+    background-color: #911d26;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .flame {
+    position: absolute;
+    bottom: 20px;
+    left: -140px;
+    width: 360px;
+    height: 380px;
+    background: radial-gradient(circle, rgba(255, 241, 163, 0.8) 20%, rgba(255, 179, 0, 0) 70%);
+    border-radius: 50%;
+    animation: flicker 1s infinite alternate ease-in-out;
+  }
+
+  @keyframes flicker {
+    0% {
+      opacity: 0.4;
+    }
+
+    80% {
+      opacity: 0.3;
+    }
+
+    100% {
+      opacity: 0.5;
+    }
   }
 }

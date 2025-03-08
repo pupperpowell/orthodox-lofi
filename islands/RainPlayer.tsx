@@ -4,7 +4,7 @@ import { Button } from "../components/Button.tsx";
 
 export default function RainPlayer() {
   const [rainProcessor, setRainProcessor] = useState<RainProcessor | null>();
-  const [rainVolume, setRainVolume] = useState(0.8);
+  const [rainVolume, setRainVolume] = useState(2.0);
   const [rainPlaying, setRainPlaying] = useState(false);
 
   const [lowPassFreq, setLowPassFreq] = useState(1500);
