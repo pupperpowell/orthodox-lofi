@@ -131,11 +131,9 @@ export default function AudioPlayer() {
         }
       `}
       </style>
-      <div class="flex flex-grow space-x-4">
+      <div class="flex space-x-4">
         <div
-          class={`flex-grow ${
-            !isPlaying ? "" : "opacity-15 pointer-events-none"
-          }`}
+          class={`flex-1 ${!isPlaying ? "" : "opacity-15 pointer-events-none"}`}
         >
           <Button
             data-umami-event="Play button clicked"
@@ -146,7 +144,7 @@ export default function AudioPlayer() {
               handlePlay();
             }}
             disabled={isLoading || isPlaying}
-            class="btn grow-3 touch-manipulation"
+            class="btn touch-manipulation w-full flex justify-center"
           >
             {isLoading
               ? (
@@ -163,9 +161,7 @@ export default function AudioPlayer() {
           </Button>
         </div>
         <div
-          class={`flex-grow ${
-            isPlaying ? "" : "opacity-15 pointer-events-none"
-          }`}
+          class={`flex-1 ${isPlaying ? "" : "opacity-15 pointer-events-none"}`}
         >
           <Button
             data-umami-event="Stop button clicked"
@@ -175,7 +171,7 @@ export default function AudioPlayer() {
               e.preventDefault();
               handleStop();
             }}
-            class={`btn grow-6 touch-manipulation`}
+            class={`btn touch-manipulation w-full flex justify-center`}
           >
             <span>stop &#9209;</span>
           </Button>
@@ -191,7 +187,7 @@ export default function AudioPlayer() {
             e.preventDefault();
             handleLofiToggle();
           }}
-          class="btn touch-manipulation active:scale-95"
+          class="btn touch-manipulation"
         >
           lofi: <span class={lofiActive ? "text-green-500" : ""}>on</span>/
           <span class={!lofiActive ? "text-rose-300" : ""}>off</span>
