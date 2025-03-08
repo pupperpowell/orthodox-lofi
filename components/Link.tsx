@@ -8,8 +8,8 @@ export function Link(props: LinkProps) {
   return (
     <a
       {...rest}
-      class={`lowercase font-inter underline decoration-dotted 
-              hover:decoration-solid transition-all duration-100 ${
+      class={`font-inter underline decoration-solid 
+              hover:decoration-dotted transition-all duration-100 ${
         className || ""
       }`}
     >

@@ -5,6 +5,7 @@
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $_layout from "./routes/_layout.tsx";
+import * as $about from "./routes/about.tsx";
 import * as $api_latest_commit from "./routes/api/latest-commit.ts";
 import * as $index from "./routes/index.tsx";
 import * as $ActiveListeners from "./islands/ActiveListeners.tsx";
@@ -20,6 +21,7 @@ const manifest = {
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
     "./routes/_layout.tsx": $_layout,
+    "./routes/about.tsx": $about,
     "./routes/api/latest-commit.ts": $api_latest_commit,
     "./routes/index.tsx": $index,
   },

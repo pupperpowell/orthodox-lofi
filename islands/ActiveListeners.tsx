@@ -70,7 +70,7 @@ export default function ActiveListeners() {
   const content = activeUsers === 0
     ? (
       <div class="font-triodion">
-        there's nobody listening right now. is this thing on?
+        there's nobody listening right now.
       </div>
     )
     : (
