@@ -2,6 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { Button } from "../components/Button.tsx";
 import { AudioStreamer } from "../utils/AudioStreamer.ts";
 import RainPlayer from "./RainPlayer.tsx";
+import { VolumeSlider } from "../components/VolumeSlider.tsx";
 
 const disableVolumeControl = () => {
   const userAgent = navigator.userAgent;
@@ -19,7 +20,7 @@ export default function AudioPlayer() {
   const [volume, setVolume] = useState(1);
   const [disableVolumeControls, setDisableVolumeControls] = useState(true);
   const [muted, setMuted] = useState(false);
-  const [volumeExpanded, setVolumeExpanded] = useState(false);
+  const [volumeExpanded, setVolumeExpanded] = useState(true); // change to false for production
 
   const handlePlay = async () => {
     try {
@@ -103,20 +104,8 @@ export default function AudioPlayer() {
       class={`space-y-4 relative ${disableVolumeControls ? "mt-8" : "mt-16"}`}
     >
       <div class={`volume-slider ${volumeExpanded ? "expanded" : ""}`}>
-        <div class="flex relative space-x-2 m-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 text-gray-300"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          <input
+        <div class="flex relative my-4">
+          <VolumeSlider
             type="range"
             min="0"
             max="1"
@@ -130,7 +119,7 @@ export default function AudioPlayer() {
               Use iPhone volume buttons
             </div>
           )}
-          <span class="font-inter min-w-[60px]">
+          <span class="font-inter pl-2 min-w-[60px]">
             {Math.round(volume * 100)}%
           </span>
         </div>
