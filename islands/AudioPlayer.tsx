@@ -20,7 +20,7 @@ export default function AudioPlayer() {
   const [volume, setVolume] = useState(1);
   const [disableVolumeControls, setDisableVolumeControls] = useState(true);
   const [muted, setMuted] = useState(false);
-  const [volumeExpanded, setVolumeExpanded] = useState(true); // change to false for production
+  const [volumeExpanded, setVolumeExpanded] = useState(false); // change to false for production
 
   const handlePlay = async () => {
     try {
