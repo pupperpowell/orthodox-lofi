@@ -202,8 +202,6 @@ export default function AudioPlayer() {
                   <span class="dot" style={{ animationDelay: "0.4s" }}>.</span>
                 </>
               )
-              : isPlaying
-              ? "pause"
               : <span>play &#9205;</span>}
           </Button>
         </div>
