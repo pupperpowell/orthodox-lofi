@@ -9,23 +9,24 @@ export default function Home() {
     <>
       <Head>
         <title>orthodox.cafe</title>
-        <script
+        {
+          /* <script
           defer
           src="https://umami.pw1.xyz/script.js"
           data-website-id="1d621ad0-c522-45e0-b890-70854b34a3fc"
           data-domains="cafe.nightbreak.app,www.cafe.nightbreak.app"
         >
-        </script>
+        </script> */
+        }
       </Head>
 
       {Deno.env.get("ENVIRONMENT") == "DEV" &&
-        <LatestCommit className="font-triodion" />}
+          <LatestCommit className="font-triodion" /> || <ActiveListeners />}
 
-      <CandleStand />
-
-      <div class="mt-4">
-        <ActiveListeners />
-      </div>
+      {
+        /* <div class="mt-8">
+      </div> */
+      }
 
       <div class="mt-8">
         <AudioPlayer />

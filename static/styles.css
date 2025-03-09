@@ -21,9 +21,7 @@
 
 /* Base styles */
 @layer base {
-  body {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.10'/%3E%3C/svg%3E");
-  }
+  body {}
 
   body {
     @apply font-triodion;
@@ -79,6 +77,25 @@
     @apply text-gray-100 font-triodion;
   }
 
+  .volume-slider {
+    position: absolute;
+    top: -60px;
+    left: 0;
+    right: 0;
+    transform: translateY(100%);
+    opacity: 0;
+    height: 0;
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+    z-index: 10;
+  }
+
+  .volume-slider.expanded {
+    transform: translateY(0);
+    opacity: 1;
+    height: 40px;
+  }
+
   /* Candle */
   .candle-container {
     display: flex;
@@ -120,4 +137,5 @@
       opacity: 0.5;
     }
   }
+
 }

@@ -17,7 +17,9 @@ export default function AudioPlayer() {
 
   // Volume control state variables
   const [volume, setVolume] = useState(1);
-  const [disableVolume, setDisableVolume] = useState(true);
+  const [disableVolumeControls, setDisableVolumeControls] = useState(true);
+  const [muted, setMuted] = useState(false);
+  const [volumeExpanded, setVolumeExpanded] = useState(false);
 
   const handlePlay = async () => {
     try {
@@ -49,9 +51,23 @@ export default function AudioPlayer() {
     }
   };
 
+  const handleVolumeButton = () => {
+    if (disableVolumeControls) {
+      if (muted) {
+        setMuted(false);
+        streamer?.setVolume(volume);
+      } else {
+        setMuted(true);
+        streamer?.setVolume(0);
+      }
+    } else {
+      setVolumeExpanded(!volumeExpanded);
+    }
+  };
+
   // Disable volume if iPhone
   useEffect(() => {
-    setDisableVolume(disableVolumeControl());
+    setDisableVolumeControls(disableVolumeControl());
   }, []);
 
   // Update the streamer volume when the volume state changes
@@ -83,39 +99,42 @@ export default function AudioPlayer() {
   };
 
   return (
-    <div class="space-y-8 border-2 border-gray-500">
-      <div class="flex relative space-x-2 m-4">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 text-gray-300"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"
-            clip-rule="evenodd"
+    <div class="space-y-8 mt-12
+     relative">
+      <div class={`volume-slider ${volumeExpanded ? "expanded" : ""}`}>
+        <div class="flex relative space-x-2 m-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 text-gray-300"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onInput={handleVolumeChange}
+            class={`w-full ${
+              disableVolumeControls ? "opacity-15 pointer-events-none" : ""
+            }`}
           />
-        </svg>
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value={volume}
-          onInput={handleVolumeChange}
-          class={`w-full ${
-            disableVolume ? "opacity-15 pointer-events-none" : ""
-          }`}
-        />
-        {disableVolume && (
-          <div class="absolute right-0 w-full text-s text-white text-center">
-            Use iPhone volume buttons
-          </div>
-        )}
-        <span class="text-description font-triodion min-w-[60px]">
-          {Math.round(volume * 100)}%
-        </span>
+          {disableVolumeControls && (
+            <div class="text-s text-white">
+              Use iPhone volume buttons
+            </div>
+          )}
+          <span class="font-inter min-w-[60px]">
+            {Math.round(volume * 100)}%
+          </span>
+        </div>
       </div>
       <style>
         {`
@@ -131,9 +150,37 @@ export default function AudioPlayer() {
         }
       `}
       </style>
+      {/* row div */}
       <div class="flex space-x-4">
+        {/* first button container */}
+        <div class="grow-2">
+          <Button
+            type="button"
+            onClick={handleVolumeButton}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              handleVolumeButton();
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-gray-300"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </Button>
+        </div>
+        {/* play button container */}
         <div
-          class={`flex-1 ${!isPlaying ? "" : "opacity-15 pointer-events-none"}`}
+          class={`flex-grow grow-6${
+            !isPlaying ? "" : "opacity-15 pointer-events-none"
+          }`}
         >
           <Button
             data-umami-event="Play button clicked"
@@ -144,7 +191,7 @@ export default function AudioPlayer() {
               handlePlay();
             }}
             disabled={isLoading || isPlaying}
-            class="btn touch-manipulation w-full flex justify-center"
+            class="btn touch-manipulation"
           >
             {isLoading
               ? (
@@ -160,8 +207,9 @@ export default function AudioPlayer() {
               : <span>play &#9205;</span>}
           </Button>
         </div>
+        {/* second button container */}
         <div
-          class={`flex-1 ${isPlaying ? "" : "opacity-15 pointer-events-none"}`}
+          class={`${isPlaying ? "" : "opacity-15 pointer-events-none"}`}
         >
           <Button
             data-umami-event="Stop button clicked"
@@ -171,7 +219,7 @@ export default function AudioPlayer() {
               e.preventDefault();
               handleStop();
             }}
-            class={`btn touch-manipulation w-full flex justify-center`}
+            class={`btn touch-manipulation`}
           >
             <span>stop &#9209;</span>
           </Button>
@@ -193,7 +241,7 @@ export default function AudioPlayer() {
           <span class={!lofiActive ? "text-rose-300" : ""}>off</span>
         </Button>
       </div>
-      <RainPlayer />
+      {/* <RainPlayer /> */}
     </div>
   );
 }

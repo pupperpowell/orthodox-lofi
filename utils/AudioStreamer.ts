@@ -62,7 +62,7 @@ export class AudioStreamer {
 
   public setVolume(value: number): void {
     const normalizedValue = Math.max(0, Math.min(1, value));
-    // Apply volume to both elements since both are playing
+    // Apply volume to both elements since we don't know which are playing
     this.audioElement.volume = normalizedValue;
     this.lofiAudioElement.volume = normalizedValue;
   }
