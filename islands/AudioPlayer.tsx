@@ -152,7 +152,7 @@ export default function AudioPlayer() {
       </style>
       {/* row div */}
       <div class="flex space-x-4">
-        {/* first button container */}
+        {/* volume button container */}
         <div class="grow-2">
           <Button
             type="button"
@@ -178,7 +178,7 @@ export default function AudioPlayer() {
         </div>
         {/* play button container */}
         <div
-          class={`flex-grow grow-6${
+          class={`flex-grow grow-6 ${
             !isPlaying ? "" : "opacity-15 pointer-events-none"
           }`}
         >
