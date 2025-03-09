@@ -7,7 +7,7 @@ export default function About() {
         <Link href="/">
           <span>&#10229;</span> back to home
         </Link>
-        <h1>about this site</h1>
+        <h1 style="mt-12">about this site</h1>
         <p>
           orthodox.cafe is a website for listening to Byzantine music of the
           Eastern Orthodox Church. There is a respectful touch of audio

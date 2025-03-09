@@ -69,15 +69,15 @@ export default function ActiveListeners() {
 
   const content = activeUsers === 0
     ? (
-      <div class="font-triodion">
+      <p class="font-triodion">
         there's nobody listening right now.
-      </div>
+      </p>
     )
     : (
-      <div class="font-triodion">
+      <p class="font-triodion">
         <span class="font-medium">{activeUsers}</span>{" "}
         {activeUsers === 1 ? "person is" : "people are"} listening now
-      </div>
+      </p>
     );
 
   return (

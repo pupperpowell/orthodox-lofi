@@ -21,12 +21,11 @@
 
 /* Base styles */
 @layer base {
-  body {}
-
   body {
     @apply font-triodion;
     @apply bg-black;
     @apply text-white;
+    @apply overflow-hidden;
   }
 
   h1,
@@ -39,7 +38,7 @@
   }
 
   h1 {
-    @apply text-4xl mt-12;
+    @apply text-4xl;
   }
 
   h2 {

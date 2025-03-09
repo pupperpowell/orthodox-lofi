@@ -99,8 +99,7 @@ export default function AudioPlayer() {
   };
 
   return (
-    <div class="space-y-8 mt-12
-     relative">
+    <div class="space-y-4 mt-12 relative">
       <div class={`volume-slider ${volumeExpanded ? "expanded" : ""}`}>
         <div class="flex relative space-x-2 m-4">
           <svg
@@ -123,7 +122,7 @@ export default function AudioPlayer() {
             value={volume}
             onInput={handleVolumeChange}
             class={`w-full ${
-              disableVolumeControls ? "opacity-15 pointer-events-none" : ""
+              disableVolumeControls ? "opacity-50 pointer-events-none" : ""
             }`}
           />
           {disableVolumeControls && (
@@ -150,7 +149,7 @@ export default function AudioPlayer() {
         }
       `}
       </style>
-      {/* row div */}
+      {/* 1st row div */}
       <div class="flex space-x-4">
         {/* volume button container */}
         <div class="grow-2">
@@ -179,7 +178,7 @@ export default function AudioPlayer() {
         {/* play button container */}
         <div
           class={`flex-grow grow-6 ${
-            !isPlaying ? "" : "opacity-15 pointer-events-none"
+            !isPlaying ? "" : "opacity-50 pointer-events-none"
           }`}
         >
           <Button
@@ -207,7 +206,7 @@ export default function AudioPlayer() {
         </div>
         {/* second button container */}
         <div
-          class={`${isPlaying ? "" : "opacity-15 pointer-events-none"}`}
+          class={`${isPlaying ? "" : "opacity-50 pointer-events-none"}`}
         >
           <Button
             data-umami-event="Stop button clicked"
@@ -223,7 +222,7 @@ export default function AudioPlayer() {
           </Button>
         </div>
       </div>
-
+      {/* 2nd row div */}
       <div class="flex items-center space-x-2">
         <Button
           data-umami-event="Lofi toggled"
@@ -239,7 +238,11 @@ export default function AudioPlayer() {
           <span class={!lofiActive ? "text-rose-300" : ""}>off</span>
         </Button>
       </div>
-      {/* <RainPlayer /> */}
+      {disableVolumeControls && (
+        <div class="text-s text-white">
+          Please check your iPhone's volume before pressing play.
+        </div>
+      )}
     </div>
   );
 }
