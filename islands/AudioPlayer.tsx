@@ -33,11 +33,11 @@ export default function AudioPlayer() {
 
         setIsPlaying(true);
       } else {
-        if (isPlaying) {
+        if (isPlaying) { // Not currently used
           streamer.pauseStream();
 
           setIsPlaying(false);
-        } else {
+        } else { // Not currently used
           await streamer.startStream();
 
           setIsPlaying(true);
@@ -54,11 +54,11 @@ export default function AudioPlayer() {
   const handleVolumeButton = () => {
     if (disableVolumeControls) {
       if (muted) {
-        setMuted(false);
         streamer?.setVolume(volume);
+        setMuted(false);
       } else {
-        setMuted(true);
         streamer?.setVolume(0);
+        setMuted(true);
       }
     } else {
       setVolumeExpanded(!volumeExpanded);
@@ -99,7 +99,9 @@ export default function AudioPlayer() {
   };
 
   return (
-    <div class="space-y-4 mt-12 relative">
+    <div
+      class={`space-y-4 relative ${disableVolumeControls ? "mt-8" : "mt-16"}`}
+    >
       <div class={`volume-slider ${volumeExpanded ? "expanded" : ""}`}>
         <div class="flex relative space-x-2 m-4">
           <svg
@@ -121,9 +123,7 @@ export default function AudioPlayer() {
             step="0.01"
             value={volume}
             onInput={handleVolumeChange}
-            class={`w-full ${
-              disableVolumeControls ? "opacity-50 pointer-events-none" : ""
-            }`}
+            class={`w-full`}
           />
           {disableVolumeControls && (
             <div class="text-s text-white">
@@ -150,9 +150,9 @@ export default function AudioPlayer() {
       `}
       </style>
       {/* 1st row div */}
-      <div class="flex space-x-4">
+      <div class="flex">
         {/* volume button container */}
-        <div class="grow-2">
+        <div class={`grow-2 mr-2 ${disableVolumeControls ? "hidden" : ""}`}>
           <Button
             type="button"
             onClick={handleVolumeButton}
@@ -160,6 +160,7 @@ export default function AudioPlayer() {
               e.preventDefault();
               handleVolumeButton();
             }}
+            class="btn touch-manipulation"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -177,7 +178,7 @@ export default function AudioPlayer() {
         </div>
         {/* play button container */}
         <div
-          class={`flex-grow grow-6 ${
+          class={`flex-grow mr-2 grow-6 ${
             !isPlaying ? "" : "opacity-50 pointer-events-none"
           }`}
         >
@@ -185,7 +186,7 @@ export default function AudioPlayer() {
             data-umami-event="Play button clicked"
             type="button"
             onClick={handlePlay}
-            onTouchStart={(e) => {
+            onTouchEnd={(e) => {
               e.preventDefault();
               handlePlay();
             }}
@@ -201,6 +202,8 @@ export default function AudioPlayer() {
                   <span class="dot" style={{ animationDelay: "0.4s" }}>.</span>
                 </>
               )
+              : isPlaying
+              ? <span>playing &#9205;</span>
               : <span>play &#9205;</span>}
           </Button>
         </div>

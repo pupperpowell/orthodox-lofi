@@ -73,13 +73,6 @@ export class AudioStreamer {
     return !this.audioElement.paused || !this.lofiAudioElement.paused;
   }
 
-  // Redundant
-  // public reconnect(): Promise<void> {
-  //   this.audioElement.src = this.streamUrl;
-  //   this.lofiAudioElement.src = this.lofiUrl;
-  //   return this.startStream();
-  // }
-
   public stopStream(): void {
     // Discards both audio elements?
     this.audioElement.src = "";

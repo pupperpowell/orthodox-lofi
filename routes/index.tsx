@@ -21,8 +21,9 @@ export default function Home() {
       </Head>
 
       {Deno.env.get("ENVIRONMENT") == "DEV" &&
-          <LatestCommit className="font-triodion" /> || <ActiveListeners />}
+        <LatestCommit className="font-triodion" />}
 
+      <ActiveListeners />
       {
         /* <div class="mt-8">
       </div> */
