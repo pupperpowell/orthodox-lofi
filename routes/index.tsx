@@ -24,12 +24,8 @@ export default function Home() {
         <LatestCommit className="font-triodion" />}
 
       <ActiveListeners />
-      {
-        /* <div class="mt-8">
-      </div> */
-      }
 
-      <div class="mt-8">
+      <div>
         <AudioPlayer />
       </div>
     </>

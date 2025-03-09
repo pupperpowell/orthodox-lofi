@@ -243,7 +243,7 @@ export default function AudioPlayer() {
       </div>
       {disableVolumeControls && (
         <div class="text-s text-white">
-          Please check your iPhone's volume before pressing play.
+          (Use physical volume buttons)
         </div>
       )}
     </div>

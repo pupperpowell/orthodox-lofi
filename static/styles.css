@@ -25,7 +25,6 @@
     @apply font-triodion;
     @apply bg-black;
     @apply text-white;
-    @apply overflow-hidden;
   }
 
   h1,
