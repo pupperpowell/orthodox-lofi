@@ -15,10 +15,10 @@ export function VolumeSlider(props: JSX.HTMLAttributes<HTMLInputElement>) {
         [&::-webkit-slider-runnable-track]:border-white
         [&::-webkit-slider-runnable-track]:h-[16px]
         [&::-webkit-slider-thumb]:appearance-none
-        [&::-webkit-slider-thumb]:w-[16px]
-        [&::-webkit-slider-thumb]:h-[16px]
+        [&::-webkit-slider-thumb]:w-[20px]
+        [&::-webkit-slider-thumb]:h-[20px]
         [&::-webkit-slider-thumb]:rounded-none
-        [&::-webkit-slider-thumb]:bg-black
+        [&::-webkit-slider-thumb]:bg-white
         [&::-webkit-slider-thumb]:border-2
         [&::-webkit-slider-thumb]:border-white
         [&::-webkit-slider-thumb]:mt-[-2px]

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { Button } from "../components/Button.tsx";
 import { AudioStreamer } from "../utils/AudioStreamer.ts";
-import RainPlayer from "./RainPlayer.tsx";
+// import RainPlayer from "./RainPlayer.tsx";
 import { VolumeSlider } from "../components/VolumeSlider.tsx";
 
 const disableVolumeControl = () => {
@@ -23,26 +23,31 @@ export default function AudioPlayer() {
   const [volumeExpanded, setVolumeExpanded] = useState(false); // change to false for production
 
   const handlePlay = async () => {
+    if (isLoading) return;
     try {
       setIsLoading(true);
 
       if (!streamer) {
         const audioStreamer = new AudioStreamer();
+        console.log("Created AudioStreamer");
+
         audioStreamer.setLofi(lofiActive);
-        setStreamer(audioStreamer);
+
         await audioStreamer.startStream();
+        setStreamer(audioStreamer);
 
         setIsPlaying(true);
-      } else {
-        if (isPlaying) { // Not currently used
-          streamer.pauseStream();
+        // } else { // Old functionality when play/pause was the same button
+        //   if (isPlaying) { // Not currently used
+        //     streamer.pauseStream();
 
-          setIsPlaying(false);
-        } else { // Not currently used
-          await streamer.startStream();
+        //     setIsPlaying(false);
+        //   } else { // Not currently used
+        //     await streamer.startStream();
 
-          setIsPlaying(true);
-        }
+        //     setIsPlaying(true);
+        //   }
+        // }
       }
     } catch (error) {
       console.error("Playback failed:", error);
@@ -143,7 +148,6 @@ export default function AudioPlayer() {
         {/* volume button container */}
         <div class={`grow-2 mr-2 ${disableVolumeControls ? "hidden" : ""}`}>
           <Button
-            type="button"
             onClick={handleVolumeButton}
             onTouchStart={(e) => {
               e.preventDefault();
@@ -173,7 +177,6 @@ export default function AudioPlayer() {
         >
           <Button
             data-umami-event="Play button clicked"
-            type="button"
             onClick={handlePlay}
             onTouchEnd={(e) => {
               e.preventDefault();
@@ -202,7 +205,6 @@ export default function AudioPlayer() {
         >
           <Button
             data-umami-event="Stop button clicked"
-            type="button"
             onClick={handleStop}
             onTouchStart={(e) => {
               e.preventDefault();
@@ -218,7 +220,6 @@ export default function AudioPlayer() {
       <div class="flex items-center space-x-2">
         <Button
           data-umami-event="Lofi toggled"
-          type="button"
           onClick={handleLofiToggle}
           onTouchStart={(e) => {
             e.preventDefault();
