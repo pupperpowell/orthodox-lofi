@@ -22,7 +22,8 @@ export default function AudioPlayer() {
   const [muted, setMuted] = useState(false);
   const [volumeExpanded, setVolumeExpanded] = useState(false); // change to false for production
 
-  const handlePlay = async () => {
+  const handlePlay = async (e: Event) => {
+    e.preventDefault();
     if (isLoading) return;
     try {
       setIsLoading(true);
@@ -57,7 +58,8 @@ export default function AudioPlayer() {
     }
   };
 
-  const handleVolumeButton = () => {
+  const handleVolumeButton = (e: Event) => {
+    e.preventDefault();
     if (disableVolumeControls) {
       if (muted) {
         streamer?.setVolume(volume);
@@ -84,19 +86,22 @@ export default function AudioPlayer() {
   }, [volume, streamer]);
 
   const handleVolumeChange = (e: Event) => {
+    e.preventDefault();
     const target = e.target as HTMLInputElement;
     setVolume(parseFloat(target.value));
   };
 
   // Toggle lofi
-  const handleLofiToggle = () => {
+  const handleLofiToggle = (e: Event) => {
+    e.preventDefault();
     if (streamer) {
       streamer.setLofi(!lofiActive);
     }
     setLofiActive(!lofiActive);
   };
 
-  const handleStop = () => {
+  const handleStop = (e: Event) => {
+    e.preventDefault();
     if (streamer) {
       streamer.stopStream();
       setStreamer(null);
@@ -149,9 +154,9 @@ export default function AudioPlayer() {
         <div class={`grow-2 mr-2 ${disableVolumeControls ? "hidden" : ""}`}>
           <Button
             onClick={handleVolumeButton}
-            onTouchStart={(e) => {
+            onTouchEnd={(e) => {
               e.preventDefault();
-              handleVolumeButton();
+              handleVolumeButton;
             }}
             class="btn touch-manipulation"
           >
@@ -180,7 +185,7 @@ export default function AudioPlayer() {
             onClick={handlePlay}
             onTouchEnd={(e) => {
               e.preventDefault();
-              handlePlay();
+              handlePlay(e);
             }}
             disabled={isLoading || isPlaying}
             class="btn touch-manipulation"
@@ -208,7 +213,7 @@ export default function AudioPlayer() {
             onClick={handleStop}
             onTouchStart={(e) => {
               e.preventDefault();
-              handleStop();
+              handleStop(e);
             }}
             class={`btn touch-manipulation`}
           >
@@ -221,9 +226,9 @@ export default function AudioPlayer() {
         <Button
           data-umami-event="Lofi toggled"
           onClick={handleLofiToggle}
-          onTouchStart={(e) => {
+          onTouchEnd={(e) => {
             e.preventDefault();
-            handleLofiToggle();
+            handleLofiToggle(e);
           }}
           class="btn touch-manipulation"
         >
