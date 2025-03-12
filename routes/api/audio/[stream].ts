@@ -2,6 +2,9 @@
 import { Handlers } from "$fresh/server.ts";
 import { listenerTracker } from "../../../listeners.ts";
 
+// Add at the top of the file, after imports
+console.log("[StreamHandler] Module initialized");
+
 export const handler: Handlers = {
   async GET(req, ctx) {
     const userAgent = req.headers.get("user-agent") || "";

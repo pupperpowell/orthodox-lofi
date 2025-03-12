@@ -12,13 +12,17 @@ class ListenerTracker {
   private cleanupInterval: number;
 
   constructor(cleanupIntervalMs = 15000) {
+    console.log("[ListenerTracker] Starting initialization...");
     // Run cleanup every 15 seconds by default
     this.cleanupInterval = setInterval(
-      () => this.cleanup(),
+      () => {
+        console.log("[ListenerTracker] Running cleanup cycle...");
+        this.cleanup();
+      },
       cleanupIntervalMs,
     ) as unknown as number;
     console.log(
-      "[ListenerTracker] Initialized with cleanup interval:",
+      "[ListenerTracker] Initialization complete with cleanup interval:",
       cleanupIntervalMs,
       "ms",
     );
