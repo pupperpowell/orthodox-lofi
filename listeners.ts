@@ -179,5 +179,18 @@ class ListenerTracker {
   }
 }
 
-// Singleton instance
-export const listenerTracker = new ListenerTracker();
+// Conditionally initialize the tracker only in runtime environment, not during build
+let listenerTracker: ListenerTracker | null = null;
+
+// Create singleton instance only when in a Deno runtime environment, not during build
+if (typeof Deno !== "undefined" && "listen" in Deno) {
+  listenerTracker = new ListenerTracker();
+}
+
+// Export a function that returns the tracker, creating it if needed
+export function getListenerTracker(): ListenerTracker {
+  if (!listenerTracker) {
+    listenerTracker = new ListenerTracker();
+  }
+  return listenerTracker;
+}

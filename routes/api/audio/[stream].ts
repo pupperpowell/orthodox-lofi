@@ -1,6 +1,6 @@
 // routes/api/audio/[stream].ts
 import { Handlers } from "$fresh/server.ts";
-import { listenerTracker } from "../../../listeners.ts";
+import { getListenerTracker } from "../../../listeners.ts";
 
 // Add at the top of the file, after imports
 console.log("[StreamHandler] Module initialized");
@@ -15,7 +15,7 @@ export const handler: Handlers = {
     );
 
     // Generate a connection ID and track this listener
-    const connectionId = listenerTracker.addListener(ctx.remoteAddr, userAgent);
+    const connectionId = getListenerTracker().addListener(ctx.remoteAddr, userAgent);
 
     // Set a cookie with the connection ID
     const headers = new Headers({
@@ -62,7 +62,7 @@ export const handler: Handlers = {
             error instanceof Error ? error.message : "No error"
           }`,
         );
-        listenerTracker.removeListener(connectionId);
+        getListenerTracker().removeListener(connectionId);
       });
 
       console.log(
