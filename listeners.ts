@@ -179,18 +179,47 @@ class ListenerTracker {
   }
 }
 
-// Conditionally initialize the tracker only in runtime environment, not during build
-let listenerTracker: ListenerTracker | null = null;
-
-// Create singleton instance only when in a Deno runtime environment, not during build
-if (typeof Deno !== "undefined" && "listen" in Deno) {
-  listenerTracker = new ListenerTracker();
+// Create mock implementation for build-time
+class MockListenerTracker {
+  private static instance: MockListenerTracker;
+  
+  addListener(_remoteAddr: Deno.NetAddr, _userAgent: string): string {
+    return "mock-connection-id";
+  }
+  
+  updateListener(_connectionId: string) {}
+  
+  removeListener(_connectionId: string) {}
+  
+  getCount(): number {
+    return 0;
+  }
+  
+  cleanup() {}
+  
+  dispose() {}
 }
 
-// Export a function that returns the tracker, creating it if needed
+// Determine if we're in a runtime context
+const IS_RUNTIME = Deno.env.get("FRESH_RUNTIME") === "1";
+
+// Export the appropriate tracker based on context
 export function getListenerTracker(): ListenerTracker {
-  if (!listenerTracker) {
-    listenerTracker = new ListenerTracker();
+  if (!IS_RUNTIME) {
+    console.log("[ListenerTracker] Using mock implementation for build time");
+    return new MockListenerTracker() as unknown as ListenerTracker;
   }
-  return listenerTracker;
+  
+  // For runtime, create once and reuse
+  if (!globalThis.listenerTrackerInstance) {
+    console.log("[ListenerTracker] Creating real tracker for runtime");
+    globalThis.listenerTrackerInstance = new ListenerTracker();
+  }
+  
+  return globalThis.listenerTrackerInstance;
+}
+
+// Prevent TS errors with global augmentation
+declare global {
+  var listenerTrackerInstance: ListenerTracker | undefined;
 }
