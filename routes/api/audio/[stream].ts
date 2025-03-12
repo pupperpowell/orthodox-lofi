@@ -26,8 +26,11 @@ export const handler: Handlers = {
     );
 
     // Use the stream parameter to determine the actual stream URL
-    const icecastBaseUrl = Deno.env.get("ICECAST_URL") ||
-      "http://lofi.george.wiki";
+    const icecastBaseUrl = ((Deno.env.get("ENVIRONMENT") == "DEV") &&
+      "https://lofi.george.wiki") ||
+      "http://localhost:1025";
+
+    console.log(`[StreamHandler] Icecast base URL: ${icecastBaseUrl}`);
     const streamUrl = `${icecastBaseUrl}/${streamName}`;
 
     console.log(`[StreamHandler] Requesting stream from: ${streamUrl}`);

@@ -1,9 +1,11 @@
-import { useEffect, useState } from "preact/hooks";
+import { useEffect, useState, useRef } from "preact/hooks";
 
 export default function ActiveListeners() {
   const [activeUsers, setActiveUsers] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFading, setIsFading] = useState(false);
+  const previousCount = useRef<number | null>(null);
 
   useEffect(() => {
     const checkListeners = async (): Promise<number> => {
@@ -39,10 +41,34 @@ export default function ActiveListeners() {
       }
     };
 
+    // Check if count has changed and trigger fade animation
+    const updateWithAnimation = (newCount: number) => {
+      if (previousCount.current !== null && previousCount.current !== newCount) {
+        // Trigger fade out
+        setIsFading(true);
+        
+        // After fading out, update the count and fade back in
+        setTimeout(() => {
+          setActiveUsers(newCount);
+          previousCount.current = newCount;
+          
+          // Small delay before fade in for a smoother transition
+          setTimeout(() => {
+            setIsFading(false);
+          }, 50);
+        }, 300); // Match with the CSS transition duration for fade out
+      } else {
+        // First load or no change, just update the state
+        setActiveUsers(newCount);
+        previousCount.current = newCount;
+      }
+    };
+
     // Initial fetch
     const fetchInitialData = async () => {
       const count = await checkListeners();
       setActiveUsers(count);
+      previousCount.current = count;
     };
 
     fetchInitialData();
@@ -50,7 +76,7 @@ export default function ActiveListeners() {
     // Set up polling interval
     const intervalId = setInterval(async () => {
       const count = await checkListeners();
-      setActiveUsers(count);
+      updateWithAnimation(count);
     }, 5000);
     
     // Clean up interval on component unmount
@@ -76,8 +102,10 @@ export default function ActiveListeners() {
 
   return (
     <div
-      class="transition-opacity duration-1000"
-      style={{ opacity: loading ? 0 : 1 }}
+      class="transition-opacity duration-300"
+      style={{ 
+        opacity: loading ? 0 : isFading ? 0 : 1 
+      }}
     >
       {content}
     </div>
