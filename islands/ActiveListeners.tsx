@@ -6,9 +6,10 @@ export default function ActiveListeners() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkStreamListneners = async (url: string): Promise<number> => {
+    const checkListeners = async (): Promise<number> => {
       try {
-        const response = await fetch(url);
+        // Use the new API endpoint for listener count
+        const response = await fetch("/api/listeners");
 
         if (!response.ok) {
           console.error(
@@ -18,49 +19,42 @@ export default function ActiveListeners() {
           return -1;
         }
 
-        const data = await response.text();
-
-        try {
-          const jsonData = JSON.parse(data);
-
-          if (!!jsonData.icestats && !!jsonData.icestats.source) {
-            setError(null);
-            // Find the source with the specific listenurl
-            const mainStream = jsonData.icestats.source.find(
-              (source: any) =>
-                source.listenurl === "http://lofi.george.wiki:1025/stream",
-            );
-            return mainStream ? mainStream.listeners : -1;
-          }
-        } catch (parseError) {
-          console.error("Error parsing JSON:", parseError);
-          setError("Error parsing JSON");
+        const data = await response.json();
+        
+        if (data && typeof data.count === 'number') {
+          console.log(`[ActiveListeners] Received listener count: ${data.count}`);
+          setError(null);
+          return data.count;
+        } else {
+          console.error("Invalid response format:", data);
+          setError("Invalid response format");
+          return -1;
         }
       } catch (error) {
-        console.error("Error fetching stream status:", error);
-        setError("Error fetching stream status");
+        console.error("Error fetching listeners:", error);
+        setError("Error fetching listeners");
+        return -1;
       } finally {
         setLoading(false);
       }
-      return -1;
     };
 
-    // Initial fetch moved inside useEffect to avoid unnecessary delay
+    // Initial fetch
     const fetchInitialData = async () => {
-      const initialActiveUsers = await checkStreamListneners(
-        "https://lofi.george.wiki/status-json.xsl",
-      );
-      setActiveUsers(initialActiveUsers);
+      const count = await checkListeners();
+      setActiveUsers(count);
     };
 
     fetchInitialData();
 
-    setInterval(async () => {
-      const activeUsers = await checkStreamListneners(
-        "https://lofi.george.wiki/status-json.xsl",
-      );
-      setActiveUsers(activeUsers);
+    // Set up polling interval
+    const intervalId = setInterval(async () => {
+      const count = await checkListeners();
+      setActiveUsers(count);
     }, 5000);
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
   }, []);
 
   if (error) {
