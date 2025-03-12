@@ -28,7 +28,7 @@ export default function ActiveListeners() {
             // Find the source with the specific listenurl
             const mainStream = jsonData.icestats.source.find(
               (source: any) =>
-                source.listenurl === "http://lofi.george.wiki:1025/stream.mp3",
+                source.listenurl === "http://lofi.george.wiki:1025/stream",
             );
             return mainStream ? mainStream.listeners : -1;
           }

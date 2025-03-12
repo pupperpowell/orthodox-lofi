@@ -1,8 +1,8 @@
 export class AudioStreamer {
   private audioElement: HTMLAudioElement;
   private lofiAudioElement: HTMLAudioElement;
-  private streamUrl: string = "https://lofi.george.wiki/stream.mp3";
-  private lofiUrl: string = "https://lofi.george.wiki/lofi.mp3";
+  private streamUrl: string = "https://lofi.george.wiki/stream";
+  private lofiUrl: string = "https://lofi.george.wiki/lofi";
 
   public lofiActive: boolean = true;
 
@@ -12,12 +12,14 @@ export class AudioStreamer {
     this.audioElement.setAttribute("playsinline", "true");
     this.audioElement.crossOrigin = "anonymous";
     this.audioElement.src = this.streamUrl;
+    this.audioElement.preload = "none";
 
     // Create the lofi stream audio element
     this.lofiAudioElement = new Audio();
     this.lofiAudioElement.setAttribute("playsinline", "true");
     this.lofiAudioElement.crossOrigin = "anonymous";
     this.lofiAudioElement.src = this.lofiUrl;
+    this.lofiAudioElement.preload = "none";
   }
 
   public async startStream(): Promise<void> {
@@ -74,7 +76,7 @@ export class AudioStreamer {
   }
 
   public stopStream(): void {
-    // Discards both audio elements?
+    // Discard both audio elements
     this.audioElement.src = "";
     this.lofiAudioElement.src = "";
   }
