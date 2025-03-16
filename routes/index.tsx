@@ -9,15 +9,23 @@ export default function Home() {
     <>
       <Head>
         <title>orthodox.cafe</title>
-        {
-          /* <script
+        {Deno.env.get("ENVIRONMENT") == "DEV" &&
+          (
+            <script
+              defer
+              src="https://umami.pw1.xyz/script.js"
+              data-website-id="b99bf8e9-7ddc-4fdc-968b-fc90ac5ed4ea"
+              data-domains="cafe.nightbreak.app,www.cafe.nightbreak.app"
+            >
+            </script>
+          )}
+        <script
           defer
           src="https://umami.pw1.xyz/script.js"
-          data-website-id="1d621ad0-c522-45e0-b890-70854b34a3fc"
-          data-domains="cafe.nightbreak.app,www.cafe.nightbreak.app"
+          data-website-id="9db30029-96c3-4f08-86c1-f931c37a73f7"
+          data-domains="orthodox.cafe,www.orthodox.cafe"
         >
-        </script> */
-        }
+        </script>
       </Head>
 
       {Deno.env.get("ENVIRONMENT") == "DEV" &&
