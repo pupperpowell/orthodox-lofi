@@ -5,8 +5,10 @@ import { getListenerTracker } from "../../listeners.ts";
 export const handler: Handlers = {
   GET(req, ctx) {
     const count = getListenerTracker().getCount();
-    console.log(`[ListenersAPI] Request from ${ctx.remoteAddr.hostname} - Current listeners: ${count}`);
-    
+    console.log(
+      `[ListenersAPI] Request from ${ctx.remoteAddr.hostname} - Current listeners: ${count}`,
+    );
+
     // Add CORS headers to allow browser fetching
     return new Response(
       JSON.stringify({
