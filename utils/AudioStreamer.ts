@@ -1,8 +1,10 @@
 export class AudioStreamer {
   private audioElement: HTMLAudioElement;
   private lofiAudioElement: HTMLAudioElement;
-  private streamUrl: string = "/api/audio/stream";
-  private lofiUrl: string = "/api/audio/lofi";
+  // private streamUrl: string = "/api/audio/stream";
+  // private lofiUrl: string = "/api/audio/lofi";
+  private streamUrl: string = "http://localhost:1025/stream";
+  private lofiUrl: string = "http://localhost:1025/lofi";
 
   public lofiActive: boolean = true;
 
