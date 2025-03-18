@@ -1,6 +1,5 @@
 import { Head } from "$fresh/runtime.ts";
 import AudioPlayer from "../islands/AudioPlayer.tsx";
-import ActiveListeners from "../islands/ActiveListeners.tsx";
 import LatestCommit from "../islands/LatestCommit.tsx";
 import CandleStand from "../islands/CandleStand.tsx";
 
