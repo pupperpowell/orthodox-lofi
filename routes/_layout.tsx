@@ -18,6 +18,7 @@ export default function Layout({ Component }: PageProps) {
       <footer class="text-lg flex gap-4">
         <Link href="/">home</Link>
         <Link href="/about">about</Link>
+        <Link href="/credits">credits</Link>
       </footer>
     </body>
   );
