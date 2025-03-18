@@ -20,9 +20,9 @@ Although there is very little in common between the two, [orthodox.cafe](https:/
    - _stillness, rest, quiet, silence_
    - _bodily rest combined with creative tension_
    - _openness to the divine (mystical) presence and to prayer_
-2. Mysticality:
+2. Mystery:
    - _having a spiritual meaning or reality that is neither apparent to the senses nor obvious to the intelligence_
-3. Communion:
+3. Community:
    - _intimate fellowship or rapport_
 
 Building software often feels like sitting at a blank canvas where anything is possible. But just because you can build anything doesn't mean you should. The magical slabs of metal and glass we carry in our pockets can do anything, and as a result, we use them to do nothing.
