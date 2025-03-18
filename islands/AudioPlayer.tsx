@@ -149,7 +149,7 @@ export default function AudioPlayer() {
         <div class={`grow-2 mr-2 ${disableVolumeControls ? "hidden" : ""}`}>
           <Button
             onClick={handleVolumeButton}
-            onTouchEnd={() => {
+            onTouchStart={() => {
               handleVolumeButton;
             }}
             class="btn touch-manipulation"
@@ -177,10 +177,10 @@ export default function AudioPlayer() {
           <Button
             data-umami-event="Play button clicked"
             onClick={handlePlay}
-            // onTouchStart={(e) => {
-            //   e.preventDefault();
-            //   handlePlay();
-            // }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              handlePlay();
+            }}
             disabled={isLoading || isPlaying}
             class="btn touch-manipulation"
           >
@@ -209,7 +209,7 @@ export default function AudioPlayer() {
               e.preventDefault();
               handleStop();
             }}
-            class={`btn touch-manipulation`}
+            class="btn touch-manipulation"
           >
             <span>stop &#9209;</span>
           </Button>
@@ -231,7 +231,7 @@ export default function AudioPlayer() {
         </Button>
       </div>
       {disableVolumeControls && (
-        <div class="text-s text-white">
+        <div class="text-s content-center text-white">
           (Use physical volume buttons)
         </div>
       )}

@@ -30,8 +30,6 @@ export default function Home() {
       {Deno.env.get("ENVIRONMENT") == "DEV" &&
         <LatestCommit className="font-triodion" />}
 
-      <ActiveListeners />
-
       <div>
         <AudioPlayer />
       </div>

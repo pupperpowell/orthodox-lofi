@@ -1,8 +1,6 @@
 export class AudioStreamer {
   private audioElement: HTMLAudioElement;
   private lofiAudioElement: HTMLAudioElement;
-  // private streamUrl: string = "/api/audio/stream";
-  // private lofiUrl: string = "/api/audio/lofi";
   private streamUrl: string = "https://lofi.george.wiki/stream";
   private lofiUrl: string = "https://lofi.george.wiki/lofi";
 

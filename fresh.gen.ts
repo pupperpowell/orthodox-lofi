@@ -6,11 +6,8 @@ import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $_layout from "./routes/_layout.tsx";
 import * as $about from "./routes/about.tsx";
-import * as $api_audio_stream_ from "./routes/api/audio/[stream].ts";
 import * as $api_latest_commit from "./routes/api/latest-commit.ts";
-import * as $api_listeners from "./routes/api/listeners.ts";
 import * as $index from "./routes/index.tsx";
-import * as $ActiveListeners from "./islands/ActiveListeners.tsx";
 import * as $AudioPlayer from "./islands/AudioPlayer.tsx";
 import * as $CandleStand from "./islands/CandleStand.tsx";
 import * as $LatestCommit from "./islands/LatestCommit.tsx";
@@ -24,13 +21,10 @@ const manifest = {
     "./routes/_app.tsx": $_app,
     "./routes/_layout.tsx": $_layout,
     "./routes/about.tsx": $about,
-    "./routes/api/audio/[stream].ts": $api_audio_stream_,
     "./routes/api/latest-commit.ts": $api_latest_commit,
-    "./routes/api/listeners.ts": $api_listeners,
     "./routes/index.tsx": $index,
   },
   islands: {
-    "./islands/ActiveListeners.tsx": $ActiveListeners,
     "./islands/AudioPlayer.tsx": $AudioPlayer,
     "./islands/CandleStand.tsx": $CandleStand,
     "./islands/LatestCommit.tsx": $LatestCommit,
