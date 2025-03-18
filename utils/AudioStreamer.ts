@@ -3,8 +3,8 @@ export class AudioStreamer {
   private lofiAudioElement: HTMLAudioElement;
   // private streamUrl: string = "/api/audio/stream";
   // private lofiUrl: string = "/api/audio/lofi";
-  private streamUrl: string = "http://localhost:1025/stream";
-  private lofiUrl: string = "http://localhost:1025/lofi";
+  private streamUrl: string = "https://lofi.nightbreak.app/stream";
+  private lofiUrl: string = "https://lofi.nightbreak.app/lofi";
 
   public lofiActive: boolean = true;
 
