@@ -6,9 +6,9 @@ import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $_layout from "./routes/_layout.tsx";
 import * as $about from "./routes/about.tsx";
-import * as $api_audio_path_ from "./routes/api/audio/[path].ts";
 import * as $api_latest_commit from "./routes/api/latest-commit.ts";
-import * as $api_radio_state from "./routes/api/radio-state.ts";
+import * as $api_music from "./routes/api/music.ts";
+import * as $api_ws from "./routes/api/ws.ts";
 import * as $credits from "./routes/credits.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $AudioPlayer from "./islands/AudioPlayer.tsx";
@@ -25,9 +25,9 @@ const manifest = {
     "./routes/_app.tsx": $_app,
     "./routes/_layout.tsx": $_layout,
     "./routes/about.tsx": $about,
-    "./routes/api/audio/[path].ts": $api_audio_path_,
     "./routes/api/latest-commit.ts": $api_latest_commit,
-    "./routes/api/radio-state.ts": $api_radio_state,
+    "./routes/api/music.ts": $api_music,
+    "./routes/api/ws.ts": $api_ws,
     "./routes/credits.tsx": $credits,
     "./routes/index.tsx": $index,
   },

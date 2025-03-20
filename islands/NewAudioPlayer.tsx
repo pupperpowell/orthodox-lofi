@@ -1,131 +1,148 @@
-// islands/AudioPlayer.tsx
+// islands/SimpleAudioPlayer.tsx
 import { useEffect, useRef, useState } from "preact/hooks";
-
-interface Track {
-  id: string;
-  title: string;
-  path: string;
-  duration: number;
-}
-
-interface RadioState {
-  currentTrack: string;
-  startedAt: number;
-  duration: number;
-  playlist: Track[];
-  isPlaying: boolean;
-}
+import { Button } from "../components/Button.tsx";
 
 export default function NewAudioPlayer() {
-  const [radioState, setRadioState] = useState<RadioState | null>(null);
-  const [isSynced, setIsSynced] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const syncTimerRef = useRef<number | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [isConnected, setIsConnected] = useState(false);
 
-  // Initialize audio element and state sync
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const wsRef = useRef<WebSocket | null>(null);
+
   useEffect(() => {
-    // Create audio element
-    const audio = new Audio();
-    audioRef.current = audio;
+    // Connect to WebSocket
+    const ws = new WebSocket(`ws://${globalThis.location.host}/api/ws`);
+    wsRef.current = ws;
 
-    // Sync with server initially
-    syncWithServer();
+    ws.onopen = () => {
+      console.log("WebSocket connected");
+      setIsConnected(true);
+    };
 
-    // Set up periodic sync
-    syncTimerRef.current = setInterval(syncWithServer, 10000);
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "progress") {
+          setCurrentTime(data.currentTime);
+          setIsPlaying(data.isPlaying);
+
+          // Sync audio element with server state
+          if (audioRef.current) {
+            // Update position if it's significantly different
+            if (Math.abs(audioRef.current.currentTime - data.currentTime) > 1) {
+              audioRef.current.currentTime = data.currentTime;
+            }
+
+            // Match play/pause state
+            if (data.isPlaying && audioRef.current.paused) {
+              audioRef.current.play().catch((e) =>
+                console.error("Play error:", e)
+              );
+            } else if (!data.isPlaying && !audioRef.current.paused) {
+              audioRef.current.pause();
+            }
+          }
+        }
+
+        if (data.type === "trackChange") {
+          // Reload the audio to get a new track
+          if (audioRef.current) {
+            const _oldSrc = audioRef.current.src;
+            audioRef.current.src = `/api/music?t=${Date.now()}`; // Cache busting
+            audioRef.current.load();
+            audioRef.current.play().catch((e) =>
+              console.error("Play error:", e)
+            );
+          }
+        }
+      } catch (e) {
+        console.error("Error parsing WebSocket message:", e);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket disconnected");
+      setIsConnected(false);
+    };
 
     return () => {
-      if (syncTimerRef.current) clearInterval(syncTimerRef.current);
-      if (audio) {
-        audio.pause();
-        audio.src = "";
-      }
+      if (wsRef.current) wsRef.current.close();
     };
   }, []);
 
-  // Handle changes to radio state
-  useEffect(() => {
-    if (!radioState || !audioRef.current) return;
+  const handleMetadata = () => {
+    if (audioRef.current) {
+      const audioDuration = audioRef.current.duration;
+      setDuration(audioDuration);
 
-    const audio = audioRef.current;
-    const currentTrack = radioState.playlist.find((t) =>
-      t.id === radioState.currentTrack
-    );
-
-    if (!currentTrack) return;
-
-    // Only reload if track changed
-    if (audio.src !== `/api/audio/${currentTrack.path}`) {
-      audio.src = `/api/audio/${currentTrack.path}`;
-      console.log("Now playing: ", currentTrack.title);
-    }
-
-    // Calculate what position we should be at
-    const elapsedSeconds = (Date.now() - radioState.startedAt) / 1000;
-
-    // Only seek if we're more than 1 second out of sync
-    if (Math.abs(audio.currentTime - elapsedSeconds) > 1) {
-      audio.currentTime = elapsedSeconds;
-    }
-
-    // Play or pause
-    if (radioState.isPlaying && audio.paused) {
-      audio.play().then(() => setIsSynced(true));
-    } else if (!radioState.isPlaying && !audio.paused) {
-      audio.pause();
-    }
-  }, [radioState]);
-
-  const syncWithServer = async () => {
-    try {
-      const response = await fetch("/api/radio-state");
-      const state = await response.json();
-      console.log("Synced with the server");
-      setRadioState(state);
-    } catch (error) {
-      console.error("Failed to sync with server:", error);
+      // Report the duration to the server
+      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+        wsRef.current.send(JSON.stringify({
+          type: "trackLoaded",
+          duration: audioDuration,
+        }));
+      }
     }
   };
 
-  const getCurrentTrackInfo = () => {
-    if (!radioState) return null;
-    return radioState.playlist.find((t) => t.id === radioState.currentTrack);
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // For admin controls
-  const togglePlayPause = async () => {
-    try {
-      const response = await fetch("/api/radio-state", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "toggle" }),
-      });
-      const state = await response.json();
-      setRadioState(state);
-    } catch (error) {
-      console.error("Failed to toggle play state:", error);
+  const sendCommand = (action: string) => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify({
+        type: "command",
+        action,
+      }));
     }
   };
-
-  const currentTrack = getCurrentTrackInfo();
 
   return (
     <div class="audio-player">
-      <h2>Web Radio</h2>
-      {radioState && currentTrack
-        ? (
-          <div>
-            <p>Now playing: {currentTrack.title}</p>
-            <p>Status: {isSynced ? "Synchronized" : "Synchronizing..."}</p>
-            <p>Listeners hear the same content simultaneously</p>
+      <h2>Synchronized MP3 Player</h2>
 
-            {/* Admin controls - you might want to hide these based on user role */}
-            <button type="button" onClick={togglePlayPause}>
-              Admin: {radioState.isPlaying ? "Pause Station" : "Start Station"}
-            </button>
+      <div
+        class={`connection-status ${
+          isConnected ? "connected" : "disconnected"
+        }`}
+      >
+        {isConnected ? "Connected" : "Disconnected"}
+      </div>
+
+      <audio
+        ref={audioRef}
+        src="/api/music"
+        preload="auto"
+        onLoadedMetadata={handleMetadata}
+      />
+
+      <div class="progress-container">
+        <div class="time">{formatTime(currentTime)}</div>
+        <div class="progress-bar">
+          <div
+            class="progress-fill"
+            style={{
+              width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`,
+            }}
+          >
           </div>
-        )
-        : <p>Loading radio...</p>}
+        </div>
+        <div class="time">{formatTime(duration)}</div>
+      </div>
+
+      <div class="controls">
+        <Button onClick={() => sendCommand("prev")}>Previous</Button>
+        <Button onClick={() => sendCommand(isPlaying ? "pause" : "play")}>
+          {isPlaying ? "Pause" : "Play"}
+        </Button>
+        <Button onClick={() => sendCommand("next")}>Next</Button>
+      </div>
     </div>
   );
 }
