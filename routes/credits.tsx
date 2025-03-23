@@ -9,6 +9,17 @@ export default function About() {
         </Link>
         <h1 class="mt-12">credits</h1>
         <p>
+          Thank you to all the people who encouraged me during the long
+          development process. Without your support, I would have abandoned this
+          project. Your enthusiasm (even if you secretly thought the idea was
+          questionable) means the world to me.
+        </p>
+        <p>
+          Thank you especially to Alanna who helped me design the audio
+          processing and effects.
+        </p>
+        {
+          /* <p>
           This project would not have been possible without the help of several
           people:
           <ul class="list-decimal list-inside pt-2 text-lg">
@@ -26,7 +37,8 @@ export default function About() {
               project, like Peggy, Jenn, Nick, my mom, and others.
             </li>
           </ul>
-        </p>
+        </p> */
+        }
       </div>
     </>
   );
