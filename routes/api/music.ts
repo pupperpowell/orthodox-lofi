@@ -21,6 +21,7 @@ async function loadAudioFiles(): Promise<string[]> {
         files.push(entry.name);
       }
     }
+    console.log("Loaded audio files:", files);
 
     // Sort files alphabetically to ensure consistent order
     return files.sort();
@@ -40,6 +41,7 @@ function getNextAudioFile(): string | null {
   // Increment the index for next time, wrapping around if needed
   currentFileIndex = (currentFileIndex + 1) % audioFiles.length;
 
+  console.log("File playing now:", fileName);
   return MP3_DIRECTORY + fileName;
 }
 
@@ -48,7 +50,7 @@ function getNextAudioFile(): string | null {
   audioFiles = await loadAudioFiles();
   if (audioFiles.length > 0) {
     currentFilePath = MP3_DIRECTORY + audioFiles[0];
-    console.log(`Selected initial audio file: ${currentFilePath}`);
+    // console.log(`Selected initial audio file: ${currentFilePath}`);
   }
 })();
 

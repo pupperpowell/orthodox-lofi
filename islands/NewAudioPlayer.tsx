@@ -7,6 +7,7 @@ export default function NewAudioPlayer() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isConnected, setIsConnected] = useState(false);
+  const [trackInfo, setTrackInfo] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
@@ -29,6 +30,11 @@ export default function NewAudioPlayer() {
           setCurrentTime(data.currentTime);
           setIsPlaying(data.isPlaying);
 
+          // Update duration if provided by server
+          if (data.duration && data.duration > 0) {
+            setDuration(data.duration);
+          }
+
           // Sync audio element with server state
           if (audioRef.current) {
             // Update position if it's significantly different
@@ -48,6 +54,16 @@ export default function NewAudioPlayer() {
         }
 
         if (data.type === "trackChange") {
+          // Update duration from server if available
+          if (data.duration && data.duration > 0) {
+            setDuration(data.duration);
+          }
+
+          // Update track info if available
+          if (data.file) {
+            setTrackInfo(data.file);
+          }
+
           // Reload the audio to get a new track
           if (audioRef.current) {
             const _oldSrc = audioRef.current.src;
@@ -75,15 +91,18 @@ export default function NewAudioPlayer() {
 
   const handleMetadata = () => {
     if (audioRef.current) {
-      const audioDuration = audioRef.current.duration;
-      setDuration(audioDuration);
+      // Only use the browser's duration as a fallback if server didn't provide one
+      if (duration === 0) {
+        const audioDuration = audioRef.current.duration;
+        setDuration(audioDuration);
 
-      // Report the duration to the server
-      if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify({
-          type: "trackLoaded",
-          duration: audioDuration,
-        }));
+        // Report the duration to the server
+        if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+          wsRef.current.send(JSON.stringify({
+            type: "trackLoaded",
+            duration: audioDuration,
+          }));
+        }
       }
     }
   };
@@ -114,6 +133,12 @@ export default function NewAudioPlayer() {
       >
         {isConnected ? "Connected" : "Disconnected"}
       </div>
+
+      {trackInfo && (
+        <div class="track-info">
+          Now playing: {trackInfo}
+        </div>
+      )}
 
       <audio
         ref={audioRef}
