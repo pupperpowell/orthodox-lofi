@@ -8,7 +8,7 @@ import * as $_layout from "./routes/_layout.tsx";
 import * as $about from "./routes/about.tsx";
 import * as $api_latest_commit from "./routes/api/latest-commit.ts";
 import * as $api_music from "./routes/api/music.ts";
-import * as $api_ws from "./routes/api/ws.ts";
+import * as $api_radio from "./routes/api/radio.ts";
 import * as $credits from "./routes/credits.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $AudioPlayer from "./islands/AudioPlayer.tsx";
@@ -27,7 +27,7 @@ const manifest = {
     "./routes/about.tsx": $about,
     "./routes/api/latest-commit.ts": $api_latest_commit,
     "./routes/api/music.ts": $api_music,
-    "./routes/api/ws.ts": $api_ws,
+    "./routes/api/radio.ts": $api_radio,
     "./routes/credits.tsx": $credits,
     "./routes/index.tsx": $index,
   },
