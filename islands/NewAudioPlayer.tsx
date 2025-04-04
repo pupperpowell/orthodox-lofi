@@ -16,6 +16,13 @@ export default function NewAudioPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const currentTrackPathRef = useRef<string>("");
+  // Add a ref to track the current isPlaying state
+  const isPlayingRef = useRef<boolean>(false);
+
+  // Update the ref whenever isPlaying changes
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
 
   useEffect(() => {
     // Connect to WebSocket
@@ -37,14 +44,15 @@ export default function NewAudioPlayer() {
           console.log("Track changed to:", data.currentTrack.path);
           currentTrackPathRef.current = data.currentTrack.path;
 
-          // Add a timestamp to prevent caching
-          setAudioSrc(`/api/music?t=${Date.now()}`);
+          setAudioSrc(`/api/music`);
 
           // If we have an audio element, load the new track but don't auto-play
           if (audioRef.current) {
             audioRef.current.load();
-            // Only continue playing if the user had already started playback
-            if (isPlaying) {
+            console.log("Loaded new track:", data.currentTrack.path);
+            // Use the ref instead of the state to check if we should play
+            if (isPlayingRef.current) {
+              console.log("Auto-playing new track");
               audioRef.current.play().catch((e) =>
                 console.error("Play error:", e)
               );
@@ -62,9 +70,6 @@ export default function NewAudioPlayer() {
         ) {
           audioRef.current.currentTime = data.progress;
         }
-
-        // We no longer automatically sync play/pause state with the server
-        // Client playback is now controlled exclusively by the user
       } catch (e) {
         console.error("Error parsing WebSocket message:", e);
       }
@@ -76,12 +81,12 @@ export default function NewAudioPlayer() {
     };
 
     // Initial audio source
-    setAudioSrc(`/api/music?t=${Date.now()}`);
+    setAudioSrc(`/api/music`);
 
     return () => {
       if (wsRef.current) wsRef.current.close();
     };
-  }, []); // Removed isPlaying dependency to prevent reconnection
+  }, []); // Empty dependency array is correct here
 
   // Add a separate effect to handle audio element state changes
   useEffect(() => {
@@ -105,18 +110,6 @@ export default function NewAudioPlayer() {
 
   const togglePlayback = () => {
     setIsPlaying(!isPlaying);
-
-    // Still send command to server to keep it in sync
-    sendCommand(!isPlaying ? "play" : "pause");
-  };
-
-  const sendCommand = (action: string) => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
-        type: "command",
-        action,
-      }));
-    }
   };
 
   return (
