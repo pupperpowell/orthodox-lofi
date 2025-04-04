@@ -116,6 +116,7 @@ async function loadAudioFiles(): Promise<AudioTrack[]> {
 function getNextAudioFile(): AudioTrack {
   const track = audioFiles[currentTrackIndex];
   currentTrackIndex = (currentTrackIndex + 1) % audioFiles.length;
+  console.log("Next audio file: " + track.path);
   return track;
 }
 
@@ -136,11 +137,11 @@ function startPlayback() {
       radio.progress = 0;
     }
 
-    console.log(
-      "Radio: " + radio.currentTrack.path + ": " + radio.progress + "s / " +
-        radio.currentTrack.duration +
-        "s",
-    );
+    // console.log(
+    //   "Radio: " + radio.currentTrack.path + ": " + radio.progress + "s / " +
+    //     radio.currentTrack.duration +
+    //     "s",
+    // );
 
     // Send the radio state to all connected clients
     broadcastMessage(radio);
@@ -160,7 +161,7 @@ function startPlayback() {
         client.send(messageStr);
       }
     }
-    console.log("Broadcasted message to " + clients.size + " clients");
+    // console.log("Broadcasted message to " + clients.size + " clients");
   }
 }
 
