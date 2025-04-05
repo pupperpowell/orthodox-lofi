@@ -9,7 +9,7 @@ export default function Layout({ Component }: PageProps) {
       <h1 class="text-3xl/8 font-bold font-triodion">
         lofi byzantine music radio &mdash; chanting to relax/study to
         <span class="left-1 bottom-4 relative">
-          <Status />
+          {/* <Status /> */}
         </span>
       </h1>
       <main className={`grow`}>

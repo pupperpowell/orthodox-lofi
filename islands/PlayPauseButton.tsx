@@ -40,20 +40,27 @@ export default function PlayPauseButton() {
         const data = JSON.parse(event.data) as Radio;
 
         // Check if the track has changed using the ref instead of state
+
         if (data.currentTrack.path !== currentTrackPathRef.current) {
           currentTrackPathRef.current = data.currentTrack.path;
 
-          setAudioSrc(`/api/music`);
+          // Append a cache buster to ensure a fresh request
+          setAudioSrc(
+            `/api/music?path=${data.currentTrack.path}&t=${Date.now()}`,
+          );
 
-          // If we have an audio element, load the new track but don't auto-play
           if (audioRef.current) {
+            // Load the new track
             audioRef.current.load();
             console.log("Fetched new track:", data.currentTrack.path);
-            // Use the ref instead of the state to check if we should play
+
+            // If playback is enabled, wait until the track is ready before auto-playing
             if (isPlayingRef.current) {
-              audioRef.current.play().catch((e) =>
-                console.error("Play error:", e)
-              );
+              audioRef.current.addEventListener("canplay", () => {
+                audioRef.current?.play().catch((e) =>
+                  console.error("Play error after canplay:", e)
+                );
+              }, { once: true });
             }
           }
         }
@@ -66,6 +73,15 @@ export default function PlayPauseButton() {
           audioRef.current &&
           Math.abs(audioRef.current.currentTime - data.progress) > 1
         ) {
+          // console.log("Syncing audio element with server progress");
+          console.log(
+            "Server progress: " + data.progress + "s, " +
+              data.currentTrack.path,
+          );
+          console.log(
+            "Audio element:" + audioRef.current.currentTime + "s, " +
+              audioRef.current.src,
+          );
           audioRef.current.currentTime = data.progress;
         }
       } catch (e) {

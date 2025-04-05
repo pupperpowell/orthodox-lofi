@@ -23,6 +23,8 @@ export const handler = async (
 
     // Read the file
     const fullPath = `${AUDIO_DIRECTORY}${trackPath}`;
+    // Get file information so we can set Content-Length header
+    const fileInfo = await Deno.stat(fullPath);
     const file = await Deno.open(fullPath, { read: true });
     const readableStream = file.readable;
 
@@ -38,12 +40,13 @@ export const handler = async (
       contentType = "audio/mpeg";
     }
 
-    // Serve the file
+    // Serve the file with proper headers
     return new Response(readableStream, {
       headers: {
         "Content-Type": contentType,
-        // the below headers prevent chromium browsers from seeking correctly
-        // "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Content-Length": fileInfo.size.toString(),
+        "Accept-Ranges": "bytes",
+        "Cache-Control": "no-store no-cache",
       },
     });
   } catch (error) {
