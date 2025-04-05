@@ -1,7 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
 import AudioPlayer from "../islands/AudioPlayer.tsx";
 import LatestCommit from "../islands/LatestCommit.tsx";
-import NewAudioPlayer from "../islands/NewAudioPlayer.tsx";
+import NewAudioPlayer from "../islands/PlayPauseButton.tsx";
 
 export default function Home() {
   return (

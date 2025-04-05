@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { Button } from "../components/Button.tsx";
 import { Radio } from "../routes/api/radio.ts";
 
-export default function NewAudioPlayer() {
+export default function PlayPauseButton() {
   const [radioState, setRadioState] = useState<Radio>({
     currentTrack: { path: "", duration: 0 },
     progress: 0,
@@ -41,7 +41,6 @@ export default function NewAudioPlayer() {
 
         // Check if the track has changed using the ref instead of state
         if (data.currentTrack.path !== currentTrackPathRef.current) {
-          console.log("Track changed to:", data.currentTrack.path);
           currentTrackPathRef.current = data.currentTrack.path;
 
           setAudioSrc(`/api/music`);
@@ -49,10 +48,9 @@ export default function NewAudioPlayer() {
           // If we have an audio element, load the new track but don't auto-play
           if (audioRef.current) {
             audioRef.current.load();
-            console.log("Loaded new track:", data.currentTrack.path);
+            console.log("Fetched new track:", data.currentTrack.path);
             // Use the ref instead of the state to check if we should play
             if (isPlayingRef.current) {
-              console.log("Auto-playing new track");
               audioRef.current.play().catch((e) =>
                 console.error("Play error:", e)
               );
@@ -86,7 +84,7 @@ export default function NewAudioPlayer() {
     return () => {
       if (wsRef.current) wsRef.current.close();
     };
-  }, []); // Empty dependency array is correct here
+  }, []);
 
   // Add a separate effect to handle audio element state changes
   useEffect(() => {
@@ -113,22 +111,22 @@ export default function NewAudioPlayer() {
   };
 
   return (
-    <div class="audio-player">
-      <h2>Orthodox Lofi Radio</h2>
-
+    <div>
       <div
         class={`connection-status ${
           isConnected ? "connected" : "disconnected"
         }`}
       >
-        {isConnected ? "Connected" : "Disconnected"}
+        {isConnected ? "connected" : "disconnected"}
       </div>
 
-      {radioState.currentTrack.path && (
+      {
+        /* {radioState.currentTrack.path && (
         <div class="track-info">
           Now playing: {radioState.currentTrack.path.split("/").pop()}
         </div>
-      )}
+      )} */
+      }
 
       <audio
         ref={audioRef}
@@ -136,28 +134,9 @@ export default function NewAudioPlayer() {
         preload="auto"
       />
 
-      <div class="progress-container">
-        <div class="time">{formatTime(radioState.progress)}</div>
-        <div class="progress-bar">
-          <div
-            class="progress-fill"
-            style={{
-              width: `${
-                radioState.currentTrack.duration > 0
-                  ? (radioState.progress / radioState.currentTrack.duration) *
-                    100
-                  : 0
-              }%`,
-            }}
-          >
-          </div>
-        </div>
-        <div class="time">{formatTime(radioState.currentTrack.duration)}</div>
-      </div>
-
       <div class="controls">
         <Button onClick={togglePlayback}>
-          {isPlaying ? "Pause" : "Play"}
+          {isPlaying ? "pause" : "play"}
         </Button>
       </div>
     </div>

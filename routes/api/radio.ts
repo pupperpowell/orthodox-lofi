@@ -1,14 +1,9 @@
 // A server TS file that keeps track of an internal "radio" state.
-
 import { FreshContext } from "$fresh/server.ts";
 
 // ✅ Loads audio files from directory on server start
 // ✅ Keeps track of current track, duration, and progress
 // ✅ Loads next track when current track ends
-
-// TODO: Provides a constantly updating Radio object status for
-// Websocket, to update the client (current file?)
-// Music.ts, to serve the current file
 
 export type Radio = {
   currentTrack: AudioTrack;
@@ -35,9 +30,11 @@ let currentTrack: AudioTrack | null = null;
 let currentTrackIndex = 0;
 // Store all available files
 let audioFiles: AudioTrack[] = [];
+
 // This variable is how often the current track is updated
 // Also used to start playback once when the server starts
 let progressInterval: number | null = null;
+
 export const radio: Radio = {
   currentTrack: {
     path: "",
@@ -52,7 +49,6 @@ export const radio: Radio = {
   audioFiles = await loadAudioFiles();
   if (audioFiles.length > 0) {
     currentTrack = audioFiles[0];
-    console.log(`Selected initial audio file: ${currentTrack}`);
   }
   startPlayback();
 })();
@@ -104,7 +100,6 @@ async function loadAudioFiles(): Promise<AudioTrack[]> {
 
   try {
     await traverseDirectory(AUDIO_DIRECTORY);
-    console.log("Loaded audio tracks");
     return audioFiles.sort((a, b) => a.path.localeCompare(b.path));
   } catch (error) {
     console.error("Error reading audio directory:", error);
@@ -116,7 +111,6 @@ async function loadAudioFiles(): Promise<AudioTrack[]> {
 function getNextAudioFile(): AudioTrack {
   const track = audioFiles[currentTrackIndex];
   currentTrackIndex = (currentTrackIndex + 1) % audioFiles.length;
-  console.log("Next audio file: " + track.path);
   return track;
 }
 
@@ -132,26 +126,12 @@ function startPlayback() {
 
     // If we reached the end of the track, change to a new one
     if (radio.progress >= radio.currentTrack.duration) {
-      console.log("Reached end of track, changing to a new one");
       radio.currentTrack = getNextAudioFile();
       radio.progress = 0;
     }
 
-    // console.log(
-    //   "Radio: " + radio.currentTrack.path + ": " + radio.progress + "s / " +
-    //     radio.currentTrack.duration +
-    //     "s",
-    // );
-
     // Send the radio state to all connected clients
     broadcastMessage(radio);
-
-    // Old broadcast function used in WebSocket
-    // broadcastMessage({
-    //   type: "progress",
-    //   currentTime: currentProgress,
-    //   isPlaying: true,
-    // });
   }, 1000); // Update every second
 
   function broadcastMessage(message: object) {
@@ -161,12 +141,10 @@ function startPlayback() {
         client.send(messageStr);
       }
     }
-    // console.log("Broadcasted message to " + clients.size + " clients");
   }
 }
 
 // This is the main function that handles the WebSocket connection
-
 export const handler = (req: Request, _ctx: FreshContext): Response => {
   const { socket, response } = Deno.upgradeWebSocket(req);
 
@@ -185,7 +163,6 @@ export const handler = (req: Request, _ctx: FreshContext): Response => {
 
   socket.onclose = () => {
     clients.delete(socket);
-    console.log(`WebSocket client disconnected (${clients.size} remaining)`);
   };
 
   socket.onerror = (e) => {

@@ -38,14 +38,12 @@ export const handler = async (
       contentType = "audio/mpeg";
     }
 
-    console.log(
-      "Returning the file " + fullPath + " with content type " + contentType,
-    );
-
+    // Serve the file
     return new Response(readableStream, {
       headers: {
         "Content-Type": contentType,
-        "Cache-Control": "no-cache, no-store, must-revalidate",
+        // the below headers prevent chromium browsers from seeking correctly
+        // "Cache-Control": "no-cache, no-store, must-revalidate",
       },
     });
   } catch (error) {

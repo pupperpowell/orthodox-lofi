@@ -14,7 +14,7 @@ import * as $index from "./routes/index.tsx";
 import * as $AudioPlayer from "./islands/AudioPlayer.tsx";
 import * as $CandleStand from "./islands/CandleStand.tsx";
 import * as $LatestCommit from "./islands/LatestCommit.tsx";
-import * as $NewAudioPlayer from "./islands/NewAudioPlayer.tsx";
+import * as $PlayPauseButton from "./islands/PlayPauseButton.tsx";
 import * as $RainPlayer from "./islands/RainPlayer.tsx";
 import * as $Status from "./islands/Status.tsx";
 import type { Manifest } from "$fresh/server.ts";
@@ -35,7 +35,7 @@ const manifest = {
     "./islands/AudioPlayer.tsx": $AudioPlayer,
     "./islands/CandleStand.tsx": $CandleStand,
     "./islands/LatestCommit.tsx": $LatestCommit,
-    "./islands/NewAudioPlayer.tsx": $NewAudioPlayer,
+    "./islands/PlayPauseButton.tsx": $PlayPauseButton,
     "./islands/RainPlayer.tsx": $RainPlayer,
     "./islands/Status.tsx": $Status,
   },
