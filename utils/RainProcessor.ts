@@ -2,7 +2,6 @@ export class RainProcessor {
   private audioContext: AudioContext;
   private source: AudioBufferSourceNode | null = null;
   private lowPassFilter: BiquadFilterNode;
-  private reverb: ConvolverNode;
   private gainNode: GainNode;
 
   private wetGain: GainNode;
@@ -15,10 +14,6 @@ export class RainProcessor {
     this.lowPassFilter = this.audioContext.createBiquadFilter();
     this.lowPassFilter.type = "lowpass";
     this.lowPassFilter.frequency.value = 1500; // Cutoff around 1.5kHz
-
-    // Reverb (Impulse Response must be loaded)
-    this.reverb = this.audioContext.createConvolver();
-    this.loadImpulseResponse("/audio/echoey-church-hall.wav");
 
     // Gain control
     this.gainNode = this.audioContext.createGain();
@@ -43,13 +38,6 @@ export class RainProcessor {
       //   .connect(this.reverb)
       .connect(this.gainNode)
       .connect(this.audioContext.destination);
-  }
-
-  async loadImpulseResponse(url: string) {
-    const response = await fetch(url);
-    const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await this.audioContext.decodeAudioData(arrayBuffer);
-    this.reverb.buffer = audioBuffer;
   }
 
   setLowPassFilterFrequency(frequency: number) {

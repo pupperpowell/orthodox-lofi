@@ -137,7 +137,10 @@ export default function PlayPauseButton() {
       </div>
 
       {
-        /* {radioState.currentTrack.path && (
+        /* Now playing example: */
+
+        /*
+        {radioState.currentTrack.path && (
         <div class="track-info">
           Now playing: {radioState.currentTrack.path.split("/").pop()}
         </div>

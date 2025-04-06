@@ -1,7 +1,4 @@
 // routes/api/music.ts
-
-// Returns a full audio file on request
-
 import { FreshContext } from "$fresh/server.ts";
 import { AUDIO_DIRECTORY, radio } from "./radio.ts";
 
@@ -25,8 +22,7 @@ export const handler = async (
     const fullPath = `${AUDIO_DIRECTORY}${trackPath}`;
     // Get file information so we can set Content-Length header
     const fileInfo = await Deno.stat(fullPath);
-    const file = await Deno.open(fullPath, { read: true });
-    const readableStream = file.readable;
+    const fileSize = fileInfo.size;
 
     // Determine content type based on file extension
     let contentType = "audio/mpeg"; // default
@@ -40,15 +36,78 @@ export const handler = async (
       contentType = "audio/mpeg";
     }
 
-    // Serve the file with proper headers
-    return new Response(readableStream, {
-      headers: {
-        "Content-Type": contentType,
-        "Content-Length": fileInfo.size.toString(),
-        "Accept-Ranges": "bytes",
-        "Cache-Control": "no-store no-cache",
-      },
-    });
+    // Handle range requests
+    const rangeHeader = req.headers.get("range");
+
+    if (rangeHeader) {
+      // Parse the range header
+      const matches = rangeHeader.match(/bytes=(\d+)-(\d*)/);
+
+      if (!matches) {
+        return new Response("Invalid range header", { status: 400 });
+      }
+
+      const start = parseInt(matches[1], 10);
+      // If end is not specified, use the file size - 1
+      const end = matches[2] ? parseInt(matches[2], 10) : fileSize - 1;
+
+      // Validate range
+      if (start >= fileSize || end >= fileSize || start > end) {
+        return new Response(
+          "Range Not Satisfiable",
+          {
+            status: 416,
+            headers: {
+              "Content-Range": `bytes */${fileSize}`,
+            },
+          },
+        );
+      }
+
+      const contentLength = end - start + 1;
+
+      // Open file and seek to the start position
+      const file = await Deno.open(fullPath, { read: true });
+
+      // Seek to the start position
+      await file.seek(start, Deno.SeekMode.Start);
+
+      // Create a readable stream that only reads the requested range
+      const readableStream = file.readable.pipeThrough(
+        new TransformStream({
+          transform(chunk, controller) {
+            controller.enqueue(chunk.slice(0, contentLength));
+          },
+          flush() {
+            file.close();
+          },
+        }),
+      );
+
+      return new Response(readableStream, {
+        status: 206, // Partial Content
+        headers: {
+          "Content-Type": contentType,
+          "Content-Length": contentLength.toString(),
+          "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+          "Accept-Ranges": "bytes",
+          "Cache-Control": "no-store no-cache",
+        },
+      });
+    } else {
+      // No range requested, serve the entire file
+      const file = await Deno.open(fullPath, { read: true });
+      const readableStream = file.readable;
+
+      return new Response(readableStream, {
+        headers: {
+          "Content-Type": contentType,
+          "Content-Length": fileSize.toString(),
+          "Accept-Ranges": "bytes",
+          "Cache-Control": "no-store no-cache",
+        },
+      });
+    }
   } catch (error) {
     console.error("Error serving audio:", error);
     return new Response("Internal Server Error", { status: 500 });
