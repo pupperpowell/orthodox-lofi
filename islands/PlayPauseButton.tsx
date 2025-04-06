@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Button } from "../components/Button.tsx";
 import { Radio } from "../routes/api/radio.ts";
+import { AudioProcessor, audioProcessor } from "../utils/AudioProcessor.ts";
 
 export default function PlayPauseButton() {
   const [radioState, setRadioState] = useState<Radio>({
@@ -99,8 +100,21 @@ export default function PlayPauseButton() {
 
     return () => {
       if (wsRef.current) wsRef.current.close();
+
+      audioProcessor.disconnect();
     };
   }, []);
+
+  // Initialize audio processor after audio element is available
+  useEffect(() => {
+    if (audioRef.current && !audioProcessor.isReady()) {
+      audioProcessor.initialize(audioRef.current, {
+        volume: 0.8,
+        lowpassFrequency: 500,
+        highpassFrequency: 1000,
+      });
+    }
+  }, [audioRef.current]);
 
   // Add a separate effect to handle audio element state changes
   useEffect(() => {
@@ -122,8 +136,12 @@ export default function PlayPauseButton() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // Update the togglePlayback function to resume AudioContext
   const togglePlayback = () => {
-    setIsPlaying(!isPlaying);
+    // Resume audio context (needed for browsers with autoplay restrictions)
+    audioProcessor.resume().then(() => {
+      setIsPlaying(!isPlaying);
+    });
   };
 
   return (
