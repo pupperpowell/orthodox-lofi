@@ -12,11 +12,8 @@ import * as $api_radio from "./routes/api/radio.ts";
 import * as $credits from "./routes/credits.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $AudioPlayer from "./islands/AudioPlayer.tsx";
-import * as $CandleStand from "./islands/CandleStand.tsx";
 import * as $LatestCommit from "./islands/LatestCommit.tsx";
-import * as $PlayPauseButton from "./islands/PlayPauseButton.tsx";
-import * as $RainPlayer from "./islands/RainPlayer.tsx";
-import * as $Status from "./islands/Status.tsx";
+import * as $OldAudioPlayer from "./islands/OldAudioPlayer.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -33,11 +30,8 @@ const manifest = {
   },
   islands: {
     "./islands/AudioPlayer.tsx": $AudioPlayer,
-    "./islands/CandleStand.tsx": $CandleStand,
     "./islands/LatestCommit.tsx": $LatestCommit,
-    "./islands/PlayPauseButton.tsx": $PlayPauseButton,
-    "./islands/RainPlayer.tsx": $RainPlayer,
-    "./islands/Status.tsx": $Status,
+    "./islands/OldAudioPlayer.tsx": $OldAudioPlayer,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

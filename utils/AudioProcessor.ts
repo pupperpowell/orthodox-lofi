@@ -7,27 +7,63 @@
 
 export interface AudioProcessorOptions {
   volume?: number;
-  lowpassFrequency?: number;
-  highpassFrequency?: number;
-  reverbLevel?: number;
+  lowpassFrequency: number;
+  highpassFrequency: number;
+  rainEnabled: boolean;
+  rainVolume: number;
+
   // Add more effect parameters as needed
 }
 
 export class AudioProcessor {
-  private audioContext: AudioContext | null = null;
-  private sourceNode: MediaElementAudioSourceNode | null = null;
-  private gainNode: GainNode | null = null;
-  private lowpassFilter: BiquadFilterNode | null = null;
-  private highpassFilter: BiquadFilterNode | null = null;
-  private connectedAudio: HTMLAudioElement | null = null;
+  // Audio elements
+  private audioContext: AudioContext;
+  private sourceNode: MediaElementAudioSourceNode;
+  private gainNode: GainNode;
+  private lowpassFilter: BiquadFilterNode;
+  private highpassFilter: BiquadFilterNode;
+  private connectedAudio: HTMLAudioElement;
   private isInitialized = false;
+
+  // Rain elements
+  private rainAudio: HTMLAudioElement;
+  private rainSourceNode: AudioBufferSourceNode;
+  private rainGainNode: GainNode;
 
   // Default options
   private options: AudioProcessorOptions = {
     volume: 1.0,
-    lowpassFrequency: 500, // Default to maximum (effectively disabled)
-    highpassFrequency: 10000, // Default to minimum (effectively disabled)
+    lowpassFrequency: 2250, // Default to maximum (effectively disabled)
+    highpassFrequency: 200, // Default to minimum (effectively disabled)
+    rainEnabled: false,
+    rainVolume: 0.5,
   };
+
+  private constructor(
+    audioElement: HTMLAudioElement,
+    options?: AudioProcessorOptions,
+  ) {
+    // Initialize base elements
+    this.audioContext = new globalThis.AudioContext();
+    this.sourceNode = this.audioContext.createMediaElementSource(audioElement);
+    this.gainNode = this.audioContext.createGain();
+    this.lowpassFilter = this.audioContext.createBiquadFilter();
+    this.highpassFilter = this.audioContext.createBiquadFilter();
+    // Initialize rain elements
+    this.rainAudio = new Audio("/static/audio/rain.wav");
+    this.rainAudio.loop = true;
+    this.rainSourceNode = this.audioContext.createMediaElementSource(
+      this.rainAudio,
+    );
+    this.rainGainNode = this.audioContext.createGain();
+  }
+
+  public static create(
+    audioElement: HTMLAudioElement,
+    options?: AudioProcessorOptions,
+  ): AudioProcessor {
+    return new AudioProcessor(audioElement, options);
+  }
 
   /**
    * Initialize the audio processing chain with an audio element
@@ -57,6 +93,9 @@ export class AudioProcessor {
 
       // Create processing nodes
       this.createProcessingNodes();
+
+      // Initialize rain audio
+      this.initializeRainAudio();
 
       // Connect the nodes
       this.connectNodes();
@@ -92,6 +131,35 @@ export class AudioProcessor {
   }
 
   /**
+   * Initialize rain audio element and nodes
+   */
+  private initializeRainAudio(): void {
+    if (!this.audioContext) return;
+
+    // Create rain audio element
+    this.rainAudio = new Audio("/static/audio/rain.wav");
+    this.rainAudio.loop = true;
+
+    // Create rain source node
+    this.rainSourceNode = this.audioContext.createMediaElementSource(
+      this.rainAudio,
+    );
+
+    // Create rain gain node for volume control
+    this.rainGainNode = this.audioContext.createGain();
+    this.rainGainNode.gain.value = this.options.rainVolume || 0.5;
+
+    // Connect rain nodes
+    this.rainSourceNode.connect(this.rainGainNode);
+    this.rainGainNode.connect(this.audioContext.destination);
+
+    // Set initial state based on options
+    if (this.options.rainEnabled) {
+      this.enableRain();
+    }
+  }
+
+  /**
    * Connect the audio processing nodes in a chain
    */
   private connectNodes(): void {
@@ -105,7 +173,6 @@ export class AudioProcessor {
     this.sourceNode.connect(this.highpassFilter);
     this.highpassFilter.connect(this.lowpassFilter);
     this.lowpassFilter.connect(this.gainNode);
-    console.log("connected lofi filters");
     this.gainNode.connect(this.audioContext.destination);
   }
 
@@ -114,8 +181,8 @@ export class AudioProcessor {
    */
   private applySettings(): void {
     this.setVolume(this.options.volume || 1.0);
-    this.setLowpassFrequency(this.options.lowpassFrequency || 20000);
-    this.setHighpassFrequency(this.options.highpassFrequency || 20);
+    this.setLowpassFrequency(this.options.lowpassFrequency);
+    this.setHighpassFrequency(this.options.highpassFrequency);
     // Apply other effect settings
   }
 
@@ -135,6 +202,13 @@ export class AudioProcessor {
       this.gainNode.gain.value = Math.max(0, Math.min(2, value)); // Clamp between 0 and 2
       this.options.volume = value;
     }
+  }
+
+  /**
+   * Toggle rain sound on/off
+   */
+  public toggleRain(): void {
+    this.options.rainEnabled = !this.options.rainEnabled;
   }
 
   /**
@@ -193,12 +267,6 @@ export class AudioProcessor {
       this.audioContext.close();
     }
 
-    this.audioContext = null;
-    this.sourceNode = null;
-    this.gainNode = null;
-    this.lowpassFilter = null;
-    this.highpassFilter = null;
-    this.connectedAudio = null;
     this.isInitialized = false;
   }
 
@@ -211,4 +279,4 @@ export class AudioProcessor {
 }
 
 // Create and export a singleton instance
-export const audioProcessor = new AudioProcessor();
+export const audioProcessor = AudioProcessor.create(audioElement, options);
