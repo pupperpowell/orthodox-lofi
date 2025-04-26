@@ -156,6 +156,24 @@ export default function AudioPlayer() {
     });
   };
 
+  // Handle highpass filter change
+  const handleHighpassChange = (e: Event) => {
+    const value = parseInt((e.target as HTMLInputElement).value);
+    updateAudioFilters({ highpassFrequency: value });
+  };
+
+  // Handle lowpass filter change
+  const handleLowpassChange = (e: Event) => {
+    const value = parseInt((e.target as HTMLInputElement).value);
+    updateAudioFilters({ lowpassFrequency: value });
+  };
+
+  // Handle volume change
+  const handleVolumeChange = (e: Event) => {
+    const value = parseFloat((e.target as HTMLInputElement).value);
+    updateAudioFilters({ volume: value });
+  };
+
   // Example function to update audio processing options
   const updateAudioFilters = (options: Partial<ProcessingChainOptions>) => {
     setProcessingOptions(prev => ({
@@ -183,7 +201,47 @@ export default function AudioPlayer() {
           {isPlaying ? "pause" : "play"}
         </Button>
 
-        {/* You could add UI controls for audio processing options here */}
+        {/* Audio filter controls */}
+        <div class="filter-controls">
+          <div class="filter-control">
+            <label htmlFor="highpass">Highpass: {processingOptions.highpassFrequency}Hz</label>
+            <input
+              type="range"
+              id="highpass"
+              min="20"
+              max="1000"
+              step="10"
+              value={processingOptions.highpassFrequency}
+              onChange={handleHighpassChange}
+            />
+          </div>
+
+          <div class="filter-control">
+            <label htmlFor="lowpass">Lowpass: {processingOptions.lowpassFrequency}Hz</label>
+            <input
+              type="range"
+              id="lowpass"
+              min="1000"
+              max="20000"
+              step="100"
+              value={processingOptions.lowpassFrequency}
+              onChange={handleLowpassChange}
+            />
+          </div>
+
+          <div class="filter-control">
+            <label htmlFor="volume">Volume: {processingOptions.volume.toFixed(2)}</label>
+            <input
+              type="range"
+              id="volume"
+              min="0"
+              max="2"
+              step="0.05"
+              value={processingOptions.volume}
+              onChange={handleVolumeChange}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
