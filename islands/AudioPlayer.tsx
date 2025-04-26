@@ -1,4 +1,10 @@
-// islands/AudioPlayer.tsx
+/**
+ * AudioPlayer.tsx: 
+ * - Creates HTML audio element using api/music.ts as a source
+ * - Imports the AudioProcessor singleton
+ * - Initializes() AudioProcessor, passing HTML audio element as an argument
+ * - Does not rely on AudioProcessor for audio playback controls except for resume()
+ */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Button } from "../components/Button.tsx";
 import { Radio } from "../routes/api/radio.ts";
