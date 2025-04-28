@@ -14,6 +14,7 @@ import * as $index from "./routes/index.tsx";
 import * as $AudioPlayer from "./islands/AudioPlayer.tsx";
 import * as $LatestCommit from "./islands/LatestCommit.tsx";
 import * as $OldAudioPlayer from "./islands/OldAudioPlayer.tsx";
+import * as $ShareButton from "./islands/ShareButton.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -32,6 +33,7 @@ const manifest = {
     "./islands/AudioPlayer.tsx": $AudioPlayer,
     "./islands/LatestCommit.tsx": $LatestCommit,
     "./islands/OldAudioPlayer.tsx": $OldAudioPlayer,
+    "./islands/ShareButton.tsx": $ShareButton,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

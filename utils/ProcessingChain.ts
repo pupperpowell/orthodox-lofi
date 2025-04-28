@@ -43,14 +43,11 @@ export class ProcessingChain {
       // Create audio nodes
       this.highpass = this.context.createBiquadFilter();
       this.highpass.type = "highpass";
-      this.highpass.frequency.value = 50; // Default value
 
       this.lowpass = this.context.createBiquadFilter();
       this.lowpass.type = "lowpass";
-      this.lowpass.frequency.value = 15000; // Default value
 
       this.gainNode = this.context.createGain();
-      this.gainNode.gain.value = 1.0; // Default volume
 
       // Create source node from audio element
       this.source = this.context.createMediaElementSource(audio);
@@ -75,6 +72,12 @@ export class ProcessingChain {
     this.highpass.connect(this.lowpass);
     this.lowpass.connect(this.gainNode);
     this.gainNode.connect(this.context.destination);
+
+    // TODO: connect rain nodes (source, high/lowpass, gain) to destination
+
+
+    // TODO: connect ambient nodes (source, high/lowpass, gain) to destination
+
   }
 
   /**

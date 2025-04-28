@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { Button } from "../components/Button.tsx";
 import { Radio } from "../routes/api/radio.ts";
 import { ProcessingChain, ProcessingChainOptions } from "../utils/ProcessingChain.ts";
+import ShareButton from "./ShareButton.tsx";
 
 export default function AudioPlayer() {
   const [radioState, setRadioState] = useState<Radio>({
@@ -22,8 +23,8 @@ export default function AudioPlayer() {
 
   // Default audio processing options
   const [processingOptions, setProcessingOptions] = useState<ProcessingChainOptions>({
-    highpassFrequency: 50,
-    lowpassFrequency: 15000,
+    highpassFrequency: 360,
+    lowpassFrequency: 2500,
     volume: 1.0,
     rainEnabled: false,
     ambientEnabled: false,
@@ -203,16 +204,16 @@ export default function AudioPlayer() {
 
         {/* Audio filter controls */}
         <div class="filter-controls">
-          <div class="filter-control">
+          {/* <div class="filter-control">
             <label htmlFor="highpass">Highpass: {processingOptions.highpassFrequency}Hz</label>
             <input
               type="range"
               id="highpass"
               min="20"
               max="1000"
-              step="10"
+              step="5"
               value={processingOptions.highpassFrequency}
-              onChange={handleHighpassChange}
+              onInput={handleHighpassChange}
             />
           </div>
 
@@ -225,9 +226,9 @@ export default function AudioPlayer() {
               max="20000"
               step="100"
               value={processingOptions.lowpassFrequency}
-              onChange={handleLowpassChange}
+              onInput={handleLowpassChange}
             />
-          </div>
+          </div> */}
 
           <div class="filter-control">
             <label htmlFor="volume">Volume: {processingOptions.volume.toFixed(2)}</label>
@@ -236,12 +237,13 @@ export default function AudioPlayer() {
               id="volume"
               min="0"
               max="2"
-              step="0.05"
+              step="0.01"
               value={processingOptions.volume}
-              onChange={handleVolumeChange}
+              onInput={handleVolumeChange}
             />
           </div>
         </div>
+        <ShareButton />
       </div>
     </div>
   );

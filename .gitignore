@@ -16,3 +16,5 @@ static/audio
 
 # editor specific
 .vscode
+
+.DS_Store
