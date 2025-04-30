@@ -9,13 +9,13 @@ export interface ProcessingChainOptions {
 
 export class ProcessingChain {
   private context: AudioContext | null = null;
-  private source: MediaElementAudioSourceNode | null = null;
+  private chantSource: MediaElementAudioSourceNode | null = null;
   private isInitialized: boolean = false;
 
   // Base audio processing
-  private highpass: BiquadFilterNode | null = null;
-  private lowpass: BiquadFilterNode | null = null;
-  private gainNode: GainNode | null = null;
+  private chantHighpass: BiquadFilterNode | null = null;
+  private chantLowpass: BiquadFilterNode | null = null;
+  private chantGain: GainNode | null = null;
 
   constructor() {
     // Don't initialize AudioContext in the constructor
@@ -41,16 +41,16 @@ export class ProcessingChain {
       this.context = new globalThis.AudioContext();
       
       // Create audio nodes
-      this.highpass = this.context.createBiquadFilter();
-      this.highpass.type = "highpass";
+      this.chantHighpass = this.context.createBiquadFilter();
+      this.chantHighpass.type = "highpass";
 
-      this.lowpass = this.context.createBiquadFilter();
-      this.lowpass.type = "lowpass";
+      this.chantLowpass = this.context.createBiquadFilter();
+      this.chantLowpass.type = "lowpass";
 
-      this.gainNode = this.context.createGain();
+      this.chantGain = this.context.createGain();
 
       // Create source node from audio element
-      this.source = this.context.createMediaElementSource(audio);
+      this.chantSource = this.context.createMediaElementSource(audio);
       this.connectProcessingChain();
       this.isInitialized = true;
       console.log("[ProcessingChain] initialized");
@@ -60,7 +60,7 @@ export class ProcessingChain {
   }
 
   private connectProcessingChain() {
-    if (!this.source || !this.highpass || !this.lowpass || !this.gainNode || !this.context) {
+    if (!this.chantSource || !this.chantHighpass || !this.chantLowpass || !this.chantGain || !this.context) {
       console.error(
         "[ProcessingChain] Audio nodes not available — can't connect processing chain"
       );
@@ -68,10 +68,10 @@ export class ProcessingChain {
     }
 
     // Connect the nodes: source -> highpass -> lowpass -> gain -> destination
-    this.source.connect(this.highpass);
-    this.highpass.connect(this.lowpass);
-    this.lowpass.connect(this.gainNode);
-    this.gainNode.connect(this.context.destination);
+    this.chantSource.connect(this.chantHighpass);
+    this.chantHighpass.connect(this.chantLowpass);
+    this.chantLowpass.connect(this.chantGain);
+    this.chantGain.connect(this.context.destination);
 
     // TODO: connect rain nodes (source, high/lowpass, gain) to destination
 
@@ -84,15 +84,15 @@ export class ProcessingChain {
    * Update audio processing parameters
    */
   public updateOptions(options: ProcessingChainOptions): void {
-    if (!this.isInitialized || !this.highpass || !this.lowpass || !this.gainNode) {
+    if (!this.isInitialized || !this.chantHighpass || !this.chantLowpass || !this.chantGain) {
       console.warn("[ProcessingChain] Not initialized, can't update options");
       return;
     }
 
     // Update filter and gain values
-    this.highpass.frequency.value = options.highpassFrequency;
-    this.lowpass.frequency.value = options.lowpassFrequency;
-    this.gainNode.gain.value = options.volume;
+    this.chantHighpass.frequency.value = options.highpassFrequency;
+    this.chantLowpass.frequency.value = options.lowpassFrequency;
+    this.chantGain.gain.value = options.volume;
 
     // Here you would also handle the ambient and rain audio based on options
     console.log("[ProcessingChain] Options updated:", options);
@@ -116,18 +116,18 @@ export class ProcessingChain {
   }
 
   public disconnect(): void {
-    if (this.source) {
-      this.source.disconnect();
+    if (this.chantSource) {
+      this.chantSource.disconnect();
     }
     
     if (this.context) {
       this.context.close();
     }
 
-    this.source = null;
-    this.highpass = null;
-    this.lowpass = null;
-    this.gainNode = null;
+    this.chantSource = null;
+    this.chantGain = null;
+    this.chantLowpass = null;
+    this.chantGain = null;
     this.context = null;
     this.isInitialized = false;
     console.log("[ProcessingChain] Disconnected");
