@@ -15,7 +15,7 @@ export class AmbientProcessor {
 
   private raining: boolean = true;
   private outside: boolean = false;
-  private windowOpen: boolean = true;
+  private windowOpen: boolean = false;
 
   // Master
   private masterGain: GainNode;
@@ -80,8 +80,8 @@ export class AmbientProcessor {
   connectChain() {
     if (this.raining) {
     this.rainSource
-      .connect(this.rainHighpassFilter)
-      .connect(this.rainLowpassFilter)
+      .connect(this.masterLowpassFilter)
+      .connect(this.masterLowpassFilter)
       .connect(this.rainGain)
       .connect(this.audioContext.destination);
     }
@@ -104,7 +104,7 @@ export class AmbientProcessor {
         .connect(this.masterLowpassFilter)
         .connect(this.audioContext.destination);
     }
-    console.log("[AmbientProcessor] connected chain");
+    // console.log("[AmbientProcessor] connected chain");
   }
 
   setRainEnabled(enabled: boolean) {
@@ -112,19 +112,21 @@ export class AmbientProcessor {
     this.connectChain();
   }
 
-  // partial rain, partial crickets, 
+  // partial rain, partial crickets, no birds
   setWindowOpen(enabled: boolean) {
     this.windowOpen = enabled;
     this.masterHighpassFilter.frequency.value = enabled ? 1000 : 20; // window open : outside
     this.masterLowpassFilter.frequency.value = enabled ? 3600 : 20000; // window open : outside
     this.rainGain.gain.value = enabled ? 1 : 0;
-    // this.doveGain.gain.value = enabled ? 0.5 : 0;
-    // this.loonGain.gain.value = enabled ? 0.5 : 0;
-    // this.cricketsGain.gain.value = enabled ? 0.5 : 0;
+    this.doveGain.gain.value = enabled ? 0.5 : 0;
+    this.loonGain.gain.value = enabled ? 0.5 : 0;
+    this.cricketsGain.gain.value = enabled ? 0.5 : 0;
     this.connectChain();
+    console.log(`[AmbientProcessor] set window ${enabled ? "open" : "closed"}`);
   }
-
-  setOutside(enabled: boolean) {
+  
+  toggleOutside(enabled: boolean) {
+    this.setRainEnabled(enabled);
     this.outside = enabled;
     this.masterHighpassFilter.frequency.value = enabled ? 20 : 1000; // window open : outside
     this.masterLowpassFilter.frequency.value = enabled ? 30000 : 3600; // window open : outside

@@ -1,3 +1,5 @@
+import { options } from "preact/src/index.d.ts";
+
 export interface ChantProcessorOptions {
   highpassFrequency: number;
   lowpassFrequency: number;
@@ -70,6 +72,19 @@ export class ChantProcessor {
       .connect(this.chantLowpass)
       .connect(this.chantGain)
       .connect(this.context.destination);
+  }
+
+  public toggleOutside(outside: boolean, options: ChantProcessorOptions): void {
+    if (!this.isInitialized || !this.chantSource || !this.chantHighpass || !this.chantLowpass || !this.chantGain) {
+      console.warn("[ChantProcessor] Not initialized, can't toggle outside");
+      return;
+    }
+
+    this.chantHighpass.frequency.value = outside ? 100 : options.highpassFrequency;
+    this.chantLowpass.frequency.value = outside ? 1000 : options.lowpassFrequency; 
+
+    this.chantGain.gain.value = outside ? 0.07 : 1;
+    console.log("[ChantProcessor] Toggled outside:", outside);
   }
 
   /**

@@ -165,6 +165,13 @@ export default function AudioPlayer() {
         cricketsRef.current
       );
       setAmbientProcessor(processor);
+      processor.play();
+    }
+
+    if (isPlaying) {
+      ambientProcessor?.stop();
+    } else {
+      ambientProcessor?.play();
     }
 
     // Resume audio context (needed for browsers with autoplay restrictions)
@@ -176,10 +183,18 @@ export default function AudioPlayer() {
 
   // Toggle outside/inside
   const toggleOutside = () => {
-    // TODO: Implement this
-    // implement and call ChantProcessor.toggleOutside()
-    // implement and call AmbientProcessor.toggleOutside()
-    setIsOutside(!isOutside);
+    const newPosition = !isOutside;
+    setIsOutside(newPosition);
+    ChantProcessorRef.current.toggleOutside(newPosition, processingOptions);
+    ambientProcessor?.toggleOutside(newPosition);
+    // TODO: implement and call AmbientProcessor.toggleOutside()
+  };
+
+  const toggleWindow = () => {
+    const newPosition = !windowOpen;
+    setWindowOpen(newPosition);
+    ambientProcessor?.setWindowOpen(newPosition);
+    // TODO: implement and call AmbientProcessor.toggleWindow()
   };
 
   // Handle highpass filter change
@@ -222,9 +237,15 @@ export default function AudioPlayer() {
           {isPlaying ? "mute" : "unmute"}
         </Button>
 
-        <Button onClick={toggleOutside}>
+        <Button onClick={toggleWindow} disabled={!isConnected || !isPlaying || isOutside}>
+          {windowOpen ? "close window" : "open window"}
+        </Button>
+
+        <Button onClick={toggleOutside} disabled={!isConnected || !isPlaying}>
           {isOutside ? "step inside" : "step outside"}
         </Button>
+
+
 
         {/* Audio filter controls */}
         {/* <div class="filter-controls">
