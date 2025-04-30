@@ -10,6 +10,7 @@ import { Button } from "../components/Button.tsx";
 import { Radio } from "../routes/api/radio.ts";
 import { ChantProcessor, ChantProcessorOptions } from "../utils/ChantProcessor.ts";
 import { AmbientProcessor } from "../utils/AmbientProcessor.ts";
+import { Processor } from "npm:postcss@8.4.35";
 
 export default function AudioPlayer() {
   const [radioState, setRadioState] = useState<Radio>({
@@ -155,10 +156,7 @@ export default function AudioPlayer() {
   }, [isPlaying]);
 
   const togglePlayback = () => {
-    // Resume audio context (needed for browsers with autoplay restrictions)
-    ChantProcessorRef.current.resume().then(() => {
-      setIsPlaying(!isPlaying);
-    });
+    // Create the ambientProcessor if it doesn't already exist
     if (!ambientProcessor && rainRef.current && loonsRef.current && dovesRef.current && cricketsRef.current) {
       const processor = new AmbientProcessor(
         rainRef.current,
@@ -167,13 +165,20 @@ export default function AudioPlayer() {
         cricketsRef.current
       );
       setAmbientProcessor(processor);
-      processor.play();
     }
+
+    // Resume audio context (needed for browsers with autoplay restrictions)
+    ChantProcessorRef.current.resume().then(() => {
+      setIsPlaying(!isPlaying);
+    });
+
   };
 
   // Toggle outside/inside
   const toggleOutside = () => {
     // TODO: Implement this
+    // implement and call ChantProcessor.toggleOutside()
+    // implement and call AmbientProcessor.toggleOutside()
     setIsOutside(!isOutside);
   };
 
@@ -205,22 +210,12 @@ export default function AudioPlayer() {
 
   return (
     <div>
-      {/* <div
-        class={`connection-status ${isConnected ? "connected" : "disconnected"}`}
-      >
-        {isConnected ? "connected" : "disconnected"}
-      </div> */}
 
-      <audio
-        ref={chantRef}
-        src={chantSrc}
-        preload="auto"
-      />
-
-      <audio ref={rainRef} src='/audio/ambient/rain.mp3' />
-      <audio ref={dovesRef} src='/audio/ambient/doves.mp3' />
-      <audio ref={loonsRef} src='/audio/ambient/loons.mp3' />
-      <audio ref={cricketsRef} src='/audio/ambient/crickets.mp3' />
+      <audio ref={chantRef} src={chantSrc} preload="auto" />
+      <audio ref={rainRef} src='/audio/ambient/rain.mp3' preload="auto" loop />
+      <audio ref={dovesRef} src='/audio/ambient/doves.mp3' preload="auto" loop />
+      <audio ref={loonsRef} src='/audio/ambient/loons.mp3' preload="auto" loop />
+      <audio ref={cricketsRef} src='/audio/ambient/crickets.mp3' preload="auto" loop />
 
       <div class="controls">
         <Button onClick={togglePlayback}>
