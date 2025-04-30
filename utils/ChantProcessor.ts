@@ -1,4 +1,4 @@
-export interface ProcessingChainOptions {
+export interface ChantProcessorOptions {
   highpassFrequency: number;
   lowpassFrequency: number;
   volume: number;
@@ -7,7 +7,7 @@ export interface ProcessingChainOptions {
   outside: boolean;
 }
 
-export class ProcessingChain {
+export class ChantProcessor {
   private context: AudioContext | null = null;
   private chantSource: MediaElementAudioSourceNode | null = null;
   private isInitialized: boolean = false;
@@ -23,9 +23,9 @@ export class ProcessingChain {
   }
 
   /**
-   * Used to connect the raw audio obtained in AudioPlayer to the ProcessingChain.
+   * Used to connect the raw audio obtained in AudioPlayer to the ChantProcessor.
    */
-  public initialize(audio: HTMLAudioElement): void {
+  public initialize(chant: HTMLAudioElement): void {
     if (this.isInitialized) {
       this.disconnect();
     }
@@ -33,59 +33,51 @@ export class ProcessingChain {
     try {
       // Check if we're in a browser environment
       if (typeof window === 'undefined') {
-        console.warn("[ProcessingChain] Not in browser environment, skipping initialization");
+        console.warn("[ChantProcessor] Not in browser environment, skipping initialization");
         return;
       }
 
       // Create AudioContext only when initialize is called
       this.context = new globalThis.AudioContext();
-      
-      // Create audio nodes
+
+      // Create chant nodes
+      this.chantSource = this.context.createMediaElementSource(chant);
       this.chantHighpass = this.context.createBiquadFilter();
       this.chantHighpass.type = "highpass";
-
       this.chantLowpass = this.context.createBiquadFilter();
       this.chantLowpass.type = "lowpass";
-
       this.chantGain = this.context.createGain();
+    
+      this.connectChantProcessor();
 
-      // Create source node from audio element
-      this.chantSource = this.context.createMediaElementSource(audio);
-      this.connectProcessingChain();
       this.isInitialized = true;
-      console.log("[ProcessingChain] initialized");
+      console.log("[ChantProcessor] initialized");
     } catch (error) {
       console.error("Failed to initialize audio processor:", error);
     }
   }
 
-  private connectProcessingChain() {
+  private connectChantProcessor() {
     if (!this.chantSource || !this.chantHighpass || !this.chantLowpass || !this.chantGain || !this.context) {
       console.error(
-        "[ProcessingChain] Audio nodes not available — can't connect processing chain"
+        "[ChantProcessor] Audio nodes not available — can't connect processing chain"
       );
       return;
     }
 
     // Connect the nodes: source -> highpass -> lowpass -> gain -> destination
-    this.chantSource.connect(this.chantHighpass);
-    this.chantHighpass.connect(this.chantLowpass);
-    this.chantLowpass.connect(this.chantGain);
-    this.chantGain.connect(this.context.destination);
-
-    // TODO: connect rain nodes (source, high/lowpass, gain) to destination
-
-
-    // TODO: connect ambient nodes (source, high/lowpass, gain) to destination
-
+    this.chantSource.connect(this.chantHighpass)
+      .connect(this.chantLowpass)
+      .connect(this.chantGain)
+      .connect(this.context.destination);
   }
 
   /**
    * Update audio processing parameters
    */
-  public updateOptions(options: ProcessingChainOptions): void {
+  public updateOptions(options: ChantProcessorOptions): void {
     if (!this.isInitialized || !this.chantHighpass || !this.chantLowpass || !this.chantGain) {
-      console.warn("[ProcessingChain] Not initialized, can't update options");
+      console.warn("[ChantProcessor] Not initialized, can't update options");
       return;
     }
 
@@ -95,7 +87,7 @@ export class ProcessingChain {
     this.chantGain.gain.value = options.volume;
 
     // Here you would also handle the ambient and rain audio based on options
-    console.log("[ProcessingChain] Options updated:", options);
+    console.log("[ChantProcessor] Options updated:", options);
   }
 
   /**
@@ -130,6 +122,6 @@ export class ProcessingChain {
     this.chantGain = null;
     this.context = null;
     this.isInitialized = false;
-    console.log("[ProcessingChain] Disconnected");
+    console.log("[ChantProcessor] Disconnected");
   }
 }

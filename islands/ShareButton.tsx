@@ -17,8 +17,6 @@ export default function ShareButton({
     title = "Orthodox Lofi",
     text = "Byzantine music to relax/study to",
     url,
-    className = "",
-    ...props
 }: ShareButtonProps) {
     const [shared, setShared] = useState(false);
     const [copied, setCopied] = useState(false);

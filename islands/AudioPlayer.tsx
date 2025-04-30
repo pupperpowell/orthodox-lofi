@@ -1,15 +1,15 @@
 /**
  * AudioPlayer.tsx: 
- * - Creates HTML audio element using api/music.ts as a source
- * - Imports the AudioProcessor singleton
- * - Initializes() AudioProcessor, passing HTML audio element as an argument
- * - Does not rely on AudioProcessor for audio playback controls except for resume()
+ * - Creates HTML audio elements (also using api/music.ts as one source)
+ * - Creates new ChantProcessor and AmbientProcessor instances
+ * - Initializes() ChantProcessor, passing HTML audio element as an argument
+ * - Constructs() AmbientProcessor, doing basically the same?
  */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Button } from "../components/Button.tsx";
 import { Radio } from "../routes/api/radio.ts";
-import { ProcessingChain, ProcessingChainOptions } from "../utils/ProcessingChain.ts";
-import ShareButton from "./ShareButton.tsx";
+import { ChantProcessor, ChantProcessorOptions } from "../utils/ChantProcessor.ts";
+import { AmbientProcessor } from "../utils/AmbientProcessor.ts";
 
 export default function AudioPlayer() {
   const [radioState, setRadioState] = useState<Radio>({
@@ -18,11 +18,17 @@ export default function AudioPlayer() {
     isPlaying: false,
   });
   const [isConnected, setIsConnected] = useState(false);
-  const [audioSrc, setAudioSrc] = useState("");
+  const [chantSrc, setChantSrc] = useState("");
   const [isPlaying, setIsPlaying] = useState(false); // client playback state
+  const [isOutside, setIsOutside] = useState(false);
+  const [isRaining, setIsRaining] = useState(false);
+  const [windowOpen, setWindowOpen] = useState(false);
+
+  // AmbientProcessor
+  const [ambientProcessor, setAmbientProcessor] = useState<AmbientProcessor | null>(null);
 
   // Default audio processing options
-  const [processingOptions, setProcessingOptions] = useState<ProcessingChainOptions>({
+  const [processingOptions, setProcessingOptions] = useState<ChantProcessorOptions>({
     highpassFrequency: 360,
     lowpassFrequency: 2500,
     volume: 1.0,
@@ -31,17 +37,23 @@ export default function AudioPlayer() {
     outside: false
   });
 
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const chantRef = useRef<HTMLAudioElement>(null);
+  const rainRef = useRef<HTMLAudioElement>(null);
+  const loonsRef = useRef<HTMLAudioElement>(null);
+  const cricketsRef = useRef<HTMLAudioElement>(null);
+  const dovesRef = useRef<HTMLAudioElement>(null);
+
   const wsRef = useRef<WebSocket | null>(null);
   const currentTrackPathRef = useRef<string>("");
   const isPlayingRef = useRef<boolean>(false);
-  const processingChainRef = useRef<ProcessingChain>(new ProcessingChain());
+  const ChantProcessorRef = useRef<ChantProcessor>(new ChantProcessor());
 
   // Update the ref whenever isPlaying changes
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
 
+  // WEBSOCKET LOGIC
   useEffect(() => {
     // Connect to WebSocket
     const ws = new WebSocket(`ws://${globalThis.location.host}/api/radio`);
@@ -62,19 +74,19 @@ export default function AudioPlayer() {
           currentTrackPathRef.current = data.currentTrack.path;
 
           // Append a cache buster to ensure a fresh request
-          setAudioSrc(
+          setChantSrc(
             `/api/music?path=${data.currentTrack.path}&t=${Date.now()}`,
           );
 
-          if (audioRef.current) {
+          if (chantRef.current) {
             // Load the new track
-            audioRef.current.load();
+            chantRef.current.load();
             console.log("Fetched new track:", data.currentTrack.path);
 
             // If playback is enabled, wait until the track is ready before auto-playing
             if (isPlayingRef.current) {
-              audioRef.current.addEventListener("canplay", () => {
-                audioRef.current?.play().catch((e) =>
+              chantRef.current.addEventListener("canplay", () => {
+                chantRef.current?.play().catch((e) =>
                   console.error("Play error after canplay:", e)
                 );
               }, { once: true });
@@ -87,18 +99,10 @@ export default function AudioPlayer() {
 
         // Sync the audio element with the server's progress
         if (
-          audioRef.current &&
-          Math.abs(audioRef.current.currentTime - data.progress) > 1
+          chantRef.current &&
+          Math.abs(chantRef.current.currentTime - data.progress) > 1
         ) {
-          console.log(
-            "Server progress: " + data.progress + "s, " +
-            data.currentTrack.path,
-          );
-          console.log(
-            "Audio element:" + audioRef.current.currentTime + "s, " +
-            audioRef.current.src,
-          );
-          audioRef.current.currentTime = data.progress;
+          chantRef.current.currentTime = data.progress;
         }
       } catch (e) {
         console.error("Error parsing WebSocket message:", e);
@@ -111,50 +115,66 @@ export default function AudioPlayer() {
     };
 
     // Initial audio source
-    setAudioSrc(`/api/music`);
+    setChantSrc(`/api/music`);
 
     return () => {
       if (wsRef.current) wsRef.current.close();
-      processingChainRef.current.disconnect();
+      ChantProcessorRef.current.disconnect();
     };
   }, []);
 
   // Initialize audio processor after audio element is available
   useEffect(() => {
-    if (audioRef.current && !processingChainRef.current.isReady()) {
-      processingChainRef.current.initialize(audioRef.current);
+    if (chantRef.current && !ChantProcessorRef.current.isReady()) {
+      ChantProcessorRef.current.initialize(chantRef.current);
       // Apply initial processing options
-      processingChainRef.current.updateOptions(processingOptions);
+      ChantProcessorRef.current.updateOptions(processingOptions);
     }
-  }, [audioRef.current]);
+  }, [chantRef.current]);
 
-  // Update processing chain when options change
+  // Update processing chain options
   useEffect(() => {
-    if (processingChainRef.current.isReady()) {
-      processingChainRef.current.updateOptions(processingOptions);
+    if (ChantProcessorRef.current.isReady()) {
+      ChantProcessorRef.current.updateOptions(processingOptions);
     }
   }, [processingOptions]);
 
   // Add a separate effect to handle audio element state changes
   useEffect(() => {
-    if (!audioRef.current) return;
+    if (!chantRef.current) return;
 
     if (isPlaying) {
-      audioRef.current.play().catch((e) => {
+      chantRef.current.play().catch((e) => {
         console.error("Error playing audio:", e);
         setIsPlaying(false); // Reset state if playback fails
       });
+
     } else {
-      audioRef.current.pause();
+      chantRef.current.pause();
     }
   }, [isPlaying]);
 
-  // Update the togglePlayback function to resume AudioContext
   const togglePlayback = () => {
     // Resume audio context (needed for browsers with autoplay restrictions)
-    processingChainRef.current.resume().then(() => {
+    ChantProcessorRef.current.resume().then(() => {
       setIsPlaying(!isPlaying);
     });
+    if (!ambientProcessor && rainRef.current && loonsRef.current && dovesRef.current && cricketsRef.current) {
+      const processor = new AmbientProcessor(
+        rainRef.current,
+        loonsRef.current,
+        dovesRef.current,
+        cricketsRef.current
+      );
+      setAmbientProcessor(processor);
+      processor.play();
+    }
+  };
+
+  // Toggle outside/inside
+  const toggleOutside = () => {
+    // TODO: Implement this
+    setIsOutside(!isOutside);
   };
 
   // Handle highpass filter change
@@ -176,7 +196,7 @@ export default function AudioPlayer() {
   };
 
   // Example function to update audio processing options
-  const updateAudioFilters = (options: Partial<ProcessingChainOptions>) => {
+  const updateAudioFilters = (options: Partial<ChantProcessorOptions>) => {
     setProcessingOptions(prev => ({
       ...prev,
       ...options
@@ -185,26 +205,35 @@ export default function AudioPlayer() {
 
   return (
     <div>
-      <div
+      {/* <div
         class={`connection-status ${isConnected ? "connected" : "disconnected"}`}
       >
         {isConnected ? "connected" : "disconnected"}
-      </div>
+      </div> */}
 
       <audio
-        ref={audioRef}
-        src={audioSrc}
+        ref={chantRef}
+        src={chantSrc}
         preload="auto"
       />
 
+      <audio ref={rainRef} src='/audio/ambient/rain.mp3' />
+      <audio ref={dovesRef} src='/audio/ambient/doves.mp3' />
+      <audio ref={loonsRef} src='/audio/ambient/loons.mp3' />
+      <audio ref={cricketsRef} src='/audio/ambient/crickets.mp3' />
+
       <div class="controls">
         <Button onClick={togglePlayback}>
-          {isPlaying ? "pause" : "play"}
+          {isPlaying ? "mute" : "unmute"}
+        </Button>
+
+        <Button onClick={toggleOutside}>
+          {isOutside ? "step inside" : "step outside"}
         </Button>
 
         {/* Audio filter controls */}
-        <div class="filter-controls">
-          {/* <div class="filter-control">
+        {/* <div class="filter-controls">
+          <div class="filter-control">
             <label htmlFor="highpass">Highpass: {processingOptions.highpassFrequency}Hz</label>
             <input
               type="range"
@@ -228,7 +257,7 @@ export default function AudioPlayer() {
               value={processingOptions.lowpassFrequency}
               onInput={handleLowpassChange}
             />
-          </div> */}
+          </div>
 
           <div class="filter-control">
             <label htmlFor="volume">Volume: {processingOptions.volume.toFixed(2)}</label>
@@ -242,8 +271,7 @@ export default function AudioPlayer() {
               onInput={handleVolumeChange}
             />
           </div>
-        </div>
-        <ShareButton />
+        </div> */}
       </div>
     </div>
   );
