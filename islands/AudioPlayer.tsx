@@ -57,7 +57,7 @@ export default function AudioPlayer() {
   // WEBSOCKET LOGIC
   useEffect(() => {
     // Connect to WebSocket
-    const ws = new WebSocket(`wss://${globalThis.location.host}/api/radio`);
+    const ws = new WebSocket(`ws://${globalThis.location.host}/api/radio`);
     wsRef.current = ws;
 
     ws.onopen = () => {
