@@ -13,7 +13,7 @@ export default function Home() {
           defer
           src="https://umami.pw1.xyz/script.js"
           data-website-id="b99bf8e9-7ddc-4fdc-968b-fc90ac5ed4ea"
-          data-domains="cafe.nightbreak.app,www.cafe.nightbreak.app"
+          data-domains="cafe.nightbreak.app,www.cafe.nightbreak.app,cafe.pw1.xyz"
         >
         </script>
 
