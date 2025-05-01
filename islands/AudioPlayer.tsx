@@ -10,7 +10,6 @@ import { Button } from "../components/Button.tsx";
 import { Radio } from "../routes/api/radio.ts";
 import { ChantProcessor, ChantProcessorOptions } from "../utils/ChantProcessor.ts";
 import { AmbientProcessor } from "../utils/AmbientProcessor.ts";
-import { Processor } from "npm:postcss@8.4.35";
 
 export default function AudioPlayer() {
   const [radioState, setRadioState] = useState<Radio>({
@@ -57,7 +56,8 @@ export default function AudioPlayer() {
   // WEBSOCKET LOGIC
   useEffect(() => {
     // Connect to WebSocket
-    const ws = new WebSocket(`ws://${globalThis.location.host}/api/radio`);
+    const protocol = globalThis.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(`${protocol}//${globalThis.location.host}/api/radio`);
     wsRef.current = ws;
 
     ws.onopen = () => {
