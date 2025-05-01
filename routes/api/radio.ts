@@ -22,7 +22,7 @@ const clients = new Set<WebSocket>();
 const DEV_ENV = Deno.env.get("ENVIRONMENT") === "DEV";
 export const AUDIO_DIRECTORY = DEV_ENV
   ? "./static/audio/paraklesis-byzantine-ark"
-  : "/home/george/media/orthodox/mp3";
+  : "/home/george/media/orthodox/agion-pascha";
 
 // Track the current file being served to all clients
 let currentTrack: AudioTrack | null = null;
