@@ -10,3 +10,11 @@ _fresh/
 # npm dependencies
 node_modules/
 .aider*
+
+# Audio files (will be supplied on server)
+static/audio
+
+# editor specific
+.vscode
+
+.DS_Store

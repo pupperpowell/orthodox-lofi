@@ -1,154 +1,317 @@
-import { useEffect, useState } from "preact/hooks";
-
-import Controls from "./Controls.tsx";
-import { AudioProcessor } from "../utils/AudioProcessor.ts";
-// import { JSX } from "preact/jsx-runtime";
+/**
+ * AudioPlayer.tsx: 
+ * - Creates HTML audio elements (also using api/music.ts as one source)
+ * - Creates new ChantProcessor and AmbientProcessor instances
+ * - Initializes() ChantProcessor, passing HTML audio element as an argument
+ * - Constructs() AmbientProcessor, doing basically the same?
+ */
+import { useEffect, useRef, useState } from "preact/hooks";
 import { Button } from "../components/Button.tsx";
+import { Radio } from "../routes/api/radio.ts";
+import { ChantProcessor, ChantProcessorOptions } from "../utils/ChantProcessor.ts";
+import { AmbientProcessor } from "../utils/AmbientProcessor.ts";
+import { VolumeSlider } from "../components/VolumeSlider.tsx";
 
 export default function AudioPlayer() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [volume, setVolume] = useState(0.7);
-  const [processor, setProcessor] = useState<AudioProcessor | null>(null);
+  const [radioState, setRadioState] = useState<Radio>({
+    currentTrack: { path: "", duration: 0 },
+    progress: 0,
+    isPlaying: false,
+  });
+  const [isConnected, setIsConnected] = useState(false);
+  const [chantSrc, setChantSrc] = useState("");
+  const [masterVolume, setMasterVolume] = useState(1.0);
+  const [isPlaying, setIsPlaying] = useState(false); // client playback state
+  const [isOutside, setIsOutside] = useState(false);
+  const [isRaining, setIsRaining] = useState(false);
+  const [windowOpen, setWindowOpen] = useState(false);
 
-  useEffect(() => {
-    if (processor) {
-      processor.setVolume(volume);
-    }
-  }, [volume, processor]);
+  // AmbientProcessor
+  const [ambientProcessor, setAmbientProcessor] = useState<AmbientProcessor | null>(null);
 
-  // Clean up audio resources when component unmounts
+  // Default audio processing options
+  const [processingOptions, setProcessingOptions] = useState<ChantProcessorOptions>({
+    highpassFrequency: 360,
+    lowpassFrequency: 2500,
+    volume: 1.0,
+    rainEnabled: false,
+    ambientEnabled: false,
+    outside: false
+  });
+
+  const chantRef = useRef<HTMLAudioElement>(null);
+  const rainRef = useRef<HTMLAudioElement>(null);
+  const loonsRef = useRef<HTMLAudioElement>(null);
+  const cricketsRef = useRef<HTMLAudioElement>(null);
+  const dovesRef = useRef<HTMLAudioElement>(null);
+
+  const wsRef = useRef<WebSocket | null>(null);
+  const currentTrackPathRef = useRef<string>("");
+  const isPlayingRef = useRef<boolean>(false);
+  const ChantProcessorRef = useRef<ChantProcessor>(new ChantProcessor());
+
+  // Update the ref whenever isPlaying changes
   useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
+
+  // WEBSOCKET LOGIC
+  useEffect(() => {
+    // Connect to WebSocket
+    const protocol = globalThis.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(`${protocol}//${globalThis.location.host}/api/radio`);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      console.log("WebSocket connected");
+      setIsConnected(true);
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        // Parse the radio state from the server
+        const data = JSON.parse(event.data) as Radio;
+
+        // Check if the track has changed using the ref instead of state
+        if (data.currentTrack.path !== currentTrackPathRef.current) {
+          currentTrackPathRef.current = data.currentTrack.path;
+
+          // Append a cache buster to ensure a fresh request
+          setChantSrc(
+            `/api/music?path=${data.currentTrack.path}&t=${Date.now()}`,
+          );
+
+          if (chantRef.current) {
+            // Load the new track
+            chantRef.current.load();
+            console.log("Fetched new track:", data.currentTrack.path);
+
+            // If playback is enabled, wait until the track is ready before auto-playing
+            if (isPlayingRef.current) {
+              chantRef.current.addEventListener("canplay", () => {
+                chantRef.current?.play().catch((e) =>
+                  console.error("Play error after canplay:", e)
+                );
+              }, { once: true });
+            }
+          }
+        }
+
+        // Update the state after checking for track changes
+        setRadioState(data);
+
+        // Sync the audio element with the server's progress
+        if (
+          chantRef.current &&
+          Math.abs(chantRef.current.currentTime - data.progress) > 1
+        ) {
+          chantRef.current.currentTime = data.progress;
+        }
+      } catch (e) {
+        console.error("Error parsing WebSocket message:", e);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket disconnected");
+      setIsConnected(false);
+    };
+
+    // Initial audio source
+    setChantSrc(`/api/music`);
+
     return () => {
-      processor?.pause();
-      setProcessor(null);
+      if (wsRef.current) wsRef.current.close();
+      ChantProcessorRef.current.disconnect();
     };
   }, []);
 
-  const handlePlay = async () => {
-    try {
-      setIsLoading(true);
-      
-      if (!processor) {
-        const newProcessor = new AudioProcessor();
-        setProcessor(newProcessor);
+  // Initialize audio processor after audio element is available
+  useEffect(() => {
+    if (chantRef.current && !ChantProcessorRef.current.isReady()) {
+      ChantProcessorRef.current.initialize(chantRef.current);
+      // Apply initial processing options
+      ChantProcessorRef.current.updateOptions(processingOptions);
+    }
+  }, [chantRef.current]);
 
-        // Mobile browsers require both resume and play to be in the gesture handler
-        await newProcessor.resume(); // Ensure we await context resume
-        newProcessor.setVolume(volume);
-        await newProcessor.play();
+  // Update processing chain options
+  useEffect(() => {
+    if (ChantProcessorRef.current.isReady()) {
+      ChantProcessorRef.current.updateOptions(processingOptions);
+    }
+  }, [processingOptions]);
 
-        setIsPlaying(true);
-      } catch (error) {
-        console.error("Error initializing audio:", error);
-      } finally {
-        setIsLoading(false);
+  // Add a separate effect to handle audio element state changes
+  useEffect(() => {
+    if (!chantRef.current) return;
+
+    if (isPlaying) {
+      chantRef.current.play().catch((e) => {
+        console.error("Error playing audio:", e);
+        setIsPlaying(false); // Reset state if playback fails
+      });
+
+    } else {
+      chantRef.current.pause();
+    }
+  }, [isPlaying]);
+
+  const togglePlayback = () => {
+    // Create the ambientProcessor if it doesn't already exist
+    if (!ambientProcessor && rainRef.current && loonsRef.current && dovesRef.current && cricketsRef.current) {
+      const processor = new AmbientProcessor(
+        rainRef.current,
+        loonsRef.current,
+        dovesRef.current,
+        cricketsRef.current
+      );
+      setAmbientProcessor(processor);
+      processor.play();
+    }
+
+    if (isPlaying) {
+      ambientProcessor?.stop();
+    } else {
+      ambientProcessor?.play();
+    }
+
+    // Resume audio context (needed for browsers with autoplay restrictions)
+    ChantProcessorRef.current.resume().then(() => {
+      setIsPlaying(!isPlaying);
+    });
+
+  };
+
+  // Toggle outside/inside
+  const toggleOutside = () => {
+    const newPosition = !isOutside;
+    setIsOutside(newPosition);
+    ChantProcessorRef.current.toggleOutside(newPosition, processingOptions);
+    ambientProcessor?.toggleOutside(newPosition);
+    // TODO: implement and call AmbientProcessor.toggleOutside()
+  };
+
+  const toggleWindow = () => {
+    const newPosition = !windowOpen;
+    setWindowOpen(newPosition);
+    ambientProcessor?.toggleWindow(newPosition);
+    // TODO: implement and call AmbientProcessor.toggleWindow()
+  };
+
+  const toggleRain = () => {
+    const raining = !isRaining;
+    setIsRaining(raining);
+    ambientProcessor?.toggleRain(raining);
+    // TODO: implement and call AmbientProcessor.toggleRain()
+  };
+
+  // Handle highpass filter change
+  const handleHighpassChange = (e: Event) => {
+    const value = parseInt((e.target as HTMLInputElement).value);
+    updateAudioFilters({ highpassFrequency: value });
+  };
+
+  // Handle lowpass filter change
+  const handleLowpassChange = (e: Event) => {
+    const value = parseInt((e.target as HTMLInputElement).value);
+    updateAudioFilters({ lowpassFrequency: value });
+  };
+
+  // Handle volume change
+  const handleVolumeChange = (e: Event) => {
+    const value = parseFloat((e.target as HTMLInputElement).value);
+    setMasterVolume(value);
+    if (isOutside) {
+      ambientProcessor?.setVolume(value);
+      if (value < 0.1) {
+        updateAudioFilters({ volume: value });
       }
-    } catch (error) {
-      console.error("Playback failed:", error);
-      setProcessor(null);
-      setIsPlaying(false);
-      setIsPaused(false);
-    } finally {
-      setIsLoading(false);
+    } else {
+      updateAudioFilters({ volume: value });
+      ambientProcessor?.setVolume(value);
     }
   };
 
-  const handleVolumeChange = (e: Event) => {
-    const target = e.target as HTMLInputElement;
-    const newVolume = parseFloat(target.value);
-    setVolume(newVolume);
+  // Example function to update audio processing options
+  const updateAudioFilters = (options: Partial<ChantProcessorOptions>) => {
+    setProcessingOptions(prev => ({
+      ...prev,
+      ...options
+    }));
   };
 
   return (
-    <div class="space-y-8">
-      <div class="flex items-center space-x-4">
-        <Button
-          type="button"
-          onClick={handlePlay}
-          onTouchEnd={(e) => {
-            e.preventDefault(); // Prevent default touch behavior
-            handlePlay();
-          }}
-          disabled={isLoading}
-          class="btn touch-manipulation active:scale-95"
-        >
-          {isLoading
-            ? (
-              <>
-                <svg
-                  class="inline animate-spin -ml-1 mr-2 h-4 w-4 text-gray-300"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  >
-                  </circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  >
-                  </path>
-                </svg>
-                LOADING
-              </>
-            )
-            : (
-              isPlaying ? (isPaused ? "RESUME" : "PAUSE") : "PLAY"
-            )}
+    <div>
+
+      <audio ref={chantRef} src={chantSrc} preload="auto" />
+      <audio ref={rainRef} src='/ambient/rain.mp3' preload="auto" loop />
+      <audio ref={dovesRef} src='/ambient/doves.mp3' preload="auto" loop />
+      <audio ref={loonsRef} src='/ambient/loons.mp3' preload="auto" loop />
+      <audio ref={cricketsRef} src='/ambient/crickets.mp3' preload="auto" loop />
+
+      <div class="controls">
+        <VolumeSlider value={masterVolume} onInput={handleVolumeChange} step={0.01} min={0} max={1} />
+
+        <Button onClick={togglePlayback}>
+          {isPlaying ? "mute" : "unmute"}
         </Button>
 
-        <div class="flex items-center space-x-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 text-gray-300"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onInput={handleVolumeChange}
-            class="w-24"
-          />
-          <span class="text-description font-triodion min-w-[40px] text-sm">
-            {Math.round(volume * 100)}%
-          </span>
-        </div>
-      </div>
+        <Button onClick={toggleWindow} disabled={!isConnected || !isPlaying || isOutside}>
+          {windowOpen ? "close window" : "open window"}
+        </Button>
 
-      {/* FilterControls always shows if processor exists */}
-      {processor && <Controls processor={processor} />}
+        <Button onClick={toggleOutside} disabled={!isConnected || !isPlaying}>
+          {isOutside ? "step inside" : "step outside"}
+        </Button>
+
+        <Button onClick={toggleRain} disabled={!isConnected || !isPlaying}>
+          {isRaining ? "stop rain" : "start rain"}
+        </Button>
+
+
+        {/* Audio filter controls */}
+        {/* <div class="filter-controls">
+          <div class="filter-control">
+            <label htmlFor="highpass">Highpass: {processingOptions.highpassFrequency}Hz</label>
+            <input
+              type="range"
+              id="highpass"
+              min="20"
+              max="1000"
+              step="5"
+              value={processingOptions.highpassFrequency}
+              onInput={handleHighpassChange}
+            />
+          </div>
+
+          <div class="filter-control">
+            <label htmlFor="lowpass">Lowpass: {processingOptions.lowpassFrequency}Hz</label>
+            <input
+              type="range"
+              id="lowpass"
+              min="1000"
+              max="20000"
+              step="100"
+              value={processingOptions.lowpassFrequency}
+              onInput={handleLowpassChange}
+            />
+          </div>
+
+          <div class="filter-control">
+            <label htmlFor="volume">Volume: {processingOptions.volume.toFixed(2)}</label>
+            <input
+              type="range"
+              id="volume"
+              min="0"
+              max="2"
+              step="0.01"
+              value={processingOptions.volume}
+              onInput={handleVolumeChange}
+            />
+          </div>
+        </div> */}
+      </div>
     </div>
   );
 }
-
-// function PlayButton(props: JSX.HTMLAttributes<HTMLButtonElement>) {
-//   return (
-//     <button
-//       style={{
-//         touchAction: "manipulation",
-//       }}
-//       {...props}
-//       class="px-2 uppercase font-inter border-2 border-white"
-//     />
-//   );
-// }

@@ -5,13 +5,15 @@
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $_layout from "./routes/_layout.tsx";
+import * as $about from "./routes/about.tsx";
 import * as $api_latest_commit from "./routes/api/latest-commit.ts";
+import * as $api_music from "./routes/api/music.ts";
+import * as $api_radio from "./routes/api/radio.ts";
+import * as $credits from "./routes/credits.tsx";
 import * as $index from "./routes/index.tsx";
-import * as $ActiveListeners from "./islands/ActiveListeners.tsx";
 import * as $AudioPlayer from "./islands/AudioPlayer.tsx";
-import * as $Controls from "./islands/Controls.tsx";
 import * as $LatestCommit from "./islands/LatestCommit.tsx";
-import * as $Status from "./islands/Status.tsx";
+import * as $ShareButton from "./islands/ShareButton.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -19,15 +21,17 @@ const manifest = {
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
     "./routes/_layout.tsx": $_layout,
+    "./routes/about.tsx": $about,
     "./routes/api/latest-commit.ts": $api_latest_commit,
+    "./routes/api/music.ts": $api_music,
+    "./routes/api/radio.ts": $api_radio,
+    "./routes/credits.tsx": $credits,
     "./routes/index.tsx": $index,
   },
   islands: {
-    "./islands/ActiveListeners.tsx": $ActiveListeners,
     "./islands/AudioPlayer.tsx": $AudioPlayer,
-    "./islands/Controls.tsx": $Controls,
     "./islands/LatestCommit.tsx": $LatestCommit,
-    "./islands/Status.tsx": $Status,
+    "./islands/ShareButton.tsx": $ShareButton,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

@@ -31,7 +31,7 @@ export default function LatestCommit({ className = "" }: LatestCommitProps) {
     fetchCommitMessage();
   }, []);
 
-  if (loading) return <div className={className}>Loading commit info...</div>;
+  if (loading) return <div className={className}>loading commit info...</div>;
   if (error) return <div className={className}>Error: {error}</div>;
 
   return (

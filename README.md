@@ -1,90 +1,62 @@
-# lofi byzantine chants to relax/study to
+# lofi byzantine music radio — chanting to relax/study to
 
-This project was made to parody the "lofi hip hop radio beats to relax/study to" genre, and honor the music of the Eastern Orthodox Church — not the other way around.
+[orthodox.cafe](https://orthodox.cafe) is a website for listening to Byzantine music of the Eastern Orthodox Church. There is a respectful touch of audio processing to give it a 'lofi' sound, which can be turned off. There are also ambient options, like distant rain.
 
-# Features
+This is the core function of the site, although I hope to add many more hidden features.
 
-1. many hours of public domain byzantine chanting.
-2. 'lofi' filter (highpass and lowpass). will continue to add layers and effects in the future.
-3. in order for the lofi effect to be more pronounced, the strength of the filters and effects need to change noticeably at defined points in the music.
-4. possible solution: for each track, note specific "breakpoints" where the effect of the filters can slide. for example,
-   1. key change(s) in psalm 135,
-   2. verse changes in Agni Parthene,
-   3. breaks of silence,
-   4. changes from reading to chanting, etc.
-      (this might be too much work! will create a "lofiSlide" function that randomly changes the lofi effect every 10 seconds or so)
+## Inspiration
 
-# database
+Although there is very little in common between the two, [orthodox.cafe](https://orthodox.cafe) was inspired by the popular YouTube stream [lofi hip hop radio - beats to relax/study to](https://www.youtube.com/watch?v=jfKfPfyJRdk).
 
-1. the audio is streamed from my icecast server.
-2. visitors are given a random "handle" for anonymous authentication, and will keep track of how many candles they light. this is stored in localStorage
-3. a visitor can only light 1 candle every 3 hours (check "last updated" on the visitor's 'lofi' row in the database).
+## Feedback
 
-# ui/ux design
+**If you have feedback for [orthodox.cafe](https://orthodox.cafe), please [email me directly](mailto:george@silentsummit.co).** Include in the subject line: **\[orthodox.cafe feedback\]** and it'll be moved to my highest priority mailbox. I love feedback, so don't hesitate to let me know your thoughts! Be mean if you have to!
 
-1. The background of the entire webpage will be a church iconostasis landscape, but it will be pitch dark with just a light in the corner showing some people chanting at the chant stand. As people view the webpage, candles will be lit that gradually illuminate the church
-2. There won't be any instructions or explanation. Just:
-   1. the title of the hymn playing, name of album, year recorded.
-   2. Amount of people listening. (corresponds to amt of candles)
+## Guiding principles
 
-- this requires a system of shaders. first of all, the entire canvas is made pitch black. then, candles (or lanterns) are lit that raise the brightness of a specific area (with a warm tone.)
-- then, scale the overall brightness of the canvas with the amount of candles.
-- for example, 0% brightness at 1 candle and 90% brightness at 100 candles.
+[orthodox.cafe](https://orthodox.cafe) has three principles that guide its design:
 
-# Todo
+1. [Stillness](https://www.oca.org/reflections/fr.-john-breck/on-silence-and-stillness) (ἡσυχία):
+   - _stillness, rest, quiet, silence_
+   - _bodily rest combined with creative tension_
+   - _openness to the divine (mystical) presence and to prayer_
+2. Mystery:
+   - _having a spiritual meaning or reality that is neither apparent to the senses nor obvious to the intelligence_
+3. Community:
+   - _intimate fellowship or rapport_
 
-## Audio
+Building software often feels like sitting at a blank canvas where anything is possible. But just because you can build anything doesn't mean you should. The magical slabs of metal and glass we carry in our pockets can do anything, and as a result, we use them to do nothing.
 
-- [ ] Add censer effect
-- [ ] Add bell effect
-- [ ] Add rain on roof effect
-- [ ] Add people talking / shuffling effect
-- [ ] Clean up the audio processing graph
-- [ ] Break out each audio effect into its own file
-- [ ] Add effects like reverb, delay, etc.
-- [ ] Add ambient tracks like whispering or shuffling
-- [ ] Way to visualize audio graph?
+Setting limits and guidelines for what the site does will help it do those things better.
 
-## Backend
+### Stillness
 
-- [ ] Move mp3 file collection to a database
-- [ ] Figure out how to stream audio from db instead of hosting static files
-- [ ] Active user count (number of recently updated rows in the db?)
-- [ ] Parse mp3s for breakpoints (lofi effect changes)
+Stillness (in the context of the Greek ἡσυχία, peacefulness) is facing the tension that comes with ignoring distractions. In a way, it's about being bored. Most modern technology is designed to relieve that tension, and we love it. But stillness is about facing that boredom like an old Western duel: standing in the middle of the road, taking ten steps away each, and turning around to look boredom in the eye as he reaches behind him for his revolver. The sun is setting, and the streets are empty, and all you see is boredom's silhouette standing down the road from you. And your hands are shaking, and your mind is racing, but you don't turn and run; you keep your hand on your revolver when finally he whips his hand out from behind his back and you still don't move because his hand is empty.
 
-## Overall design / UX
+Anyways, stillness as a guiding principle for [orthodox.cafe](https://orthodox.cafe) means it should be simple in function and transparent in its purpose.
 
-- [ ] Darkening shader
-- [ ] Lamp shader (local brightness)
-- [ ] Candle shader (flickering, moving flame)
-- [ ] Local brightness shader (surrounds candlse, scales with # of active users)
-- [ ] Candle placement zones
+Its purpose is to provide a consistent and respectful listening experience. Respectful means both respectful to the listener and the music itself.
+
+## What is Byzantine chanting?
+
+Byzantine chanting is a "significant cultural tradition and comprehensive music system" surrounding and involving the many hymns and services of the Eastern Orthodox Church. It's been around in various forms for several thousand years.
+
+From the UNESCO [Intangible Cultural Heritage](https://ich.unesco.org/en/RL/byzantine-chant-01508) site:
+
+> "...it is exclusively vocal music; it is essentially monophonic; the chants are codified into an eight-mode or eight-tone system; and the chant employs different styles of rhythm to accentuate the desired syllables of specific words."
+
+There are other, more Americanized ways of singing hymns and services, and there's nothing wrong with them in the slightest. I just prefer to listen to Byzantine chant, so I didn't include any of the western music that is common among Greek churches here in New England. There are many Byzantine chant albums that were recorded as a performance instead of as prayer, and I tried to avoid those wherever possible. As a result, most of the audio on [orthodox.cafe](https://orthodox.cafe) is performed by various groups of all-male monastics from Greece.
+
+I am currently looking to add more music as performed by women, a mix of women and men, and also other languages, especially Arabic. If you know of any (that's public domain, or who I could reach out to the rights holders for permission to play on this site), please let me know!
+
+Further reading: [orthodoxwiki.org](https://orthodoxwiki.org/Byzantine_Chant), [wikipedia](https://en.wikipedia.org/wiki/Byzantine_music)
+
+## Technical architecture
+
+The [orthodox.cafe](https://orthodox.cafe) client (what you see when you visit the webpage) was built with the [Deno Fresh](https://fresh.deno.dev/) web framework, which uses [Preact](https://preactjs.com/) as the frontend framework, [Deno](https://deno.com/) as the server runtime, and Typescript as the language tying it all together. Not too long ago, I assumed most websites were built with vanilla HTML and Javascript, so I'm proud of everything I've learned since then.
+
+The music was sourced from archive.org and YouTube and plays on an Icecast web radio 24/7. The scripting language used to assemble playlists and scheduling is Liquidsoap. I pay roughly $10 a month in server costs, but this could be $0 if I hosted it on a laptop in my closet. I don't know how much bandwidth will cost because as of writing this, version 1 of the site has not been released yet.
 
 ---
 
-1. Building this design has quickly become more complicated than I expected. There are no easy options that also look good.
-2. The most reasonable option is to manually draw the interior of an orthodox church at night - perhaps by coloring over a real image, using a limited color palette and drawing our own
-
-## UI
-
-- [ ] Orthodox church background image
-- [ ] "X others are here" counter
-
----
-
-## Fresh project
-
-Your new Fresh project is ready to go. You can follow the Fresh "Getting
-Started" guide here: https://fresh.deno.dev/docs/getting-started
-
-### Usage
-
-Make sure to install Deno: https://deno.land/manual/getting_started/installation
-
-Then start the project:
-
-```
-deno task start
-```
-
-This will watch the project directory and restart as necessary.
+_I'm currently looking for roles in product design or full-stack development — anything from contract work to full-time positions — and can be reached via [email](mailto:george@silentsummit.co)._
