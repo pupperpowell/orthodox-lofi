@@ -234,10 +234,10 @@ export default function AudioPlayer() {
     <div>
 
       <audio ref={chantRef} src={chantSrc} preload="auto" />
-      <audio ref={rainRef} src='/audio/ambient/rain.mp3' preload="auto" loop />
-      <audio ref={dovesRef} src='/audio/ambient/doves.mp3' preload="auto" loop />
-      <audio ref={loonsRef} src='/audio/ambient/loons.mp3' preload="auto" loop />
-      <audio ref={cricketsRef} src='/audio/ambient/crickets.mp3' preload="auto" loop />
+      <audio ref={rainRef} src='/ambient/rain.mp3' preload="auto" loop />
+      <audio ref={dovesRef} src='/ambient/doves.mp3' preload="auto" loop />
+      <audio ref={loonsRef} src='/ambient/loons.mp3' preload="auto" loop />
+      <audio ref={cricketsRef} src='/ambient/crickets.mp3' preload="auto" loop />
 
       <div class="controls">
         <Button onClick={togglePlayback}>
