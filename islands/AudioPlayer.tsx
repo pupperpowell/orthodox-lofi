@@ -10,6 +10,7 @@ import { Button } from "../components/Button.tsx";
 import { Radio } from "../routes/api/radio.ts";
 import { ChantProcessor, ChantProcessorOptions } from "../utils/ChantProcessor.ts";
 import { AmbientProcessor } from "../utils/AmbientProcessor.ts";
+import { VolumeSlider } from "../components/VolumeSlider.tsx";
 
 export default function AudioPlayer() {
   const [radioState, setRadioState] = useState<Radio>({
@@ -19,6 +20,7 @@ export default function AudioPlayer() {
   });
   const [isConnected, setIsConnected] = useState(false);
   const [chantSrc, setChantSrc] = useState("");
+  const [masterVolume, setMasterVolume] = useState(1.0);
   const [isPlaying, setIsPlaying] = useState(false); // client playback state
   const [isOutside, setIsOutside] = useState(false);
   const [isRaining, setIsRaining] = useState(false);
@@ -219,7 +221,16 @@ export default function AudioPlayer() {
   // Handle volume change
   const handleVolumeChange = (e: Event) => {
     const value = parseFloat((e.target as HTMLInputElement).value);
-    updateAudioFilters({ volume: value });
+    setMasterVolume(value);
+    if (isOutside) {
+      ambientProcessor?.setVolume(value);
+      if (value < 0.1) {
+        updateAudioFilters({ volume: value });
+      }
+    } else {
+      updateAudioFilters({ volume: value });
+      ambientProcessor?.setVolume(value);
+    }
   };
 
   // Example function to update audio processing options
@@ -240,6 +251,8 @@ export default function AudioPlayer() {
       <audio ref={cricketsRef} src='/ambient/crickets.mp3' preload="auto" loop />
 
       <div class="controls">
+        <VolumeSlider value={masterVolume} onInput={handleVolumeChange} step={0.01} min={0} max={1} />
+
         <Button onClick={togglePlayback}>
           {isPlaying ? "mute" : "unmute"}
         </Button>

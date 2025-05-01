@@ -98,9 +98,6 @@ export class ChantProcessor {
     this.chantHighpass.frequency.value = options.highpassFrequency;
     this.chantLowpass.frequency.value = options.lowpassFrequency;
     this.chantGain.gain.value = options.volume;
-
-    // Here you would also handle the ambient and rain audio based on options
-    console.log("[ChantProcessor] Options updated:", options);
   }
 
   /**
