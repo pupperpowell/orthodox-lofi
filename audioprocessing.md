@@ -12,11 +12,16 @@
 
 Chanting:
 
-- 360hz highpass, 3000hz lowpass
+- 360hz highpass, 3000hz lowpass (regular lofi)
+- all ambient sounds muted
 
-Nature sounds (?)
+## WINDOW OPEN
 
-- 1000hz lowpass, 0.1 gain (?)
+Chanting:
+
+- 360hz highpass, 3000hz lowpass (regular lofi)
+- Rain slightly muted, start at 360/3k high:low and tweak.
+- Crickets can play as well
 
 ## OUTSIDE
 

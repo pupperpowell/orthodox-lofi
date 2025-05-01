@@ -5,6 +5,9 @@
  * - toggleOutside() = full volume of both, no filters
  * - toggleRain() = connects or disconnects rain from context graph
  */
+
+type Location = "outside" | "inside";
+
 export class AmbientProcessor {
   private audioContext: AudioContext;
 
@@ -13,14 +16,14 @@ export class AmbientProcessor {
   private loonsAudio: HTMLAudioElement;
   private cricketsAudio: HTMLAudioElement;
 
-  private raining: boolean = true;
-  private outside: boolean = false;
+  private location: Location;
   private windowOpen: boolean = false;
+  private raining: boolean = false;
 
   // Master
   private masterGain: GainNode;
-  private masterHighpassFilter: BiquadFilterNode;
-  private masterLowpassFilter: BiquadFilterNode;
+  private cricketsHighpassFilter: BiquadFilterNode;
+  private cricketsLowpassFilter: BiquadFilterNode;
 
   // Rain
   private rainSource: MediaElementAudioSourceNode;
@@ -38,6 +41,33 @@ export class AmbientProcessor {
   private cricketsSource: MediaElementAudioSourceNode;
   private cricketsGain: GainNode;
 
+  private lowpassDisabled: number = 50000;
+  private highpassDisabled: number = 0;
+
+  // Highpass/lowpass filter values
+  private filters: { [key: string]: number } = {
+    insideRainHighpass: 300,
+    insideRainLowpass: 2500,
+    insideRainGain: 0.7,
+    // 
+    windowOpenRainHighpass: 200,
+    windowOpenRainLowpass: 5000,
+    windowOpenRainGain: 0.5,
+    windowOpenCricketsHighpass: 100,
+    windowOpenCricketsLowpass: 2000,
+    windowOpenCricketsGain: 0.3,
+    //
+    outsideRainHighpass: this.highpassDisabled,
+    outsideRainLowpass: this.lowpassDisabled,
+    outsideRainGain: 1,
+    outsideCricketsHighpass: this.highpassDisabled,
+    outsideCricketsLowpass: this.lowpassDisabled,
+    outsideCricketsGain: 1,
+    outsideDovesGain: 1,
+    outsideLoonsGain: 0.5,
+  }
+
+
   constructor(
     rain: HTMLAudioElement, 
     loons: HTMLAudioElement, 
@@ -45,6 +75,8 @@ export class AmbientProcessor {
     crickets: HTMLAudioElement
   ) {
     this.audioContext = new AudioContext();
+
+    this.location = "inside";
 
     this.rainAudio = rain;
     this.dovesAudio = doves;
@@ -57,10 +89,10 @@ export class AmbientProcessor {
     this.loonSource = this.audioContext.createMediaElementSource(loons);
     this.cricketsSource = this.audioContext.createMediaElementSource(crickets);
 
-    this.masterLowpassFilter = this.audioContext.createBiquadFilter();
-    this.masterLowpassFilter.type = "lowpass";
-    this.masterHighpassFilter = this.audioContext.createBiquadFilter();
-    this.masterHighpassFilter.type = "highpass";
+    this.cricketsLowpassFilter = this.audioContext.createBiquadFilter();
+    this.cricketsLowpassFilter.type = "lowpass";
+    this.cricketsHighpassFilter = this.audioContext.createBiquadFilter();
+    this.cricketsHighpassFilter.type = "highpass";
     
     this.rainLowpassFilter = this.audioContext.createBiquadFilter();
     this.rainLowpassFilter.type = "lowpass";
@@ -73,78 +105,95 @@ export class AmbientProcessor {
     this.loonGain = this.audioContext.createGain();
     this.cricketsGain = this.audioContext.createGain();
 
+    this.adjustFilters();
+
     this.connectChain();
     console.log("[AmbientProcessor] initialized");
   }
 
   connectChain() {
-    if (this.raining) {
+
     this.rainSource
-      .connect(this.masterLowpassFilter)
-      .connect(this.masterLowpassFilter)
+      // apparently the filters have default settings!
       .connect(this.rainGain)
+      .connect(this.rainHighpassFilter)
+      .connect(this.rainLowpassFilter)
+      .connect(this.masterGain)
       .connect(this.audioContext.destination);
-    }
-    if (this.windowOpen || this.outside) {
-      this.doveSource
-        .connect(this.doveGain)
-        .connect(this.masterHighpassFilter)
-        .connect(this.masterLowpassFilter)
-        .connect(this.audioContext.destination);
 
-      this.loonSource
-        .connect(this.loonGain)
-        .connect(this.masterHighpassFilter)
-        .connect(this.masterLowpassFilter)
-        .connect(this.audioContext.destination);
+    this.doveSource
+      .connect(this.doveGain)
 
-      this.cricketsSource
-        .connect(this.cricketsGain)
-        .connect(this.masterHighpassFilter)
-        .connect(this.masterLowpassFilter)
-        .connect(this.audioContext.destination);
-    }
-    // console.log("[AmbientProcessor] connected chain");
+      .connect(this.masterGain)
+      .connect(this.audioContext.destination);
+
+    this.loonSource
+      .connect(this.loonGain)
+
+      .connect(this.masterGain)
+      .connect(this.audioContext.destination);
+      
+    this.cricketsSource
+      .connect(this.cricketsGain)
+      .connect(this.cricketsHighpassFilter)
+      .connect(this.cricketsLowpassFilter)
+      .connect(this.masterGain)
+      .connect(this.audioContext.destination);
+    
+    console.log("[AmbientProcessor] connected chain");
   }
 
-  setRainEnabled(enabled: boolean) {
-    this.raining = enabled;
-    this.connectChain();
+  adjustFilters() {
+    // INSIDE, WINDOW OPEN
+    if (this.location == "inside" && this.windowOpen) {
+      this.rainHighpassFilter.frequency.value = this.filters.windowOpenRainHighpass;
+      this.rainLowpassFilter.frequency.value = this.filters.windowOpenRainLowpass;
+      this.rainGain.gain.value = this.raining ? this.filters.windowOpenRainGain : 0;
+
+      this.cricketsGain.gain.value = this.filters.windowOpenCricketsGain;
+      this.cricketsHighpassFilter.frequency.value = this.filters.windowOpenCricketsHighpass;
+      this.cricketsLowpassFilter.frequency.value = this.filters.windowOpenCricketsLowpass;
+      this.doveGain.gain.value = 0;
+      this.loonGain.gain.value = 0;
+    } else if (this.location == "inside") {
+      this.rainHighpassFilter.frequency.value = this.filters.insideRainHighpass;
+      this.rainLowpassFilter.frequency.value = this.filters.insideRainLowpass;
+      this.rainGain.gain.value = this.raining ? this.filters.insideRainGain : 0;
+
+      this.cricketsGain.gain.value = 0;
+      this.doveGain.gain.value = 0;
+      this.loonGain.gain.value = 0;
+    } else { 
+      // (outside)
+      this.rainHighpassFilter.frequency.value = this.highpassDisabled;
+      this.rainLowpassFilter.frequency.value = this.lowpassDisabled;
+      this.rainGain.gain.value = this.raining ? this.filters.outsideRainGain : 0;
+
+      this.cricketsGain.gain.value = this.filters.outsideCricketsGain;
+      this.cricketsHighpassFilter.frequency.value = this.highpassDisabled;
+      this.cricketsLowpassFilter.frequency.value = this.lowpassDisabled;
+
+      this.doveGain.gain.value = this.filters.outsideDovesGain;
+      this.loonGain.gain.value = this.filters.outsideLoonsGain;
+    }
   }
 
-  // partial rain, partial crickets, no birds
-  setWindowOpen(enabled: boolean) {
-    this.windowOpen = enabled;
-    this.masterHighpassFilter.frequency.value = enabled ? 1000 : 20; // window open : outside
-    this.masterLowpassFilter.frequency.value = enabled ? 3600 : 20000; // window open : outside
-    this.rainGain.gain.value = enabled ? 1 : 0;
-    this.doveGain.gain.value = enabled ? 0.5 : 0;
-    this.loonGain.gain.value = enabled ? 0.5 : 0;
-    this.cricketsGain.gain.value = enabled ? 0.5 : 0;
-    this.connectChain();
-    console.log(`[AmbientProcessor] set window ${enabled ? "open" : "closed"}`);
+  toggleRain(raining: boolean) {
+    this.raining = raining;
+    this.adjustFilters();
+    console.log(`[AmbientProcessor] Turned ${raining ? "on" : "off"} the rain`);
+  }
+
+  toggleWindow(windowOpen: boolean) {
+    this.windowOpen = windowOpen;
+    this.adjustFilters();
+    console.log(`[AmbientProcessor] set window ${windowOpen ? "open" : "closed"}`);
   }
   
-  toggleOutside(enabled: boolean) {
-    this.setRainEnabled(enabled);
-    this.outside = enabled;
-    this.masterHighpassFilter.frequency.value = enabled ? 20 : 1000; // window open : outside
-    this.masterLowpassFilter.frequency.value = enabled ? 30000 : 3600; // window open : outside
-    this.connectChain();
-  }
-
-  setLowPassFilterFrequency(frequency: number) {
-    this.masterLowpassFilter.frequency.value = Math.max(
-      20,
-      Math.min(frequency, 20000),
-    );
-  }
-
-  setHighPassFilterFrequency(frequency: number) {
-    this.masterHighpassFilter.frequency.value = Math.max(
-      20,
-      Math.min(frequency, 20000),
-    );
+  toggleOutside(outside: boolean) {
+    outside ? this.location = "outside" : this.location = "inside";
+    this.adjustFilters();
+    console.log(`[AmbientProcessor] set location to ${outside ? "outside" : "inside"}`);
   }
 
   setVolume(volume: number) {

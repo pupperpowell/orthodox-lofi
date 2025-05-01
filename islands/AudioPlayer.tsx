@@ -193,8 +193,15 @@ export default function AudioPlayer() {
   const toggleWindow = () => {
     const newPosition = !windowOpen;
     setWindowOpen(newPosition);
-    ambientProcessor?.setWindowOpen(newPosition);
+    ambientProcessor?.toggleWindow(newPosition);
     // TODO: implement and call AmbientProcessor.toggleWindow()
+  };
+
+  const toggleRain = () => {
+    const raining = !isRaining;
+    setIsRaining(raining);
+    ambientProcessor?.toggleRain(raining);
+    // TODO: implement and call AmbientProcessor.toggleRain()
   };
 
   // Handle highpass filter change
@@ -245,6 +252,9 @@ export default function AudioPlayer() {
           {isOutside ? "step inside" : "step outside"}
         </Button>
 
+        <Button onClick={toggleRain} disabled={!isConnected || !isPlaying}>
+          {isRaining ? "stop rain" : "start rain"}
+        </Button>
 
 
         {/* Audio filter controls */}
