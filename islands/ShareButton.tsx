@@ -70,9 +70,8 @@ export default function ShareButton({
     return (
         <Button
             onClick={handleShare}
-
             aria-label="Share this page"
-
+            data-umami-event="Share button clicked"
         >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem" }}>
                 <span>{copied ? "link copied to clipboard!" : "listen with a friend"}</span>
