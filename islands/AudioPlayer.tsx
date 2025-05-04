@@ -239,12 +239,13 @@ export default function AudioPlayer() {
       <audio ref={cricketsRef} src='/ambient/crickets.mp3' preload="auto" loop />
 
       <div class="controls space-y-2">
-        <div class="my-6">
-          <VolumeSlider value={masterVolume} onInput={handleVolumeChange} step={0.01} min={0} max={0.5} />
-        </div>
+
+
         <Button onClick={togglePlayback}>
           {isPlaying ? "mute" : "unmute"}
         </Button>
+
+        <VolumeSlider value={masterVolume} onInput={handleVolumeChange} step={0.01} min={0} max={0.5} />
 
         <Button onClick={toggleWindow} disabled={!isConnected || !isPlaying || isOutside}>
           {windowOpen ? "close window" : "open window"}
