@@ -20,7 +20,7 @@ export default function AudioPlayer() {
   });
   const [isConnected, setIsConnected] = useState(false);
   const [chantSrc, setChantSrc] = useState("");
-  const [masterVolume, setMasterVolume] = useState(1.0);
+  const [masterVolume, setMasterVolume] = useState(0.5);
   const [isPlaying, setIsPlaying] = useState(false); // client playback state
   const [isOutside, setIsOutside] = useState(false);
   const [isRaining, setIsRaining] = useState(false);
@@ -33,7 +33,7 @@ export default function AudioPlayer() {
   const [processingOptions, setProcessingOptions] = useState<ChantProcessorOptions>({
     highpassFrequency: 360,
     lowpassFrequency: 2500,
-    volume: 1.0,
+    volume: 0.5,
     rainEnabled: false,
     ambientEnabled: false,
     outside: false
@@ -206,25 +206,13 @@ export default function AudioPlayer() {
     // TODO: implement and call AmbientProcessor.toggleRain()
   };
 
-  // Handle highpass filter change
-  const handleHighpassChange = (e: Event) => {
-    const value = parseInt((e.target as HTMLInputElement).value);
-    updateAudioFilters({ highpassFrequency: value });
-  };
-
-  // Handle lowpass filter change
-  const handleLowpassChange = (e: Event) => {
-    const value = parseInt((e.target as HTMLInputElement).value);
-    updateAudioFilters({ lowpassFrequency: value });
-  };
-
   // Handle volume change
   const handleVolumeChange = (e: Event) => {
     const value = parseFloat((e.target as HTMLInputElement).value);
     setMasterVolume(value);
     if (isOutside) {
       ambientProcessor?.setVolume(value);
-      if (value < 0.1) {
+      if (value < 0.15) {
         updateAudioFilters({ volume: value });
       }
     } else {
@@ -252,7 +240,7 @@ export default function AudioPlayer() {
 
       <div class="controls space-y-2">
         <div class="my-6">
-          <VolumeSlider value={masterVolume} onInput={handleVolumeChange} step={0.01} min={0} max={1} />
+          <VolumeSlider value={masterVolume} onInput={handleVolumeChange} step={0.01} min={0} max={0.5} />
         </div>
         <Button onClick={togglePlayback}>
           {isPlaying ? "mute" : "unmute"}
