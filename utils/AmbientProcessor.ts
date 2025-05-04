@@ -49,11 +49,11 @@ export class AmbientProcessor {
   private filters: { [key: string]: number } = {
     insideRainHighpass: 300,
     insideRainLowpass: 2500,
-    insideRainGain: 0.3,
+    insideRainGain: 0.5,
     // 
     windowOpenRainHighpass: 200,
     windowOpenRainLowpass: 5000,
-    windowOpenRainGain: 0.2,
+    windowOpenRainGain: 0.4,
     windowOpenCricketsHighpass: 100,
     windowOpenCricketsLowpass: 2000,
     windowOpenCricketsGain: 0.3,
@@ -104,6 +104,7 @@ export class AmbientProcessor {
     this.pan = this.audioContext.createStereoPanner();
 
     this.masterGain = this.audioContext.createGain();
+    this.masterGain.gain.value = 0.5;
     this.rainGain = this.audioContext.createGain();
     this.doveGain = this.audioContext.createGain();
     this.loonGain = this.audioContext.createGain();
