@@ -81,7 +81,8 @@ export class ChantProcessor {
     this.chantHighpass.frequency.value = outside ? 100 : options.highpassFrequency;
     this.chantLowpass.frequency.value = outside ? 1000 : options.lowpassFrequency; 
 
-    this.chantGain.gain.value = outside ? 0.1 : 1;
+    this.chantGain.gain.value = outside ? 0.15 : options.volume;
+    console.log("[ChantProcessor] Volume set to:", this.chantGain.gain.value);
     console.log("[ChantProcessor] Toggled outside:", outside);
   }
 
@@ -98,6 +99,7 @@ export class ChantProcessor {
     this.chantHighpass.frequency.value = options.highpassFrequency;
     this.chantLowpass.frequency.value = options.lowpassFrequency;
     this.chantGain.gain.value = options.volume;
+    console.log("[ChantProcessor] Volume set to:", options.volume);
   }
 
   /**

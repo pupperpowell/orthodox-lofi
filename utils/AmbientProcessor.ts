@@ -59,12 +59,12 @@ export class AmbientProcessor {
     //
     outsideRainHighpass: this.highpassDisabled,
     outsideRainLowpass: this.lowpassDisabled,
-    outsideRainGain: 1,
+    outsideRainGain: 0.6,
     outsideCricketsHighpass: this.highpassDisabled,
     outsideCricketsLowpass: this.lowpassDisabled,
-    outsideCricketsGain: 1,
-    outsideDovesGain: 1,
-    outsideLoonsGain: 0.5,
+    outsideCricketsGain: 0.3,
+    outsideDovesGain: 0.7,
+    outsideLoonsGain: 0.3,
   }
 
 
@@ -196,16 +196,30 @@ export class AmbientProcessor {
     console.log(`[AmbientProcessor] set location to ${outside ? "outside" : "inside"}`);
   }
 
+  playAmbientNature(today: Date) {
+    const hour = today.getHours();
+    if (hour < 6) { // 12am - 6am
+      this.loonsAudio.play(); 
+      this.cricketsAudio.play();
+    } else if (hour < 12) { // 6am - 12pm
+      this.dovesAudio.play();
+    } else if (hour < 18) { // 12pm - 6pm
+      this.dovesAudio.play();
+    } else { // 6pm - 12am
+      this.dovesAudio.play();
+      this.loonsAudio.play(); 
+      this.cricketsAudio.play();
+    }
+  }
+
   setVolume(volume: number) {
     this.masterGain.gain.value = volume;
   }
   
   play() {
     this.audioContext?.resume();
+    this.playAmbientNature(new Date());
     this.rainAudio.play();
-    this.dovesAudio.play();
-    this.loonsAudio.play(); 
-    this.cricketsAudio.play();
     console.log("[AmbientProcessor] playing");
   }
 
