@@ -1,5 +1,6 @@
 import { PageProps } from "$fresh/server.ts";
 import { Link } from "../components/Link.tsx";
+import ShareButton from "../islands/ShareButton.tsx";
 
 export default function Layout({ Component }: PageProps) {
   // do something with state here
@@ -14,9 +15,9 @@ export default function Layout({ Component }: PageProps) {
         <Component />
       </main>
       <footer class="text-lg flex gap-4">
-        <Link href="/">home</Link>
-        <Link href="/about">about</Link>
-        <Link href="/credits">credits</Link>
+        <ShareButton />
+        {/* <Link href="/about">about</Link> */}
+        {/* <Link href="/credits">credits</Link> */}
       </footer>
     </body>
   );
