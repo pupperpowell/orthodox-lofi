@@ -1,7 +1,6 @@
 import { Head } from "$fresh/runtime.ts";
 import LatestCommit from "../islands/LatestCommit.tsx";
 import AudioPlayer from "../islands/AudioPlayer.tsx";
-import ShareButton from "../islands/ShareButton.tsx";
 
 export default function Home() {
   return (
@@ -33,7 +32,6 @@ export default function Home() {
         {Deno.env.get("ENVIRONMENT") == "DEV" &&
           <LatestCommit className="font-triodion" />}
         <AudioPlayer />
-        <ShareButton />
       </div>
     </>
   );

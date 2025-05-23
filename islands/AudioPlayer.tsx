@@ -241,23 +241,23 @@ export default function AudioPlayer() {
       <div class="controls space-y-2">
 
 
-        <Button onClick={togglePlayback}>
-          {isPlaying ? "mute" : "unmute"}
-        </Button>
+        <button class="btn btn-primary w-full rounded-full" onClick={togglePlayback} type="button">
+          {isPlaying ? "click to mute" : "click to listen"}
+        </button>
 
-        <VolumeSlider value={masterVolume} onInput={handleVolumeChange} step={0.01} min={0} max={0.5} />
+        <input type="range" class="range w-full" value={masterVolume} onInput={handleVolumeChange} step={0.001} min={0} max={0.5} />
 
-        <Button onClick={toggleWindow} disabled={!isConnected || !isPlaying || isOutside}>
+        <button class="btn w-full rounded-full" onClick={toggleWindow} disabled={!isConnected || !isPlaying || isOutside}>
           {windowOpen ? "close window" : "open window"}
-        </Button>
+        </button>
 
-        <Button onClick={toggleOutside} disabled={!isConnected || !isPlaying}>
+        <button class="btn w-full rounded-full" onClick={toggleOutside} disabled={!isConnected || !isPlaying}>
           {isOutside ? "step inside" : "step outside"}
-        </Button>
+        </button>
 
-        <Button onClick={toggleRain} disabled={!isConnected || !isPlaying}>
+        <button class="btn w-full rounded-full" onClick={toggleRain} disabled={!isConnected || !isPlaying}>
           {isRaining ? "stop rain" : "start rain"}
-        </Button>
+        </button>
 
 
         {/* Audio filter controls */}
