@@ -6,11 +6,9 @@
  * - Constructs() AmbientProcessor, doing basically the same?
  */
 import { useEffect, useRef, useState } from "preact/hooks";
-import { Button } from "../components/Button.tsx";
 import { Radio } from "../routes/api/radio.ts";
 import { ChantProcessor, ChantProcessorOptions } from "../utils/ChantProcessor.ts";
 import { AmbientProcessor } from "../utils/AmbientProcessor.ts";
-import { VolumeSlider } from "../components/VolumeSlider.tsx";
 
 export default function AudioPlayer() {
   const [radioState, setRadioState] = useState<Radio>({
