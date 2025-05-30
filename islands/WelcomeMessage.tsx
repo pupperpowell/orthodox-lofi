@@ -70,8 +70,8 @@ export default function WelcomeMessage() {
             <p class="mb-2 text-xl">
                 {getWeatherDescription()}
                 {!isOutside && connectedUsers > 1 && (
-                    <span class="block mt-1">
-                        There are {connectedUsers - 1} others here.
+                    <span>
+                        There {connectedUsers < 2 ? "is" : "are"} {connectedUsers - 1} {connectedUsers < 2 ? "other" : "others"} here.
                     </span>
                 )}
             </p>
