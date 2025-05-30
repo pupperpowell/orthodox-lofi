@@ -26,13 +26,14 @@ export default function Home() {
         </script>
       </Head>
 
-
-
       <div>
-        <h1>Welcome to St. George Chapel. It's a warm spring morning. You are standing in the back.</h1>
+        <h1>
+          Welcome to St. George Chapel. It's a warm spring morning. You are
+          standing in the back.
+        </h1>
         {Deno.env.get("ENVIRONMENT") == "DEV" &&
           <LatestCommit className="font-triodion" />}
-        <WelcomeMessage raining={false} inside={false} />
+        <WelcomeMessage />
         <AudioPlayer />
       </div>
     </>

@@ -1,5 +1,5 @@
 /**
- * AudioPlayer.tsx: 
+ * AudioPlayer.tsx:
  * - Creates HTML audio elements (also using api/music.ts as one source)
  * - Creates new ChantProcessor and AmbientProcessor instances
  * - Initializes() ChantProcessor, passing HTML audio element as an argument
@@ -7,34 +7,47 @@
  */
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Radio } from "../routes/api/radio.ts";
-import { ChantProcessor, ChantProcessorOptions } from "../utils/ChantProcessor.ts";
+import {
+  ChantProcessor,
+  ChantProcessorOptions,
+} from "../utils/ChantProcessor.ts";
 import { AmbientProcessor } from "../utils/AmbientProcessor.ts";
+import {
+  appState,
+  setIsConnected,
+  setIsOutside,
+  setIsPlaying,
+  setIsRaining,
+} from "../utils/AppContext.tsx";
 
 export default function AudioPlayer() {
+  // Access shared state from signals
+  const { isConnected, isPlaying, isOutside, isRaining } = appState.value;
+
   const [radioState, setRadioState] = useState<Radio>({
     currentTrack: { path: "", duration: 0 },
     progress: 0,
     isPlaying: false,
   });
-  const [isConnected, setIsConnected] = useState(false);
   const [chantSrc, setChantSrc] = useState("");
   const [masterVolume, setMasterVolume] = useState(0.5);
-  const [isPlaying, setIsPlaying] = useState(false); // client playback state
-  const [isOutside, setIsOutside] = useState(false);
-  const [isRaining, setIsRaining] = useState(false);
   const [windowOpen, setWindowOpen] = useState(false);
 
   // AmbientProcessor
-  const [ambientProcessor, setAmbientProcessor] = useState<AmbientProcessor | null>(null);
+  const [ambientProcessor, setAmbientProcessor] = useState<
+    AmbientProcessor | null
+  >(null);
 
   // Default audio processing options
-  const [processingOptions, setProcessingOptions] = useState<ChantProcessorOptions>({
+  const [processingOptions, setProcessingOptions] = useState<
+    ChantProcessorOptions
+  >({
     highpassFrequency: 360,
     lowpassFrequency: 2500,
     volume: 0.5,
     rainEnabled: false,
     ambientEnabled: false,
-    outside: false
+    outside: false,
   });
 
   const chantRef = useRef<HTMLAudioElement>(null);
@@ -56,8 +69,10 @@ export default function AudioPlayer() {
   // WEBSOCKET LOGIC
   useEffect(() => {
     // Connect to WebSocket
-    const protocol = globalThis.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const ws = new WebSocket(`${protocol}//${globalThis.location.host}/api/radio`);
+    const protocol = globalThis.location.protocol === "https:" ? "wss:" : "ws:";
+    const ws = new WebSocket(
+      `${protocol}//${globalThis.location.host}/api/radio`,
+    );
     wsRef.current = ws;
 
     ws.onopen = () => {
@@ -149,7 +164,6 @@ export default function AudioPlayer() {
         console.error("Error playing audio:", e);
         setIsPlaying(false); // Reset state if playback fails
       });
-
     } else {
       chantRef.current.pause();
     }
@@ -157,12 +171,15 @@ export default function AudioPlayer() {
 
   const togglePlayback = () => {
     // Create the ambientProcessor if it doesn't already exist
-    if (!ambientProcessor && rainRef.current && loonsRef.current && dovesRef.current && cricketsRef.current) {
+    if (
+      !ambientProcessor && rainRef.current && loonsRef.current &&
+      dovesRef.current && cricketsRef.current
+    ) {
       const processor = new AmbientProcessor(
         rainRef.current,
         loonsRef.current,
         dovesRef.current,
-        cricketsRef.current
+        cricketsRef.current,
       );
       setAmbientProcessor(processor);
       processor.play();
@@ -178,7 +195,6 @@ export default function AudioPlayer() {
     ChantProcessorRef.current.resume().then(() => {
       setIsPlaying(!isPlaying);
     });
-
   };
 
   // Toggle outside/inside
@@ -221,45 +237,71 @@ export default function AudioPlayer() {
 
   // Example function to update audio processing options
   const updateAudioFilters = (options: Partial<ChantProcessorOptions>) => {
-    setProcessingOptions(prev => ({
+    setProcessingOptions((prev) => ({
       ...prev,
-      ...options
+      ...options,
     }));
   };
 
   return (
     <div>
-
       <audio ref={chantRef} src={chantSrc} preload="auto" />
-      <audio ref={rainRef} src='/ambient/rain.mp3' preload="auto" loop />
-      <audio ref={dovesRef} src='/ambient/doves.mp3' preload="auto" loop />
-      <audio ref={loonsRef} src='/ambient/loons.mp3' preload="auto" loop />
-      <audio ref={cricketsRef} src='/ambient/crickets.mp3' preload="auto" loop />
+      <audio ref={rainRef} src="/ambient/rain.mp3" preload="auto" loop />
+      <audio ref={dovesRef} src="/ambient/doves.mp3" preload="auto" loop />
+      <audio ref={loonsRef} src="/ambient/loons.mp3" preload="auto" loop />
+      <audio
+        ref={cricketsRef}
+        src="/ambient/crickets.mp3"
+        preload="auto"
+        loop
+      />
 
       <div class="controls space-y-2">
-
-
-        <button class="btn btn-primary w-full rounded-full" onClick={togglePlayback} type="button">
+        <button
+          class="btn btn-primary w-full rounded-full"
+          onClick={togglePlayback}
+          type="button"
+        >
           {isPlaying ? "click to mute" : "click to listen"}
         </button>
 
-        <input type="range" class="range w-full" value={masterVolume} onInput={handleVolumeChange} step={0.001} min={0} max={0.5} />
+        <input
+          type="range"
+          class="range w-full"
+          value={masterVolume}
+          onInput={handleVolumeChange}
+          step={0.001}
+          min={0}
+          max={0.5}
+        />
 
-        {/* <button type="button" class="btn w-full rounded-full" onClick={toggleWindow} disabled={!isConnected || !isPlaying || isOutside}>
+        {
+          /* <button type="button" class="btn w-full rounded-full" onClick={toggleWindow} disabled={!isConnected || !isPlaying || isOutside}>
           {windowOpen ? "close window" : "open window"}
-        </button> */}
+        </button> */
+        }
 
-        <button type="button" class="btn w-full rounded-full" onClick={toggleOutside} disabled={!isConnected || !isPlaying}>
+        <button
+          type="button"
+          class="btn w-full rounded-full"
+          onClick={toggleOutside}
+          disabled={!isConnected || !isPlaying}
+        >
           {isOutside ? "step inside" : "step outside"}
         </button>
 
-        <button type="button" class="btn w-full rounded-full" onClick={toggleRain} disabled={!isConnected || !isPlaying}>
+        <button
+          type="button"
+          class="btn w-full rounded-full"
+          onClick={toggleRain}
+          disabled={!isConnected || !isPlaying}
+        >
           {isRaining ? "stop rain" : "start rain"}
         </button>
 
-
         {/* Audio filter controls */}
-        {/* <div class="filter-controls">
+        {
+          /* <div class="filter-controls">
           <div class="filter-control">
             <label htmlFor="highpass">Highpass: {processingOptions.highpassFrequency}Hz</label>
             <input
@@ -298,7 +340,8 @@ export default function AudioPlayer() {
               onInput={handleVolumeChange}
             />
           </div>
-        </div> */}
+        </div> */
+        }
       </div>
     </div>
   );

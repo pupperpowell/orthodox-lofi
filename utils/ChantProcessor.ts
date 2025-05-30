@@ -32,8 +32,10 @@ export class ChantProcessor {
 
     try {
       // Check if we're in a browser environment
-      if (typeof window === 'undefined') {
-        console.warn("[ChantProcessor] Not in browser environment, skipping initialization");
+      if (typeof window === "undefined") {
+        console.warn(
+          "[ChantProcessor] Not in browser environment, skipping initialization",
+        );
         return;
       }
 
@@ -47,7 +49,7 @@ export class ChantProcessor {
       this.chantLowpass = this.context.createBiquadFilter();
       this.chantLowpass.type = "lowpass";
       this.chantGain = this.context.createGain();
-    
+
       this.connectChantProcessor();
 
       this.isInitialized = true;
@@ -58,9 +60,12 @@ export class ChantProcessor {
   }
 
   private connectChantProcessor() {
-    if (!this.chantSource || !this.chantHighpass || !this.chantLowpass || !this.chantGain || !this.context) {
+    if (
+      !this.chantSource || !this.chantHighpass || !this.chantLowpass ||
+      !this.chantGain || !this.context
+    ) {
       console.error(
-        "[ChantProcessor] Audio nodes not available — can't connect processing chain"
+        "[ChantProcessor] Audio nodes not available — can't connect processing chain",
       );
       return;
     }
@@ -73,13 +78,20 @@ export class ChantProcessor {
   }
 
   public toggleOutside(outside: boolean, options: ChantProcessorOptions): void {
-    if (!this.isInitialized || !this.chantSource || !this.chantHighpass || !this.chantLowpass || !this.chantGain) {
+    if (
+      !this.isInitialized || !this.chantSource || !this.chantHighpass ||
+      !this.chantLowpass || !this.chantGain
+    ) {
       console.warn("[ChantProcessor] Not initialized, can't toggle outside");
       return;
     }
 
-    this.chantHighpass.frequency.value = outside ? 100 : options.highpassFrequency;
-    this.chantLowpass.frequency.value = outside ? 1000 : options.lowpassFrequency; 
+    this.chantHighpass.frequency.value = outside
+      ? 100
+      : options.highpassFrequency;
+    this.chantLowpass.frequency.value = outside
+      ? 1000
+      : options.lowpassFrequency;
 
     this.chantGain.gain.value = outside ? 0.15 : options.volume;
     console.log("[ChantProcessor] Volume set to:", this.chantGain.gain.value);
@@ -90,7 +102,10 @@ export class ChantProcessor {
    * Update audio processing parameters
    */
   public updateOptions(options: ChantProcessorOptions): void {
-    if (!this.isInitialized || !this.chantHighpass || !this.chantLowpass || !this.chantGain) {
+    if (
+      !this.isInitialized || !this.chantHighpass || !this.chantLowpass ||
+      !this.chantGain
+    ) {
       console.warn("[ChantProcessor] Not initialized, can't update options");
       return;
     }
@@ -123,7 +138,7 @@ export class ChantProcessor {
     if (this.chantSource) {
       this.chantSource.disconnect();
     }
-    
+
     if (this.context) {
       this.context.close();
     }

@@ -50,7 +50,7 @@ export class AmbientProcessor {
     insideRainHighpass: 300,
     insideRainLowpass: 2500,
     insideRainGain: 0.5,
-    // 
+    //
     windowOpenRainHighpass: 200,
     windowOpenRainLowpass: 5000,
     windowOpenRainGain: 0.4,
@@ -67,14 +67,13 @@ export class AmbientProcessor {
     outsideCricketsGain: 0.3,
     outsideDovesGain: 0.7,
     outsideLoonsGain: 0.3,
-  }
-
+  };
 
   constructor(
-    rain: HTMLAudioElement, 
-    loons: HTMLAudioElement, 
-    doves: HTMLAudioElement, 
-    crickets: HTMLAudioElement
+    rain: HTMLAudioElement,
+    loons: HTMLAudioElement,
+    doves: HTMLAudioElement,
+    crickets: HTMLAudioElement,
   ) {
     this.audioContext = new AudioContext();
 
@@ -95,7 +94,7 @@ export class AmbientProcessor {
     this.cricketsLowpassFilter.type = "lowpass";
     this.cricketsHighpassFilter = this.audioContext.createBiquadFilter();
     this.cricketsHighpassFilter.type = "highpass";
-    
+
     this.rainLowpassFilter = this.audioContext.createBiquadFilter();
     this.rainLowpassFilter.type = "lowpass";
     this.rainHighpassFilter = this.audioContext.createBiquadFilter();
@@ -117,7 +116,6 @@ export class AmbientProcessor {
   }
 
   connectChain() {
-
     this.rainSource
       // apparently the filters have default settings!
       .connect(this.rainGain)
@@ -129,16 +127,14 @@ export class AmbientProcessor {
 
     this.doveSource
       .connect(this.doveGain)
-
       .connect(this.masterGain)
       .connect(this.audioContext.destination);
 
     this.loonSource
       .connect(this.loonGain)
-
       .connect(this.masterGain)
       .connect(this.audioContext.destination);
-      
+
     this.cricketsSource
       .connect(this.cricketsGain)
       .connect(this.cricketsHighpassFilter)
@@ -146,22 +142,28 @@ export class AmbientProcessor {
       .connect(this.pan)
       .connect(this.masterGain)
       .connect(this.audioContext.destination);
-    
+
     console.log("[AmbientProcessor] connected chain");
   }
 
   adjustFilters() {
     // INSIDE, WINDOW OPEN
     if (this.location == "inside" && this.windowOpen) {
-      this.rainHighpassFilter.frequency.value = this.filters.windowOpenRainHighpass;
-      this.rainLowpassFilter.frequency.value = this.filters.windowOpenRainLowpass;
-      this.rainGain.gain.value = this.raining ? this.filters.windowOpenRainGain : 0;
+      this.rainHighpassFilter.frequency.value =
+        this.filters.windowOpenRainHighpass;
+      this.rainLowpassFilter.frequency.value =
+        this.filters.windowOpenRainLowpass;
+      this.rainGain.gain.value = this.raining
+        ? this.filters.windowOpenRainGain
+        : 0;
 
       this.pan.pan.value = this.filters.windowOpenPan;
 
       this.cricketsGain.gain.value = this.filters.windowOpenCricketsGain;
-      this.cricketsHighpassFilter.frequency.value = this.filters.windowOpenCricketsHighpass;
-      this.cricketsLowpassFilter.frequency.value = this.filters.windowOpenCricketsLowpass;
+      this.cricketsHighpassFilter.frequency.value =
+        this.filters.windowOpenCricketsHighpass;
+      this.cricketsLowpassFilter.frequency.value =
+        this.filters.windowOpenCricketsLowpass;
       this.doveGain.gain.value = 0;
       this.loonGain.gain.value = 0;
     } else if (this.location == "inside") {
@@ -174,11 +176,13 @@ export class AmbientProcessor {
       this.cricketsGain.gain.value = 0;
       this.doveGain.gain.value = 0;
       this.loonGain.gain.value = 0;
-    } else { 
+    } else {
       // (outside)
       this.rainHighpassFilter.frequency.value = this.highpassDisabled;
       this.rainLowpassFilter.frequency.value = this.lowpassDisabled;
-      this.rainGain.gain.value = this.raining ? this.filters.outsideRainGain : 0;
+      this.rainGain.gain.value = this.raining
+        ? this.filters.outsideRainGain
+        : 0;
 
       this.pan.pan.value = 0;
 
@@ -202,19 +206,23 @@ export class AmbientProcessor {
   toggleWindow(windowOpen: boolean) {
     this.windowOpen = windowOpen;
     this.adjustFilters();
-    console.log(`[AmbientProcessor] set window ${windowOpen ? "open" : "closed"}`);
+    console.log(
+      `[AmbientProcessor] set window ${windowOpen ? "open" : "closed"}`,
+    );
   }
-  
+
   toggleOutside(outside: boolean) {
     outside ? this.location = "outside" : this.location = "inside";
     this.adjustFilters();
-    console.log(`[AmbientProcessor] set location to ${outside ? "outside" : "inside"}`);
+    console.log(
+      `[AmbientProcessor] set location to ${outside ? "outside" : "inside"}`,
+    );
   }
 
   playAmbientNature(today: Date) {
     const hour = today.getHours();
     if (hour < 6) { // 12am - 6am
-      this.loonsAudio.play(); 
+      this.loonsAudio.play();
       this.cricketsAudio.play();
     } else if (hour < 12) { // 6am - 12pm
       this.dovesAudio.play();
@@ -222,7 +230,7 @@ export class AmbientProcessor {
       this.dovesAudio.play();
     } else { // 6pm - 12am
       this.dovesAudio.play();
-      this.loonsAudio.play(); 
+      this.loonsAudio.play();
       this.cricketsAudio.play();
     }
   }
@@ -230,7 +238,7 @@ export class AmbientProcessor {
   setVolume(volume: number) {
     this.masterGain.gain.value = volume;
   }
-  
+
   play() {
     this.audioContext?.resume();
     this.playAmbientNature(new Date());
@@ -246,5 +254,4 @@ export class AmbientProcessor {
     this.cricketsAudio.pause();
     console.log("[AmbientProcessor] stopped");
   }
-
 }

@@ -49,15 +49,14 @@
   blockquote {
     @apply border-l-4 font-mono border-gray-300 pl-4 mt-4;
   }
-
 }
 
 /* Component styles */
 @layer components {
-
   /* Link styles */
   .link {
-    @apply lowercase font-inter underline decoration-dotted hover:border-solid transition-all duration-100;
+    @apply lowercase font-inter underline decoration-dotted hover:border-solid
+      transition-all duration-100;
   }
 
   /* Button styles */
@@ -73,5 +72,4 @@
   .text-description {
     @apply text-gray-100 font-triodion;
   }
-
 }
