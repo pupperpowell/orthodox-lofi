@@ -245,15 +245,15 @@ export default function AudioPlayer() {
 
         <input type="range" class="range w-full" value={masterVolume} onInput={handleVolumeChange} step={0.001} min={0} max={0.5} />
 
-        <button class="btn w-full rounded-full" onClick={toggleWindow} disabled={!isConnected || !isPlaying || isOutside}>
+        {/* <button type="button" class="btn w-full rounded-full" onClick={toggleWindow} disabled={!isConnected || !isPlaying || isOutside}>
           {windowOpen ? "close window" : "open window"}
-        </button>
+        </button> */}
 
-        <button class="btn w-full rounded-full" onClick={toggleOutside} disabled={!isConnected || !isPlaying}>
+        <button type="button" class="btn w-full rounded-full" onClick={toggleOutside} disabled={!isConnected || !isPlaying}>
           {isOutside ? "step inside" : "step outside"}
         </button>
 
-        <button class="btn w-full rounded-full" onClick={toggleRain} disabled={!isConnected || !isPlaying}>
+        <button type="button" class="btn w-full rounded-full" onClick={toggleRain} disabled={!isConnected || !isPlaying}>
           {isRaining ? "stop rain" : "start rain"}
         </button>
 

@@ -62,7 +62,7 @@
 
   /* Button styles */
   .btn {
-    @apply font-triodion font-bold text-lg transition-colors duration-100;
+    @apply font-triodion font-bold text-2xl transition-colors duration-100;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     cursor: pointer;

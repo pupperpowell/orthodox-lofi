@@ -21,7 +21,7 @@ const clients = new Set<WebSocket>();
 
 const DEV_ENV = Deno.env.get("ENVIRONMENT") === "DEV";
 export const AUDIO_DIRECTORY = DEV_ENV
-  ? "./static/audio/pascha"
+  ? "./static/audio/test-audio"
   : "/home/george/media/orthodox/mp3"; // this is the production location of audio
 
 // Track the current file being served to all clients

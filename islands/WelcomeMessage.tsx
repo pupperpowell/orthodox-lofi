@@ -15,6 +15,11 @@ const getTimeOfDay = (): string => {
     return "evening";
 };
 
+const getTemp = (): string => {
+    const dayOfWeek = new Date().getDay();
+    return dayOfWeek.toString();
+}
+
 const getSeason = (): string => {
     if (!IS_BROWSER) return "spring";
     const month = new Date().getMonth();
@@ -44,8 +49,8 @@ export default function WelcomeMessage({ inside, raining }: WelcomeMessageProps)
     };
 
     const getLocationDescription = () => {
-        if (inside) return "You are inside the chapel.";
-        return "You are standing outside the chapel.";
+        if (inside) return "You are standing inside the church.";
+        return "You are standing outside.";
     };
 
     const getGreeting = () => {
@@ -62,14 +67,14 @@ export default function WelcomeMessage({ inside, raining }: WelcomeMessageProps)
     };
 
     return (
-        <div class="p-4 bg-gray-100 rounded-lg shadow-md text-center">
+        <div class="p-4 mb-4 text-3xl border-white border-2 rounded-lg shadow-md text-center">
             <h1 class="text-2xl font-bold mb-2">
-                {getGreeting()}, dear visitor.
+                {getGreeting()}, visitor.
             </h1>
-            <p class="text-gray-700 mb-2">
-                Welcome to St. George Chapel. It's a {season} {timeOfDay}. {getWeatherDescription()}
+            <p class="mb-2">
+                Welcome to St. George Church. It's a {getTemp} {season} {timeOfDay}. {getWeatherDescription()}
             </p>
-            <p class="text-gray-700">
+            <p>
                 {getLocationDescription()}
             </p>
         </div>

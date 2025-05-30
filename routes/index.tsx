@@ -1,8 +1,7 @@
 import { Head } from "$fresh/runtime.ts";
 import LatestCommit from "../islands/LatestCommit.tsx";
 import AudioPlayer from "../islands/AudioPlayer.tsx";
-import ShareButton from "../islands/ShareButton.tsx";
-import ThemeController from "../components/ThemeController.tsx";
+import WelcomeMessage from "../islands/WelcomeMessage.tsx";
 
 export default function Home() {
   return (
@@ -33,6 +32,7 @@ export default function Home() {
         <h1>Welcome to St. George Chapel. It's a warm spring morning. You are standing in the back.</h1>
         {Deno.env.get("ENVIRONMENT") == "DEV" &&
           <LatestCommit className="font-triodion" />}
+        <WelcomeMessage raining={false} inside={false} />
         <AudioPlayer />
       </div>
     </>
