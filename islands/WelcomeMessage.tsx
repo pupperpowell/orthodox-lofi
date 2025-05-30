@@ -40,8 +40,8 @@ export default function WelcomeMessage() {
     }, []);
 
     const getWeatherDescription = () => {
-        if (isRaining) return "It's raining.";
-        return "The sky is clear.";
+        if (isRaining) return "It's raining. ";
+        return "The sky is clear. ";
     };
 
     const getLocationDescription = () => {
