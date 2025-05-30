@@ -27,15 +27,11 @@ export default function Home() {
       </Head>
 
       <div>
-        <h1>
-          Welcome to St. George Chapel. It's a warm spring morning. You are
-          standing in the back.
-        </h1>
-        {Deno.env.get("ENVIRONMENT") == "DEV" &&
-          <LatestCommit className="font-triodion" />}
         <WelcomeMessage />
         <AudioPlayer />
       </div>
+      {Deno.env.get("ENVIRONMENT") == "DEV" &&
+        <LatestCommit className="font-triodion" />}
     </>
   );
 }
