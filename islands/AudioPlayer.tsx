@@ -18,10 +18,13 @@ import {
   setIsOutside,
   setIsPlaying,
   setIsRaining,
+  setIsWindowOpen, // Added
+  registerAudioToggleFunctions, // Added
 } from "../utils/AppContext.tsx";
 
 export default function AudioPlayer() {
   // Access shared state from signals
+  // isWindowOpen will be available via appState.value.isWindowOpen
   const { isConnected, isPlaying, isOutside, isRaining } = appState.value;
 
   const [radioState, setRadioState] = useState<Radio>({
@@ -31,7 +34,7 @@ export default function AudioPlayer() {
   });
   const [chantSrc, setChantSrc] = useState("");
   const [masterVolume, setMasterVolume] = useState(0.5);
-  const [windowOpen, setWindowOpen] = useState(false);
+  // Removed: const [windowOpen, setWindowOpen] = useState(false);
 
   // AmbientProcessor
   const [ambientProcessor, setAmbientProcessor] = useState<
@@ -199,26 +202,42 @@ export default function AudioPlayer() {
 
   // Toggle outside/inside
   const toggleOutside = () => {
-    const newPosition = !isOutside;
+    const newPosition = !appState.value.isOutside; // Always read current state
     setIsOutside(newPosition);
     ChantProcessorRef.current.toggleOutside(newPosition, processingOptions);
     ambientProcessor?.toggleOutside(newPosition);
-    // TODO: implement and call AmbientProcessor.toggleOutside()
   };
 
   const toggleWindow = () => {
-    const newPosition = !windowOpen;
-    setWindowOpen(newPosition);
+    const newPosition = !appState.value.isWindowOpen; // Use global state
+    setIsWindowOpen(newPosition); // Use global setter
     ambientProcessor?.toggleWindow(newPosition);
-    // TODO: implement and call AmbientProcessor.toggleWindow()
   };
 
   const toggleRain = () => {
-    const raining = !isRaining;
+    const raining = !appState.value.isRaining; // Always read current state
     setIsRaining(raining);
     ambientProcessor?.toggleRain(raining);
-    // TODO: implement and call AmbientProcessor.toggleRain()
   };
+
+  // Register toggle functions with context
+  useEffect(() => {
+    if (ambientProcessor) {
+      registerAudioToggleFunctions({
+        toggleWindow: toggleWindow,
+        toggleRain: toggleRain,
+        toggleOutside: toggleOutside,
+      });
+    }
+    // Optional: Cleanup function to de-register
+    return () => {
+      registerAudioToggleFunctions({
+        toggleWindow: () => console.warn("AudioPlayer unmounted, toggleWindow disabled"),
+        toggleRain: () => console.warn("AudioPlayer unmounted, toggleRain disabled"),
+        toggleOutside: () => console.warn("AudioPlayer unmounted, toggleOutside disabled"),
+      });
+    };
+  }, [ambientProcessor]); // Re-run if ambientProcessor changes
 
   // Handle volume change
   const handleVolumeChange = (e: Event) => {
@@ -275,13 +294,17 @@ export default function AudioPlayer() {
           max={0.5}
         />
 
+        <div class="flex w-full flex-col">
+          <div class="divider">slide to adjust volume</div>
+        </div>
+
         {
           /* <button type="button" class="btn w-full rounded-full" onClick={toggleWindow} disabled={!isConnected || !isPlaying || isOutside}>
           {windowOpen ? "close window" : "open window"}
         </button> */
         }
 
-        <button
+        {/* <button
           type="button"
           class="btn w-full rounded-full"
           onClick={toggleOutside}
@@ -297,51 +320,8 @@ export default function AudioPlayer() {
           disabled={!isConnected || !isPlaying}
         >
           {isRaining ? "stop rain" : "start rain"}
-        </button>
+        </button> */}
 
-        {/* Audio filter controls */}
-        {
-          /* <div class="filter-controls">
-          <div class="filter-control">
-            <label htmlFor="highpass">Highpass: {processingOptions.highpassFrequency}Hz</label>
-            <input
-              type="range"
-              id="highpass"
-              min="20"
-              max="1000"
-              step="5"
-              value={processingOptions.highpassFrequency}
-              onInput={handleHighpassChange}
-            />
-          </div>
-
-          <div class="filter-control">
-            <label htmlFor="lowpass">Lowpass: {processingOptions.lowpassFrequency}Hz</label>
-            <input
-              type="range"
-              id="lowpass"
-              min="1000"
-              max="20000"
-              step="100"
-              value={processingOptions.lowpassFrequency}
-              onInput={handleLowpassChange}
-            />
-          </div>
-
-          <div class="filter-control">
-            <label htmlFor="volume">Volume: {processingOptions.volume.toFixed(2)}</label>
-            <input
-              type="range"
-              id="volume"
-              min="0"
-              max="2"
-              step="0.01"
-              value={processingOptions.volume}
-              onInput={handleVolumeChange}
-            />
-          </div>
-        </div> */
-        }
       </div>
     </div>
   );
