@@ -19,6 +19,7 @@ import {
   setIsPlaying,
   setIsRaining,
   setIsWindowOpen, // Added
+  setConnectedUsers, // Added
   registerAudioToggleFunctions, // Added
 } from "../utils/AppContext.tsx";
 
@@ -31,6 +32,7 @@ export default function AudioPlayer() {
     currentTrack: { path: "", duration: 0 },
     progress: 0,
     isPlaying: false,
+    connectedUsers: 0,
   });
   const [chantSrc, setChantSrc] = useState("");
   const [masterVolume, setMasterVolume] = useState(0.5);
@@ -115,6 +117,9 @@ export default function AudioPlayer() {
 
         // Update the state after checking for track changes
         setRadioState(data);
+
+        // Update the global connected users count
+        setConnectedUsers(data.connectedUsers);
 
         // Sync the audio element with the server's progress
         if (

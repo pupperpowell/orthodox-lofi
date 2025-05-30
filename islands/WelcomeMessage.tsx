@@ -24,7 +24,7 @@ export default function WelcomeMessage() {
     // Access shared state from signals
     // We can get isOutside, isRaining, and isWindowOpen directly from appState.value
     // And the toggle functions: appState.value.toggleRain, appState.value.toggleWindow, appState.value.toggleOutside
-    const { isOutside, isRaining, isWindowOpen } = appState.value;
+    const { isOutside, isRaining, isWindowOpen, connectedUsers } = appState.value;
 
     const [timeOfDay, setTimeOfDay] = useState(getTimeOfDay());
     const [season, setSeason] = useState(getSeason());
@@ -62,16 +62,21 @@ export default function WelcomeMessage() {
 
 
     return (
-        <div class="p-4 mb-4 card text-3xl border-white border-2 rounded-lg shadow-md text-center">
+        <div class="p-4 mb-4 text-3xl border-white border-2 rounded-lg shadow-md text-center">
             <h1 class="text-2xl font-bold mb-2">
                 {getGreeting()}, visitor.
                 You are standing {getLocationDescription()} the church of St. George. It's a {season} {timeOfDay}.
             </h1>
             <p class="mb-2 text-xl">
                 {getWeatherDescription()}
+                {!isOutside && connectedUsers > 1 && (
+                    <span class="block mt-1">
+                        There are {connectedUsers - 1} others here.
+                    </span>
+                )}
             </p>
             {/* Added buttons to control audio states */}
-            <div class="flex justify-center space-x-2 mt-4">
+            <div class="flex-col justify-center space-x-2 mt-4">
                 <button
                     type="button"
                     class="btn btn-sm rounded-full"
@@ -97,7 +102,6 @@ export default function WelcomeMessage() {
                     {isOutside ? "Step Inside" : "Step Outside"}
                 </button>
             </div>
-            {/* <button type="button"></button>  This line seems to have been a temporary addition, removing it for now unless it's intended */}
         </div>
     );
 }

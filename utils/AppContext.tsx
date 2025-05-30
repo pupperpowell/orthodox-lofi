@@ -6,6 +6,7 @@ interface AppState {
   isRaining: boolean;
   isPlaying: boolean;
   isWindowOpen: boolean; // Added
+  connectedUsers: number; // Added
   // Functions to be provided by AudioPlayer
   toggleWindow?: () => void;
   toggleRain?: () => void;
@@ -19,6 +20,7 @@ export const appState = signal<AppState>({
   isRaining: false,
   isPlaying: false,
   isWindowOpen: false, // Added
+  connectedUsers: 0, // Added
   toggleWindow: undefined,
   toggleRain: undefined,
   toggleOutside: undefined,
@@ -44,6 +46,11 @@ export const setIsPlaying = (value: boolean) => {
 // Added setter for isWindowOpen
 export const setIsWindowOpen = (value: boolean) => {
   appState.value = { ...appState.value, isWindowOpen: value };
+};
+
+// Added setter for connectedUsers
+export const setConnectedUsers = (value: number) => {
+  appState.value = { ...appState.value, connectedUsers: value };
 };
 
 // Added function to allow AudioPlayer to register its methods
