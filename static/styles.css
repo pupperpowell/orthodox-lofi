@@ -76,23 +76,35 @@
   /* Clickable text with subtle glow */
   .clickable-text {
     @apply cursor-pointer transition-all duration-300 ease-in-out select-none;
-    text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
-    /* border-bottom: 1px dotted rgba(255, 255, 255, 0.4); */
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+    animation: pulse-shadow 4s infinite ease-in-out;
   }
 
   .clickable-text:hover {
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 12px rgba(255, 255, 255, 0.4);
-    /* border-bottom: 1px solid rgba(255, 255, 255, 0.8); */
   }
 
   .clickable-text.disabled {
     @apply cursor-not-allowed opacity-70;
+    animation: none;
     text-shadow: none;
-    /* border-bottom: 1px dotted rgba(255, 255, 255, 0.2); */
   }
 
   .clickable-text.disabled:hover {
     text-shadow: none;
-    /* border-bottom: 1px dotted rgba(255, 255, 255, 0.2); */
+  }
+
+  @keyframes pulse-shadow {
+    0% {
+      text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+    }
+
+    50% {
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    }
+
+    100% {
+      text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+    }
   }
 }

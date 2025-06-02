@@ -57,7 +57,7 @@ export default function WelcomeMessage() {
                     }}
                 >
                     {isOutside ? "outside" : "inside"}
-                </span> the church of St. George, near the back. It's a {season} {timeOfDay}, and {" "}
+                </span> the church of St. George{isOutside ? "" : ", near the back"}. It's a {season} {timeOfDay}, and {" "}
                 {/* {!isOutside && (
                     <span>
                         The window is{" "}
@@ -89,7 +89,7 @@ export default function WelcomeMessage() {
             <p class="mb-2 text-xl">
                 {connectedUsers > 1 && (
                     <span>
-                        There {connectedUsers < 2 ? "is" : "are"} {connectedUsers - 1} {connectedUsers < 2 ? "other" : "others"} here.
+                        There {connectedUsers < 3 ? "is" : "are"} {connectedUsers - 1} {connectedUsers < 3 ? "other person" : "others"} here too.
                     </span>
                 )}
             </p>
