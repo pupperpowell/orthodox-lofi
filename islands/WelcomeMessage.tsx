@@ -44,64 +44,55 @@ export default function WelcomeMessage() {
         return "The sky is clear. ";
     };
 
-    const getLocationDescription = () => {
-        if (!isOutside) return "inside";
-        return "outside";
-    };
-
-    const getGreeting = () => {
-        switch (timeOfDay) {
-            case "morning":
-                return "Good morning";
-            case "afternoon":
-                return "Good afternoon";
-            case "evening":
-                return "Good evening";
-        }
-    };
-
-
     return (
-        <div class="p-4 mb-4 text-3xl border-white border-2 rounded-lg shadow-md text-center">
-            <h1 class="text-2xl font-bold mb-2">
-                {getGreeting()}, visitor.
-                You are standing {getLocationDescription()} the church of St. George. It's a {season} {timeOfDay}.
+        <div class="p-4 mb-4 border-white border-2 rounded-lg shadow-md text-center">
+            <h1 class="text-3xl font-bold mb-2">
+                You are standing {" "}
+                <span
+                    class={`clickable-text ${!appState.value.isConnected || !appState.value.isPlaying ? 'disabled' : ''}`}
+                    onClick={() => {
+                        if (appState.value.isConnected && appState.value.isPlaying) {
+                            appState.value.toggleOutside?.();
+                        }
+                    }}
+                >
+                    {isOutside ? "outside" : "inside"}
+                </span> the church of St. George, near the back. It's a {season} {timeOfDay}, and {" "}
+                {/* {!isOutside && (
+                    <span>
+                        The window is{" "}
+                        <span
+                            class={`clickable-text ${!appState.value.isConnected || !appState.value.isPlaying ? 'disabled' : ''}`}
+                            onClick={() => {
+                                if (appState.value.isConnected && appState.value.isPlaying) {
+                                    appState.value.toggleWindow?.();
+                                }
+                            }}
+                        >
+                            {isWindowOpen ? "open" : "closed"}
+                        </span>
+                        .{" "}
+                    </span>
+                )} */}
+                {isRaining ? "it's " : "the sky is "}
+                <span
+                    class={`clickable-text ${!appState.value.isConnected || !appState.value.isPlaying ? 'disabled' : ''}`}
+                    onClick={() => {
+                        if (appState.value.isConnected && appState.value.isPlaying) {
+                            appState.value.toggleRain?.();
+                        }
+                    }}
+                >
+                    {isRaining ? "raining" : "clear"}
+                </span>.
             </h1>
             <p class="mb-2 text-xl">
-                {getWeatherDescription()}
-                {!isOutside && connectedUsers > 1 && (
+                {connectedUsers > 1 && (
                     <span>
                         There {connectedUsers < 2 ? "is" : "are"} {connectedUsers - 1} {connectedUsers < 2 ? "other" : "others"} here.
                     </span>
                 )}
             </p>
-            {/* Added buttons to control audio states */}
-            <div class="flex-col justify-center space-x-2 mt-4">
-                <button
-                    type="button"
-                    class="btn btn-sm rounded-full"
-                    onClick={() => appState.value.toggleRain?.()}
-                    disabled={!appState.value.isConnected || !appState.value.isPlaying}
-                >
-                    {isRaining ? "Stop Rain" : "Start Rain"}
-                </button>
-                <button
-                    type="button"
-                    class="btn btn-sm rounded-full"
-                    onClick={() => appState.value.toggleWindow?.()}
-                    disabled={!appState.value.isConnected || !appState.value.isPlaying || isOutside}
-                >
-                    {isWindowOpen ? "Close Window" : "Open Window"}
-                </button>
-                <button
-                    type="button"
-                    class="btn btn-sm rounded-full"
-                    onClick={() => appState.value.toggleOutside?.()}
-                    disabled={!appState.value.isConnected || !appState.value.isPlaying}
-                >
-                    {isOutside ? "Step Inside" : "Step Outside"}
-                </button>
-            </div>
         </div>
     );
 }

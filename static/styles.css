@@ -53,10 +53,10 @@
 
 /* Component styles */
 @layer components {
+
   /* Link styles */
   .link {
-    @apply lowercase font-inter underline decoration-dotted hover:border-solid
-      transition-all duration-100;
+    @apply lowercase font-inter underline decoration-dotted hover:border-solid transition-all duration-100;
   }
 
   /* Button styles */
@@ -71,5 +71,28 @@
   /* Descriptive text */
   .text-description {
     @apply text-gray-100 font-triodion;
+  }
+
+  /* Clickable text with subtle glow */
+  .clickable-text {
+    @apply cursor-pointer transition-all duration-300 ease-in-out select-none;
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+    /* border-bottom: 1px dotted rgba(255, 255, 255, 0.4); */
+  }
+
+  .clickable-text:hover {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 12px rgba(255, 255, 255, 0.4);
+    /* border-bottom: 1px solid rgba(255, 255, 255, 0.8); */
+  }
+
+  .clickable-text.disabled {
+    @apply cursor-not-allowed opacity-70;
+    text-shadow: none;
+    /* border-bottom: 1px dotted rgba(255, 255, 255, 0.2); */
+  }
+
+  .clickable-text.disabled:hover {
+    text-shadow: none;
+    /* border-bottom: 1px dotted rgba(255, 255, 255, 0.2); */
   }
 }
