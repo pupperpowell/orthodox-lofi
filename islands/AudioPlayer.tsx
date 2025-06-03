@@ -23,14 +23,6 @@ import {
   registerAudioToggleFunctions, // Added
 } from "../utils/AppContext.tsx";
 
-// iOS background audio support
-interface IOSAudioSetup {
-  audioContext: AudioContext | null;
-  mediaStreamDestination: MediaStreamAudioDestinationNode | null;
-  streamAudio: HTMLAudioElement | null;
-  sourceNode: MediaElementAudioSourceNode | null;
-}
-
 export default function AudioPlayer() {
   // Access shared state from signals
   // isWindowOpen will be available via appState.value.isWindowOpen
@@ -45,14 +37,6 @@ export default function AudioPlayer() {
   const [chantSrc, setChantSrc] = useState("");
   const [masterVolume, setMasterVolume] = useState(0.5);
   // Removed: const [windowOpen, setWindowOpen] = useState(false);
-
-  // iOS background audio setup
-  const [iosAudioSetup, setIosAudioSetup] = useState<IOSAudioSetup>({
-    audioContext: null,
-    mediaStreamDestination: null,
-    streamAudio: null,
-    sourceNode: null,
-  });
 
   // AmbientProcessor
   const [ambientProcessor, setAmbientProcessor] = useState<
@@ -72,7 +56,6 @@ export default function AudioPlayer() {
   });
 
   const chantRef = useRef<HTMLAudioElement>(null);
-  const iosChantRef = useRef<HTMLAudioElement>(null); // Separate audio element for iOS streaming
   const rainRef = useRef<HTMLAudioElement>(null);
   const loonsRef = useRef<HTMLAudioElement>(null);
   const cricketsRef = useRef<HTMLAudioElement>(null);
@@ -87,74 +70,6 @@ export default function AudioPlayer() {
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
-
-  // iOS detection and background audio setup
-  const isIOS = () => {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  };
-
-  const setupIOSBackgroundAudio = async () => {
-    if (!isIOS() || iosAudioSetup.audioContext) return;
-
-    try {
-      // Create AudioContext
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-
-      // Create MediaStreamAudioDestinationNode
-      const mediaStreamDestination = audioContext.createMediaStreamDestination();
-
-      // Create a new audio element for the stream
-      const streamAudio = new Audio();
-      streamAudio.srcObject = mediaStreamDestination.stream;
-      streamAudio.autoplay = true;
-      streamAudio.loop = true;
-
-      // Set up the stream audio element to enable background playback
-      streamAudio.addEventListener('loadstart', () => {
-        console.log('iOS background audio stream started');
-      });
-
-      setIosAudioSetup({
-        audioContext,
-        mediaStreamDestination,
-        streamAudio,
-        sourceNode: null,
-      });
-
-      console.log('iOS background audio setup completed');
-    } catch (error) {
-      console.error('Failed to setup iOS background audio:', error);
-    }
-  };
-
-  const connectAudioToIOSStream = () => {
-    if (!isIOS() || !iosChantRef.current || !iosAudioSetup.audioContext || !iosAudioSetup.mediaStreamDestination) {
-      return;
-    }
-
-    try {
-      // Disconnect existing source if any
-      if (iosAudioSetup.sourceNode) {
-        iosAudioSetup.sourceNode.disconnect();
-      }
-
-      // Create source node from the separate iOS audio element
-      const sourceNode = iosAudioSetup.audioContext.createMediaElementSource(iosChantRef.current);
-
-      // Connect only to the stream destination (not the main destination to avoid conflicts)
-      sourceNode.connect(iosAudioSetup.mediaStreamDestination);
-
-      setIosAudioSetup(prev => ({
-        ...prev,
-        sourceNode,
-      }));
-
-      console.log('Audio connected to iOS background stream');
-    } catch (error) {
-      console.error('Failed to connect audio to iOS stream:', error);
-    }
-  };
 
   // WEBSOCKET LOGIC
   useEffect(() => {
@@ -180,8 +95,9 @@ export default function AudioPlayer() {
           currentTrackPathRef.current = data.currentTrack.path;
 
           // Append a cache buster to ensure a fresh request
-          const newSrc = `/api/music?path=${data.currentTrack.path}&t=${Date.now()}`;
-          setChantSrc(newSrc);
+          setChantSrc(
+            `/api/music?path=${data.currentTrack.path}&t=${Date.now()}`,
+          );
 
           if (chantRef.current) {
             // Load the new track
@@ -194,24 +110,6 @@ export default function AudioPlayer() {
                 chantRef.current?.play().catch((e) =>
                   console.error("Play error after canplay:", e)
                 );
-              }, { once: true });
-            }
-          }
-
-          // Update iOS audio element separately
-          if (iosChantRef.current) {
-            iosChantRef.current.src = newSrc;
-            iosChantRef.current.load();
-
-            // Sync iOS audio element to the same progress
-            if (isPlayingRef.current) {
-              iosChantRef.current.addEventListener("canplay", () => {
-                if (iosChantRef.current) {
-                  iosChantRef.current.currentTime = data.progress;
-                  iosChantRef.current.play().catch((e) =>
-                    console.error("iOS audio play error after canplay:", e)
-                  );
-                }
               }, { once: true });
             }
           }
@@ -230,16 +128,6 @@ export default function AudioPlayer() {
         ) {
           chantRef.current.currentTime = data.progress;
         }
-
-        // Sync iOS audio element with server progress (separate from main element)
-        if (
-          isIOS() &&
-          iosChantRef.current &&
-          isPlayingRef.current &&
-          Math.abs(iosChantRef.current.currentTime - data.progress) > 1
-        ) {
-          iosChantRef.current.currentTime = data.progress;
-        }
       } catch (e) {
         console.error("Error parsing WebSocket message:", e);
       }
@@ -256,17 +144,6 @@ export default function AudioPlayer() {
     return () => {
       if (wsRef.current) wsRef.current.close();
       ChantProcessorRef.current.disconnect();
-      // Cleanup iOS audio setup
-      if (iosAudioSetup.sourceNode) {
-        iosAudioSetup.sourceNode.disconnect();
-      }
-      if (iosAudioSetup.streamAudio) {
-        iosAudioSetup.streamAudio.pause();
-        iosAudioSetup.streamAudio.srcObject = null;
-      }
-      if (iosAudioSetup.audioContext) {
-        iosAudioSetup.audioContext.close();
-      }
     };
   }, []);
 
@@ -295,29 +172,12 @@ export default function AudioPlayer() {
         console.error("Error playing audio:", e);
         setIsPlaying(false); // Reset state if playback fails
       });
-
-      // Also handle iOS audio element
-      if (isIOS() && iosChantRef.current) {
-        iosChantRef.current.play().catch((e) => {
-          console.error("Error playing iOS audio:", e);
-        });
-      }
     } else {
       chantRef.current.pause();
-
-      // Also pause iOS audio element
-      if (isIOS() && iosChantRef.current) {
-        iosChantRef.current.pause();
-      }
     }
   }, [isPlaying]);
 
-  const togglePlayback = async () => {
-    // Setup iOS background audio if needed
-    if (isIOS() && !iosAudioSetup.audioContext) {
-      await setupIOSBackgroundAudio();
-    }
-
+  const togglePlayback = () => {
     // Create the ambientProcessor if it doesn't already exist
     if (
       !ambientProcessor && rainRef.current && loonsRef.current &&
@@ -335,22 +195,8 @@ export default function AudioPlayer() {
 
     if (isPlaying) {
       ambientProcessor?.stop();
-      // Pause iOS stream audio if it exists
-      if (iosAudioSetup.streamAudio) {
-        iosAudioSetup.streamAudio.pause();
-      }
     } else {
       ambientProcessor?.play();
-      // Connect audio to iOS stream and play
-      if (isIOS() && chantRef.current) {
-        connectAudioToIOSStream();
-        // Start the iOS stream audio
-        if (iosAudioSetup.streamAudio) {
-          iosAudioSetup.streamAudio.play().catch(e =>
-            console.error('Failed to play iOS stream audio:', e)
-          );
-        }
-      }
     }
 
     // Resume audio context (needed for browsers with autoplay restrictions)
@@ -424,8 +270,6 @@ export default function AudioPlayer() {
   return (
     <div>
       <audio ref={chantRef} src={chantSrc} preload="auto" />
-      {/* Separate audio element for iOS background streaming */}
-      <audio ref={iosChantRef} src={chantSrc} preload="auto" style={{ display: 'none' }} />
       <audio ref={rainRef} src="/ambient/rain.mp3" preload="auto" loop />
       <audio ref={dovesRef} src="/ambient/doves.mp3" preload="auto" loop />
       <audio ref={loonsRef} src="/ambient/loons.mp3" preload="auto" loop />
