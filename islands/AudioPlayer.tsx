@@ -23,6 +23,14 @@ import {
   registerAudioToggleFunctions, // Added
 } from "../utils/AppContext.tsx";
 
+// iOS background audio support
+interface IOSAudioSetup {
+  audioContext: AudioContext | null;
+  mediaStreamDestination: MediaStreamAudioDestinationNode | null;
+  streamAudio: HTMLAudioElement | null;
+  sourceNode: MediaElementAudioSourceNode | null;
+}
+
 export default function AudioPlayer() {
   // Access shared state from signals
   // isWindowOpen will be available via appState.value.isWindowOpen
@@ -37,6 +45,14 @@ export default function AudioPlayer() {
   const [chantSrc, setChantSrc] = useState("");
   const [masterVolume, setMasterVolume] = useState(0.5);
   // Removed: const [windowOpen, setWindowOpen] = useState(false);
+
+  // iOS background audio setup
+  const [iosAudioSetup, setIosAudioSetup] = useState<IOSAudioSetup>({
+    audioContext: null,
+    mediaStreamDestination: null,
+    streamAudio: null,
+    sourceNode: null,
+  });
 
   // AmbientProcessor
   const [ambientProcessor, setAmbientProcessor] = useState<
@@ -70,6 +86,75 @@ export default function AudioPlayer() {
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
+
+  // iOS detection and background audio setup
+  const isIOS = () => {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  };
+
+  const setupIOSBackgroundAudio = async () => {
+    if (!isIOS() || iosAudioSetup.audioContext) return;
+
+    try {
+      // Create AudioContext
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+
+      // Create MediaStreamAudioDestinationNode
+      const mediaStreamDestination = audioContext.createMediaStreamDestination();
+
+      // Create a new audio element for the stream
+      const streamAudio = new Audio();
+      streamAudio.srcObject = mediaStreamDestination.stream;
+      streamAudio.autoplay = true;
+      streamAudio.loop = true;
+
+      // Set up the stream audio element to enable background playback
+      streamAudio.addEventListener('loadstart', () => {
+        console.log('iOS background audio stream started');
+      });
+
+      setIosAudioSetup({
+        audioContext,
+        mediaStreamDestination,
+        streamAudio,
+        sourceNode: null,
+      });
+
+      console.log('iOS background audio setup completed');
+    } catch (error) {
+      console.error('Failed to setup iOS background audio:', error);
+    }
+  };
+
+  const connectAudioToIOSStream = () => {
+    if (!isIOS() || !chantRef.current || !iosAudioSetup.audioContext || !iosAudioSetup.mediaStreamDestination) {
+      return;
+    }
+
+    try {
+      // Disconnect existing source if any
+      if (iosAudioSetup.sourceNode) {
+        iosAudioSetup.sourceNode.disconnect();
+      }
+
+      // Create source node from the main audio element
+      const sourceNode = iosAudioSetup.audioContext.createMediaElementSource(chantRef.current);
+
+      // Connect to both the destination (for normal playback) and the stream (for background)
+      sourceNode.connect(iosAudioSetup.audioContext.destination);
+      sourceNode.connect(iosAudioSetup.mediaStreamDestination);
+
+      setIosAudioSetup(prev => ({
+        ...prev,
+        sourceNode,
+      }));
+
+      console.log('Audio connected to iOS background stream');
+    } catch (error) {
+      console.error('Failed to connect audio to iOS stream:', error);
+    }
+  };
 
   // WEBSOCKET LOGIC
   useEffect(() => {
@@ -144,6 +229,17 @@ export default function AudioPlayer() {
     return () => {
       if (wsRef.current) wsRef.current.close();
       ChantProcessorRef.current.disconnect();
+      // Cleanup iOS audio setup
+      if (iosAudioSetup.sourceNode) {
+        iosAudioSetup.sourceNode.disconnect();
+      }
+      if (iosAudioSetup.streamAudio) {
+        iosAudioSetup.streamAudio.pause();
+        iosAudioSetup.streamAudio.srcObject = null;
+      }
+      if (iosAudioSetup.audioContext) {
+        iosAudioSetup.audioContext.close();
+      }
     };
   }, []);
 
@@ -177,7 +273,12 @@ export default function AudioPlayer() {
     }
   }, [isPlaying]);
 
-  const togglePlayback = () => {
+  const togglePlayback = async () => {
+    // Setup iOS background audio if needed
+    if (isIOS() && !iosAudioSetup.audioContext) {
+      await setupIOSBackgroundAudio();
+    }
+
     // Create the ambientProcessor if it doesn't already exist
     if (
       !ambientProcessor && rainRef.current && loonsRef.current &&
@@ -195,8 +296,22 @@ export default function AudioPlayer() {
 
     if (isPlaying) {
       ambientProcessor?.stop();
+      // Pause iOS stream audio if it exists
+      if (iosAudioSetup.streamAudio) {
+        iosAudioSetup.streamAudio.pause();
+      }
     } else {
       ambientProcessor?.play();
+      // Connect audio to iOS stream and play
+      if (isIOS() && chantRef.current) {
+        connectAudioToIOSStream();
+        // Start the iOS stream audio
+        if (iosAudioSetup.streamAudio) {
+          iosAudioSetup.streamAudio.play().catch(e =>
+            console.error('Failed to play iOS stream audio:', e)
+          );
+        }
+      }
     }
 
     // Resume audio context (needed for browsers with autoplay restrictions)
