@@ -72,6 +72,7 @@ export default function AudioPlayer() {
   });
 
   const chantRef = useRef<HTMLAudioElement>(null);
+  const iosChantRef = useRef<HTMLAudioElement>(null); // Separate audio element for iOS streaming
   const rainRef = useRef<HTMLAudioElement>(null);
   const loonsRef = useRef<HTMLAudioElement>(null);
   const cricketsRef = useRef<HTMLAudioElement>(null);
@@ -128,7 +129,7 @@ export default function AudioPlayer() {
   };
 
   const connectAudioToIOSStream = () => {
-    if (!isIOS() || !chantRef.current || !iosAudioSetup.audioContext || !iosAudioSetup.mediaStreamDestination) {
+    if (!isIOS() || !iosChantRef.current || !iosAudioSetup.audioContext || !iosAudioSetup.mediaStreamDestination) {
       return;
     }
 
@@ -138,11 +139,10 @@ export default function AudioPlayer() {
         iosAudioSetup.sourceNode.disconnect();
       }
 
-      // Create source node from the main audio element
-      const sourceNode = iosAudioSetup.audioContext.createMediaElementSource(chantRef.current);
+      // Create source node from the separate iOS audio element
+      const sourceNode = iosAudioSetup.audioContext.createMediaElementSource(iosChantRef.current);
 
-      // Connect to both the destination (for normal playback) and the stream (for background)
-      sourceNode.connect(iosAudioSetup.audioContext.destination);
+      // Connect only to the stream destination (not the main destination to avoid conflicts)
       sourceNode.connect(iosAudioSetup.mediaStreamDestination);
 
       setIosAudioSetup(prev => ({
@@ -180,9 +180,8 @@ export default function AudioPlayer() {
           currentTrackPathRef.current = data.currentTrack.path;
 
           // Append a cache buster to ensure a fresh request
-          setChantSrc(
-            `/api/music?path=${data.currentTrack.path}&t=${Date.now()}`,
-          );
+          const newSrc = `/api/music?path=${data.currentTrack.path}&t=${Date.now()}`;
+          setChantSrc(newSrc);
 
           if (chantRef.current) {
             // Load the new track
@@ -195,6 +194,24 @@ export default function AudioPlayer() {
                 chantRef.current?.play().catch((e) =>
                   console.error("Play error after canplay:", e)
                 );
+              }, { once: true });
+            }
+          }
+
+          // Update iOS audio element separately
+          if (iosChantRef.current) {
+            iosChantRef.current.src = newSrc;
+            iosChantRef.current.load();
+
+            // Sync iOS audio element to the same progress
+            if (isPlayingRef.current) {
+              iosChantRef.current.addEventListener("canplay", () => {
+                if (iosChantRef.current) {
+                  iosChantRef.current.currentTime = data.progress;
+                  iosChantRef.current.play().catch((e) =>
+                    console.error("iOS audio play error after canplay:", e)
+                  );
+                }
               }, { once: true });
             }
           }
@@ -212,6 +229,16 @@ export default function AudioPlayer() {
           Math.abs(chantRef.current.currentTime - data.progress) > 1
         ) {
           chantRef.current.currentTime = data.progress;
+        }
+
+        // Sync iOS audio element with server progress (separate from main element)
+        if (
+          isIOS() &&
+          iosChantRef.current &&
+          isPlayingRef.current &&
+          Math.abs(iosChantRef.current.currentTime - data.progress) > 1
+        ) {
+          iosChantRef.current.currentTime = data.progress;
         }
       } catch (e) {
         console.error("Error parsing WebSocket message:", e);
@@ -268,8 +295,20 @@ export default function AudioPlayer() {
         console.error("Error playing audio:", e);
         setIsPlaying(false); // Reset state if playback fails
       });
+
+      // Also handle iOS audio element
+      if (isIOS() && iosChantRef.current) {
+        iosChantRef.current.play().catch((e) => {
+          console.error("Error playing iOS audio:", e);
+        });
+      }
     } else {
       chantRef.current.pause();
+
+      // Also pause iOS audio element
+      if (isIOS() && iosChantRef.current) {
+        iosChantRef.current.pause();
+      }
     }
   }, [isPlaying]);
 
@@ -385,6 +424,8 @@ export default function AudioPlayer() {
   return (
     <div>
       <audio ref={chantRef} src={chantSrc} preload="auto" />
+      {/* Separate audio element for iOS background streaming */}
+      <audio ref={iosChantRef} src={chantSrc} preload="auto" style={{ display: 'none' }} />
       <audio ref={rainRef} src="/ambient/rain.mp3" preload="auto" loop />
       <audio ref={dovesRef} src="/ambient/doves.mp3" preload="auto" loop />
       <audio ref={loonsRef} src="/ambient/loons.mp3" preload="auto" loop />
