@@ -76,7 +76,7 @@
   /* Clickable text with subtle glow */
   .clickable-text {
     @apply cursor-pointer transition-all duration-300 ease-in-out select-none;
-    text-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+    text-shadow: 0 0 24px rgba(255, 255, 255, 0.5);
     animation: pulse-shadow 4s infinite ease-in-out;
   }
 
@@ -96,15 +96,15 @@
 
   @keyframes pulse-shadow {
     0% {
-      text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+      text-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
     }
 
     50% {
-      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+      text-shadow: 0 0 24px rgba(255, 255, 255, 0.7);
     }
 
     100% {
-      text-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+      text-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
     }
   }
 }
