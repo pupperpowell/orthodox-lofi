@@ -303,29 +303,6 @@ export default function AudioPlayer() {
           <div class="divider">slide to adjust volume</div>
         </div>
 
-        {
-          /* <button type="button" class="btn w-full rounded-full" onClick={toggleWindow} disabled={!isConnected || !isPlaying || isOutside}>
-          {windowOpen ? "close window" : "open window"}
-        </button> */
-        }
-
-        {/* <button
-          type="button"
-          class="btn w-full rounded-full"
-          onClick={toggleOutside}
-          disabled={!isConnected || !isPlaying}
-        >
-          {isOutside ? "step inside" : "step outside"}
-        </button>
-
-        <button
-          type="button"
-          class="btn w-full rounded-full"
-          onClick={toggleRain}
-          disabled={!isConnected || !isPlaying}
-        >
-          {isRaining ? "stop rain" : "start rain"}
-        </button> */}
 
       </div>
     </div>
