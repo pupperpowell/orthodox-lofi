@@ -7,7 +7,23 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>orthodox.cafe</title>
+        <title>lofi byzantine music radio</title>
+        <meta name="description" content="byzantine music soundscape to relax/study/pray to" />
+
+        {/* Facebook Meta Tags */}
+        <meta property="og:url" content="https://orthodox.cafe" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="lofi byzantine music radio" />
+        <meta property="og:description" content="byzantine music soundscape to relax/study/pray to" />
+        <meta property="og:image" content="church.jpg" />
+
+        {/* Twitter Meta Tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="twitter:domain" content="orthodox.cafe" />
+        <meta property="twitter:url" content="https://orthodox.cafe" />
+        <meta name="twitter:title" content="lofi byzantine music radio" />
+        <meta name="twitter:description" content="byzantine music soundscape to relax/study/pray to" />
+        <meta name="twitter:image" content="church.jpg" />
 
         <script
           defer
@@ -24,14 +40,16 @@ export default function Home() {
           data-domains="orthodox.cafe,www.orthodox.cafe"
         >
         </script>
-      </Head>
+      </Head >
 
       <div>
         <WelcomeMessage />
         <AudioPlayer />
       </div>
-      {Deno.env.get("ENVIRONMENT") == "DEV" &&
-        <LatestCommit className="font-triodion" />}
+      {
+        Deno.env.get("ENVIRONMENT") == "DEV" &&
+        <LatestCommit className="font-triodion" />
+      }
     </>
   );
 }
