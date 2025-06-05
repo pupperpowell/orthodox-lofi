@@ -37,6 +37,7 @@ export default function AudioPlayer() {
   const [chantSrc, setChantSrc] = useState("");
   const [masterVolume, setMasterVolume] = useState(0.5);
   // Removed: const [windowOpen, setWindowOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   // AmbientProcessor
   const [ambientProcessor, setAmbientProcessor] = useState<
@@ -60,6 +61,7 @@ export default function AudioPlayer() {
   const loonsRef = useRef<HTMLAudioElement>(null);
   const cricketsRef = useRef<HTMLAudioElement>(null);
   const dovesRef = useRef<HTMLAudioElement>(null);
+  const chickadeesRef = useRef<HTMLAudioElement>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
   const currentTrackPathRef = useRef<string>("");
@@ -70,6 +72,15 @@ export default function AudioPlayer() {
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
+
+  // Update currentTime every minute
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60 * 1000); // Every minute
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, []);
 
   // WEBSOCKET LOGIC
   useEffect(() => {
@@ -181,13 +192,14 @@ export default function AudioPlayer() {
     // Create the ambientProcessor if it doesn't already exist
     if (
       !ambientProcessor && rainRef.current && loonsRef.current &&
-      dovesRef.current && cricketsRef.current
+      dovesRef.current && cricketsRef.current && chickadeesRef.current
     ) {
       const processor = new AmbientProcessor(
         rainRef.current,
         loonsRef.current,
         dovesRef.current,
         cricketsRef.current,
+        chickadeesRef.current,
       );
       setAmbientProcessor(processor);
       processor.play();
@@ -267,11 +279,22 @@ export default function AudioPlayer() {
 
   return (
     <div>
+
       <audio ref={chantRef} src={chantSrc} preload="auto" />
       <audio ref={rainRef} src="/ambient/rain.mp3" preload="auto" loop />
       <audio ref={dovesRef} src="/ambient/doves.mp3" preload="auto" loop />
-      <audio ref={loonsRef} src="/ambient/loons.mp3" preload="auto" loop />
-      <audio ref={cricketsRef} src="/ambient/crickets.mp3" preload="auto" loop />
+      {currentTime.getHours() >= 18 ? (
+        <>
+          <audio ref={loonsRef} src="/ambient/loons.mp3" preload="auto" loop />
+          <audio ref={cricketsRef} src="/ambient/crickets.mp3" preload="auto" loop />
+        </>
+      ) : (
+        <>
+          <audio ref={chickadeesRef} src="/ambient/chickadees.mp3" preload="auto" loop />
+          <audio ref={loonsRef} src="" preload="auto" loop />
+          <audio ref={cricketsRef} src="" preload="auto" loop />
+        </>
+      )}
 
       <div class="divider"></div>
 
