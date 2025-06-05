@@ -24,6 +24,7 @@ export class AmbientProcessor {
   private masterGain: GainNode;
   private cricketsHighpassFilter: BiquadFilterNode;
   private cricketsLowpassFilter: BiquadFilterNode;
+  private pan: StereoPannerNode;
 
   // Rain
   private rainSource: MediaElementAudioSourceNode;
@@ -44,35 +45,35 @@ export class AmbientProcessor {
   private lowpassDisabled: number = 50000;
   private highpassDisabled: number = 0;
 
-  // Highpass/lowpass filter values
+  // Values for each location
   private filters: { [key: string]: number } = {
     insideRainHighpass: 300,
     insideRainLowpass: 2500,
-    insideRainGain: 0.7,
-    // 
+    insideRainGain: 0.5,
+    //
     windowOpenRainHighpass: 200,
     windowOpenRainLowpass: 5000,
-    windowOpenRainGain: 0.5,
+    windowOpenRainGain: 0.4,
     windowOpenCricketsHighpass: 100,
     windowOpenCricketsLowpass: 2000,
     windowOpenCricketsGain: 0.3,
+    windowOpenPan: 0.4, // to the right
     //
     outsideRainHighpass: this.highpassDisabled,
     outsideRainLowpass: this.lowpassDisabled,
-    outsideRainGain: 1,
+    outsideRainGain: 0.6,
     outsideCricketsHighpass: this.highpassDisabled,
     outsideCricketsLowpass: this.lowpassDisabled,
-    outsideCricketsGain: 1,
-    outsideDovesGain: 1,
-    outsideLoonsGain: 0.5,
-  }
-
+    outsideCricketsGain: 0.3,
+    outsideDovesGain: 0.7,
+    outsideLoonsGain: 0.3,
+  };
 
   constructor(
-    rain: HTMLAudioElement, 
-    loons: HTMLAudioElement, 
-    doves: HTMLAudioElement, 
-    crickets: HTMLAudioElement
+    rain: HTMLAudioElement,
+    loons: HTMLAudioElement,
+    doves: HTMLAudioElement,
+    crickets: HTMLAudioElement,
   ) {
     this.audioContext = new AudioContext();
 
@@ -93,13 +94,16 @@ export class AmbientProcessor {
     this.cricketsLowpassFilter.type = "lowpass";
     this.cricketsHighpassFilter = this.audioContext.createBiquadFilter();
     this.cricketsHighpassFilter.type = "highpass";
-    
+
     this.rainLowpassFilter = this.audioContext.createBiquadFilter();
     this.rainLowpassFilter.type = "lowpass";
     this.rainHighpassFilter = this.audioContext.createBiquadFilter();
     this.rainHighpassFilter.type = "highpass";
 
+    this.pan = this.audioContext.createStereoPanner();
+
     this.masterGain = this.audioContext.createGain();
+    this.masterGain.gain.value = 0.5;
     this.rainGain = this.audioContext.createGain();
     this.doveGain = this.audioContext.createGain();
     this.loonGain = this.audioContext.createGain();
@@ -112,47 +116,54 @@ export class AmbientProcessor {
   }
 
   connectChain() {
-
     this.rainSource
       // apparently the filters have default settings!
       .connect(this.rainGain)
       .connect(this.rainHighpassFilter)
       .connect(this.rainLowpassFilter)
+      .connect(this.pan)
       .connect(this.masterGain)
       .connect(this.audioContext.destination);
 
     this.doveSource
       .connect(this.doveGain)
-
       .connect(this.masterGain)
       .connect(this.audioContext.destination);
 
     this.loonSource
       .connect(this.loonGain)
-
       .connect(this.masterGain)
       .connect(this.audioContext.destination);
-      
+
     this.cricketsSource
       .connect(this.cricketsGain)
       .connect(this.cricketsHighpassFilter)
       .connect(this.cricketsLowpassFilter)
+      .connect(this.pan)
       .connect(this.masterGain)
       .connect(this.audioContext.destination);
-    
+
     console.log("[AmbientProcessor] connected chain");
   }
 
   adjustFilters() {
     // INSIDE, WINDOW OPEN
     if (this.location == "inside" && this.windowOpen) {
-      this.rainHighpassFilter.frequency.value = this.filters.windowOpenRainHighpass;
-      this.rainLowpassFilter.frequency.value = this.filters.windowOpenRainLowpass;
-      this.rainGain.gain.value = this.raining ? this.filters.windowOpenRainGain : 0;
+      this.rainHighpassFilter.frequency.value =
+        this.filters.windowOpenRainHighpass;
+      this.rainLowpassFilter.frequency.value =
+        this.filters.windowOpenRainLowpass;
+      this.rainGain.gain.value = this.raining
+        ? this.filters.windowOpenRainGain
+        : 0;
+
+      this.pan.pan.value = this.filters.windowOpenPan;
 
       this.cricketsGain.gain.value = this.filters.windowOpenCricketsGain;
-      this.cricketsHighpassFilter.frequency.value = this.filters.windowOpenCricketsHighpass;
-      this.cricketsLowpassFilter.frequency.value = this.filters.windowOpenCricketsLowpass;
+      this.cricketsHighpassFilter.frequency.value =
+        this.filters.windowOpenCricketsHighpass;
+      this.cricketsLowpassFilter.frequency.value =
+        this.filters.windowOpenCricketsLowpass;
       this.doveGain.gain.value = 0;
       this.loonGain.gain.value = 0;
     } else if (this.location == "inside") {
@@ -160,18 +171,26 @@ export class AmbientProcessor {
       this.rainLowpassFilter.frequency.value = this.filters.insideRainLowpass;
       this.rainGain.gain.value = this.raining ? this.filters.insideRainGain : 0;
 
+      this.pan.pan.value = 0;
+
       this.cricketsGain.gain.value = 0;
       this.doveGain.gain.value = 0;
       this.loonGain.gain.value = 0;
-    } else { 
+    } else {
       // (outside)
       this.rainHighpassFilter.frequency.value = this.highpassDisabled;
       this.rainLowpassFilter.frequency.value = this.lowpassDisabled;
-      this.rainGain.gain.value = this.raining ? this.filters.outsideRainGain : 0;
+      this.rainGain.gain.value = this.raining
+        ? this.filters.outsideRainGain
+        : 0;
+
+      this.pan.pan.value = 0;
 
       this.cricketsGain.gain.value = this.filters.outsideCricketsGain;
       this.cricketsHighpassFilter.frequency.value = this.highpassDisabled;
       this.cricketsLowpassFilter.frequency.value = this.lowpassDisabled;
+
+      this.pan.pan.value = 0;
 
       this.doveGain.gain.value = this.filters.outsideDovesGain;
       this.loonGain.gain.value = this.filters.outsideLoonsGain;
@@ -187,25 +206,43 @@ export class AmbientProcessor {
   toggleWindow(windowOpen: boolean) {
     this.windowOpen = windowOpen;
     this.adjustFilters();
-    console.log(`[AmbientProcessor] set window ${windowOpen ? "open" : "closed"}`);
+    console.log(
+      `[AmbientProcessor] set window ${windowOpen ? "open" : "closed"}`,
+    );
   }
-  
+
   toggleOutside(outside: boolean) {
     outside ? this.location = "outside" : this.location = "inside";
     this.adjustFilters();
-    console.log(`[AmbientProcessor] set location to ${outside ? "outside" : "inside"}`);
+    console.log(
+      `[AmbientProcessor] set location to ${outside ? "outside" : "inside"}`,
+    );
+  }
+
+  playAmbientNature(today: Date) {
+    const hour = today.getHours();
+    if (hour < 6) { // 12am - 6am
+      this.loonsAudio.play();
+      this.cricketsAudio.play();
+    } else if (hour < 12) { // 6am - 12pm
+      this.dovesAudio.play();
+    } else if (hour < 18) { // 12pm - 6pm
+      this.dovesAudio.play();
+    } else { // 6pm - 12am
+      this.dovesAudio.play();
+      this.loonsAudio.play();
+      this.cricketsAudio.play();
+    }
   }
 
   setVolume(volume: number) {
     this.masterGain.gain.value = volume;
   }
-  
+
   play() {
     this.audioContext?.resume();
+    this.playAmbientNature(new Date());
     this.rainAudio.play();
-    this.dovesAudio.play();
-    this.loonsAudio.play(); 
-    this.cricketsAudio.play();
     console.log("[AmbientProcessor] playing");
   }
 
@@ -217,5 +254,4 @@ export class AmbientProcessor {
     this.cricketsAudio.pause();
     console.log("[AmbientProcessor] stopped");
   }
-
 }

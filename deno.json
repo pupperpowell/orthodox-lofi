@@ -23,6 +23,8 @@
   ],
   "imports": {
     "$fresh/": "https://deno.land/x/fresh@1.7.3/",
+    "basecoat-css": "npm:basecoat-css@^0.1.2",
+    "daisyui": "npm:daisyui@^5.0.37",
     "pocketbase": "npm:pocketbase@^0.25.1",
     "preact": "https://esm.sh/preact@10.22.0",
     "preact/": "https://esm.sh/preact@10.22.0/",

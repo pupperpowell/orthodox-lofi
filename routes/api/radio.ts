@@ -9,6 +9,7 @@ export type Radio = {
   currentTrack: AudioTrack;
   progress: number;
   isPlaying: boolean;
+  connectedUsers: number;
 };
 
 export type AudioTrack = {
@@ -21,7 +22,7 @@ const clients = new Set<WebSocket>();
 
 const DEV_ENV = Deno.env.get("ENVIRONMENT") === "DEV";
 export const AUDIO_DIRECTORY = DEV_ENV
-  ? "./static/audio/paraklesis-byzantine-ark"
+  ? "./static/audio/test-audio"
   : "/home/george/media/orthodox/mp3"; // this is the production location of audio
 
 // Track the current file being served to all clients
@@ -42,6 +43,7 @@ export const radio: Radio = {
   },
   progress: 0,
   isPlaying: false,
+  connectedUsers: 0,
 };
 
 // Initialize the files array and current file at startup
@@ -130,7 +132,8 @@ function startPlayback() {
       radio.progress = 0;
     }
 
-    // Send the radio state to all connected clients
+    // Update connected users count and send the radio state to all connected clients
+    radio.connectedUsers = clients.size;
     broadcastMessage(radio);
   }, 1000); // Update every second
 
@@ -152,7 +155,8 @@ export const handler = (req: Request, _ctx: FreshContext): Response => {
     clients.add(socket);
     console.log(`WebSocket client connected (${clients.size} total)`);
 
-    // Send current state to the new client
+    // Update connected users count and send current state to the new client
+    radio.connectedUsers = clients.size;
     socket.send(JSON.stringify(radio));
 
     // Start playback

@@ -23,8 +23,6 @@
 @layer base {
   body {
     @apply font-triodion;
-    @apply bg-black;
-    @apply text-white;
   }
 
   h1,
@@ -51,105 +49,6 @@
   blockquote {
     @apply border-l-4 font-mono border-gray-300 pl-4 mt-4;
   }
-
-
-  /* Range input globals */
-  input[type="range"] {
-    color: white;
-    background: transparent;
-    width: 100%;
-    position: relative;
-
-    --thumb-height: 2em;
-    --thumb-width: 2em;
-    --track-height: 2em;
-    --track-color: black;
-    --clip-edges: 3em;
-  }
-
-  .custom-range,
-  .custom-range::-webkit-slider-runnable-track,
-  .custom-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    transition: all ease 100ms;
-    height: var(--thumb-height);
-  }
-
-  .custom-range::-webkit-slider-runnable-track {
-    background: linear-gradient(var(--track-color) 0 0) scroll no-repeat center / 100% calc(var(--track-height) + 1px);
-    border: 2px solid white;
-  }
-
-  .custom-range::-webkit-slider-thumb {
-    width: var(--thumb-width);
-    background-color: black;
-    border: 2px solid white;
-    border-radius: 0;
-    margin-top: -2px;
-  }
-
-  input[type="range"],
-  input[type="range"]::-webkit-slider-runnable-track,
-  input[type="range"]::-webkit-slider-thumb {
-    position: relative;
-  }
-
-  input[type="range"]::-webkit-slider-thumb {
-    --thumb-radius: calc((var(--thumb-height) * 0.5) - 1px);
-    --clip-top: calc((var(--thumb-height) - var(--track-height)) * 0.5 - 0.5px);
-    --clip-bottom: calc(var(--thumb-height) - var(--clip-top));
-    --clip-further: calc(100% + 1px);
-    /* --box-fill: calc(-100vmax - var(--thumb-width, var(--thumb-height))) 0 0 100vmax white; */
-
-    width: var(--thumb-width, var(--thumb-height));
-    background: linear-gradient(black 0 0) scroll no-repeat left center / 50% calc(var(--track-height) + 1px);
-    background-color: black;
-    box-shadow: var(--box-fill);
-    border-radius: 0;
-
-    filter: brightness(100%);
-    clip-path: polygon(100% -1px,
-        var(--clip-edges) -1px,
-        0 var(--clip-top),
-        -10vmax var(--clip-top),
-        -10vmax var(--clip-bottom),
-        0 var(--clip-bottom),
-        var(--clip-edges) 100%,
-        var(--clip-further) var(--clip-further));
-  }
-
-  /* i dont think this does anything */
-  input[type="range"]::-webkit-slider-runnable-track {
-    background: linear-gradient(var(--track-color) 0 0) scroll no-repeat center / 100% calc(var(--track-height) + 1px);
-  }
-
-  /* Firefox styles */
-  .custom-range::-moz-range-track {
-    background-color: black;
-    border: 2px solid white;
-    height: var(--track-height);
-  }
-
-  .custom-range::-moz-range-thumb {
-    appearance: none;
-    width: var(--thumb-width);
-    height: var(--thumb-height);
-    background-color: black;
-    border: 2px solid white;
-    border-radius: 0;
-    z-index: 10;
-  }
-
-  .custom-range::-moz-range-progress {
-    background-color: white;
-    height: var(--track-height);
-  }
-
-  .custom-range:disabled {
-    filter: grayscale(1);
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
 }
 
 /* Component styles */
@@ -162,7 +61,7 @@
 
   /* Button styles */
   .btn {
-    @apply font-inter font-medium transition-colors duration-100;
+    @apply font-triodion font-bold text-2xl transition-colors duration-100;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
     cursor: pointer;
@@ -174,66 +73,38 @@
     @apply text-gray-100 font-triodion;
   }
 
-  .volume-slider {
-    position: absolute;
-    top: -60px;
-    left: 0;
-    right: 0;
-    transform: translateY(100%);
-    opacity: 0;
-    height: 0;
-    transition: all 0.3s ease-in-out;
-    z-index: 10;
-    color: white;
+  /* Clickable text with subtle glow */
+  .clickable-text {
+    @apply cursor-pointer transition-all duration-300 ease-in-out select-none;
+    text-shadow: 0 0 24px rgba(255, 255, 255, 0.5);
+    animation: pulse-shadow 4s infinite ease-in-out;
   }
 
-  .volume-slider.expanded {
-    transform: translateY(0);
-    opacity: 1;
-    height: 40px;
+  .clickable-text:hover {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 12px rgba(255, 255, 255, 0.4);
   }
 
-
-  /* Candle */
-  .candle-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* height: 100vh; */
+  .clickable-text.disabled {
+    @apply cursor-not-allowed opacity-70;
+    animation: none;
+    text-shadow: none;
   }
 
-  .candle {
-    width: 60px;
-    height: 200px;
-    background-color: #911d26;
-    border-radius: 4px;
-    position: relative;
-    overflow: hidden;
+  .clickable-text.disabled:hover {
+    text-shadow: none;
   }
 
-  .flame {
-    position: absolute;
-    bottom: 20px;
-    left: -140px;
-    width: 360px;
-    height: 380px;
-    background: radial-gradient(circle, rgba(255, 241, 163, 0.8) 20%, rgba(255, 179, 0, 0) 70%);
-    border-radius: 50%;
-    animation: flicker 1s infinite alternate ease-in-out;
-  }
-
-  @keyframes flicker {
+  @keyframes pulse-shadow {
     0% {
-      opacity: 0.4;
+      text-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
     }
 
-    80% {
-      opacity: 0.3;
+    50% {
+      text-shadow: 0 0 24px rgba(255, 255, 255, 0.7);
     }
 
     100% {
-      opacity: 0.5;
+      text-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
     }
   }
-
 }
