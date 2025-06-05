@@ -150,16 +150,16 @@ export default function AudioPlayer() {
   // Initialize audio processor after audio element is available
   useEffect(() => {
     if (chantRef.current && !ChantProcessorRef.current.isReady()) {
-      ChantProcessorRef.current.initialize(chantRef.current);
-      // Apply initial processing options
-      ChantProcessorRef.current.updateOptions(processingOptions);
+      // Pass initial processingOptions to initialize
+      ChantProcessorRef.current.initialize(chantRef.current, processingOptions);
     }
-  }, [chantRef.current]);
+  }, [chantRef.current, processingOptions]); // Add processingOptions to dependency array
 
-  // Update processing chain options
+  // Update base processing chain options when processingOptions state changes
   useEffect(() => {
     if (ChantProcessorRef.current.isReady()) {
-      ChantProcessorRef.current.updateOptions(processingOptions);
+      // Use updateBaseOptions instead of updateOptions
+      ChantProcessorRef.current.updateBaseOptions(processingOptions);
     }
   }, [processingOptions]);
 
@@ -209,7 +209,8 @@ export default function AudioPlayer() {
   const toggleOutside = () => {
     const newPosition = !appState.value.isOutside; // Always read current state
     setIsOutside(newPosition);
-    ChantProcessorRef.current.toggleOutside(newPosition, processingOptions);
+    // Call toggleOutside without processingOptions
+    ChantProcessorRef.current.toggleOutside(newPosition);
     ambientProcessor?.toggleOutside(newPosition);
   };
 
@@ -247,25 +248,22 @@ export default function AudioPlayer() {
   // Handle volume change
   const handleVolumeChange = (e: Event) => {
     const value = parseFloat((e.target as HTMLInputElement).value);
-    setMasterVolume(value);
-    if (isOutside) {
-      ambientProcessor?.setVolume(value);
-      if (value < 0.15) {
-        updateAudioFilters({ volume: value });
-      }
-    } else {
-      updateAudioFilters({ volume: value });
-      ambientProcessor?.setVolume(value);
-    }
-  };
+    setMasterVolume(value); // Update UI slider
 
-  // Example function to update audio processing options
-  const updateAudioFilters = (options: Partial<ChantProcessorOptions>) => {
+    // Update the volume in the local processingOptions state
+    // This will trigger the useEffect hook to call ChantProcessorRef.current.updateBaseOptions
     setProcessingOptions((prev) => ({
       ...prev,
-      ...options,
+      volume: value,
     }));
+
+    // Also update ambient processor volume directly
+    ambientProcessor?.setVolume(value);
   };
+
+  // The updateAudioFilters function is no longer needed as setProcessingOptions handles updates,
+  // and the useEffect hook propagates them to ChantProcessor.
+  // We can remove it.
 
   return (
     <div>
@@ -273,12 +271,7 @@ export default function AudioPlayer() {
       <audio ref={rainRef} src="/ambient/rain.mp3" preload="auto" loop />
       <audio ref={dovesRef} src="/ambient/doves.mp3" preload="auto" loop />
       <audio ref={loonsRef} src="/ambient/loons.mp3" preload="auto" loop />
-      <audio
-        ref={cricketsRef}
-        src="/ambient/crickets.mp3"
-        preload="auto"
-        loop
-      />
+      <audio ref={cricketsRef} src="/ambient/crickets.mp3" preload="auto" loop />
 
       <div class="controls space-y-2">
         <button
