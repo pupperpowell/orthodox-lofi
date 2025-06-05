@@ -9,6 +9,9 @@ export default function Layout({ Component }: PageProps) {
         <Component />
       </main>
       <footer >
+        <div class="flex w-full flex-col">
+          <div class="divider">designed for headphones!</div>
+        </div>
         <ShareButton />
         {/* <Link href="/about">about</Link> */}
         {/* <Link href="/credits">credits</Link> */}
