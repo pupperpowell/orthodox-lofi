@@ -273,14 +273,21 @@ export default function AudioPlayer() {
       <audio ref={loonsRef} src="/ambient/loons.mp3" preload="auto" loop />
       <audio ref={cricketsRef} src="/ambient/crickets.mp3" preload="auto" loop />
 
+      <div class="divider"></div>
+
       <div class="controls space-y-2">
         <button
           class="btn btn-primary w-full rounded-full"
+          style={`height: 4rem; font-size: 2.5rem;`}
           onClick={togglePlayback}
           type="button"
         >
           {isPlaying ? "click to mute" : "click to listen"}
         </button>
+
+        <div class="flex w-full flex-col">
+          <div class="divider">slide to adjust volume</div>
+        </div>
 
         <input
           type="range"
@@ -292,9 +299,7 @@ export default function AudioPlayer() {
           max={0.5}
         />
 
-        <div class="flex w-full flex-col">
-          <div class="divider">slide to adjust volume</div>
-        </div>
+
 
 
       </div>
