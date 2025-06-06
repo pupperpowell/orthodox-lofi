@@ -287,6 +287,7 @@ export default function AudioPlayer() {
         <>
           <audio ref={loonsRef} src="/ambient/loons.mp3" preload="auto" loop />
           <audio ref={cricketsRef} src="/ambient/crickets.mp3" preload="auto" loop />
+          <audio ref={chickadeesRef} src="" preload="auto" loop />
         </>
       ) : (
         <>
@@ -321,9 +322,6 @@ export default function AudioPlayer() {
           min={0}
           max={0.5}
         />
-
-
-
 
       </div>
     </div>
