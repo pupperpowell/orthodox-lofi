@@ -80,6 +80,10 @@
     animation: pulse-shadow 4s infinite ease-in-out;
   }
 
+  [data-theme="light"].clickable-text {
+    text-shadow: 0 0 24px rgba(255, 157, 29, 0.724);
+  }
+
   .clickable-text:hover {
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 0 12px rgba(255, 255, 255, 0.4);
   }
@@ -96,15 +100,15 @@
 
   @keyframes pulse-shadow {
     0% {
-      text-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+      text-shadow: 0 0 4px rgba(255, 157, 29, 0.5);
     }
 
     50% {
-      text-shadow: 0 0 24px rgba(255, 255, 255, 0.7);
+      text-shadow: 0 0 24px rgba(255, 157, 29, 0.7);
     }
 
     100% {
-      text-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+      text-shadow: 0 0 4px rgba(255, 157, 29, 0.5);
     }
   }
 }

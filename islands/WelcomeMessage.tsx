@@ -94,10 +94,14 @@ export default function WelcomeMessage() {
                         >
                             {isWindowOpen ? "open" : "closed"}
                         </span>
-                        .{" "}
+                        .
                     </span>
-                )}
+                )
+                }
+
             </h1>
+
+
             <p class="mb-2 text-xl">
                 {connectedUsers > 1 && (
                     <span>

@@ -25,13 +25,13 @@ export default function Home() {
         <meta name="twitter:description" content="byzantine music soundscape to relax/study/pray to" />
         <meta name="twitter:image" content="church.jpg" />
 
-        <script
+        {/* <script
           defer
           src="https://umami.pw1.xyz/script.js"
           data-website-id="b99bf8e9-7ddc-4fdc-968b-fc90ac5ed4ea"
           data-domains="cafe.nightbreak.app,www.cafe.nightbreak.app,cafe.pw1.xyz"
         >
-        </script>
+        </script> */}
 
         <script
           defer
@@ -46,10 +46,14 @@ export default function Home() {
         <WelcomeMessage />
         <AudioPlayer />
       </div>
+
       {
         Deno.env.get("ENVIRONMENT") == "DEV" &&
-        <LatestCommit className="font-triodion" />
+        <span> latest commit: {" "}
+          <LatestCommit className="font-triodion inline-block" />
+        </span>
       }
+
     </>
   );
 }

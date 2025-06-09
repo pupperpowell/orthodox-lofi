@@ -14,6 +14,7 @@ import * as $index from "./routes/index.tsx";
 import * as $AudioPlayer from "./islands/AudioPlayer.tsx";
 import * as $LatestCommit from "./islands/LatestCommit.tsx";
 import * as $ShareButton from "./islands/ShareButton.tsx";
+import * as $ThemeController from "./islands/ThemeController.tsx";
 import * as $WelcomeMessage from "./islands/WelcomeMessage.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
@@ -33,6 +34,7 @@ const manifest = {
     "./islands/AudioPlayer.tsx": $AudioPlayer,
     "./islands/LatestCommit.tsx": $LatestCommit,
     "./islands/ShareButton.tsx": $ShareButton,
+    "./islands/ThemeController.tsx": $ThemeController,
     "./islands/WelcomeMessage.tsx": $WelcomeMessage,
   },
   baseUrl: import.meta.url,

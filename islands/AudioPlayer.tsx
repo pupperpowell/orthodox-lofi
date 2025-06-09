@@ -301,7 +301,7 @@ export default function AudioPlayer() {
 
       <div class="controls space-y-2">
         <button
-          class="btn btn-primary w-full rounded-full"
+          class={`btn btn-primary w-full rounded-full ${!isPlaying ? "clickable-text" : ""}`}
           style={`height: 4rem; font-size: 2.5rem;`}
           onClick={togglePlayback}
           type="button"
@@ -315,12 +315,13 @@ export default function AudioPlayer() {
 
         <input
           type="range"
-          class="range w-full"
+          class="range w-full range-xl"
           value={masterVolume}
           onInput={handleVolumeChange}
           step={0.001}
           min={0}
           max={0.5}
+          disabled={!isPlaying}
         />
 
       </div>
