@@ -273,29 +273,50 @@ export default function AudioPlayer() {
     ambientProcessor?.setVolume(value);
   };
 
-  // The updateAudioFilters function is no longer needed as setProcessingOptions handles updates,
-  // and the useEffect hook propagates them to ChantProcessor.
-  // We can remove it.
+  type AudioClip = {
+    ref: preact.RefObject<HTMLAudioElement>;
+    src: string;
+  };
+
+  const hour = new Date().getHours();
+
+  const ambientClips: AudioClip[] = [];
+
+  if (hour < 6) {
+    ambientClips.push(
+      { ref: loonsRef, src: "/ambient/loons.mp3" },
+      { ref: cricketsRef, src: "/ambient/crickets.mp3" },
+      { ref: dovesRef, src: "" },
+      { ref: chickadeesRef, src: "" }
+    );
+    console.log("it is the deep of night and early morning. even the doves have gone to bed")
+  } else if (hour < 18) {
+    ambientClips.push(
+      { ref: dovesRef, src: "/ambient/doves.mp3" },
+      { ref: chickadeesRef, src: "/ambient/chickadees.mp3" },
+      { ref: loonsRef, src: "" },
+      { ref: cricketsRef, src: "" }
+    );
+    console.log("it is daytime. songbirds chatter and doves can be heard calling out mournfully")
+  } else {
+    ambientClips.push(
+      { ref: dovesRef, src: "/ambient/doves.mp3" },
+      { ref: loonsRef, src: "/ambient/loons.mp3" },
+      { ref: cricketsRef, src: "/ambient/crickets.mp3" },
+      { ref: chickadeesRef, src: "" }
+    );
+    console.log("evening has fallen, and the loons begin their nightly cries...")
+  }
 
   return (
     <div>
 
       <audio ref={chantRef} src={chantSrc} preload="auto" />
       <audio ref={rainRef} src="/ambient/rain.mp3" preload="auto" loop />
-      <audio ref={dovesRef} src="/ambient/doves.mp3" preload="auto" loop />
-      {(currentTime.getHours() >= 18 || currentTime.getHours() < 6) ? (
-        <>
-          <audio ref={loonsRef} src="/ambient/loons.mp3" preload="auto" loop />
-          <audio ref={cricketsRef} src="/ambient/crickets.mp3" preload="auto" loop />
-          <audio ref={chickadeesRef} src="" preload="auto" loop />
-        </>
-      ) : (
-        <>
-          <audio ref={chickadeesRef} src="/ambient/chickadees.mp3" preload="auto" loop />
-          <audio ref={loonsRef} src="" preload="auto" loop />
-          <audio ref={cricketsRef} src="" preload="auto" loop />
-        </>
-      )}
+
+      {ambientClips.map(({ ref, src }, index) => (
+        <audio key={index} ref={ref} src={src} preload="auto" loop />
+      ))}
 
       <div class="divider"></div>
 
