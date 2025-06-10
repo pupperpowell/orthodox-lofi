@@ -283,7 +283,7 @@ export default function AudioPlayer() {
       <audio ref={chantRef} src={chantSrc} preload="auto" />
       <audio ref={rainRef} src="/ambient/rain.mp3" preload="auto" loop />
       <audio ref={dovesRef} src="/ambient/doves.mp3" preload="auto" loop />
-      {currentTime.getHours() >= 18 ? (
+      {(currentTime.getHours() >= 18 || currentTime.getHours() < 6) ? (
         <>
           <audio ref={loonsRef} src="/ambient/loons.mp3" preload="auto" loop />
           <audio ref={cricketsRef} src="/ambient/crickets.mp3" preload="auto" loop />
