@@ -15,6 +15,7 @@ export class AmbientProcessor {
   private dovesAudio: HTMLAudioElement;
   private loonsAudio: HTMLAudioElement;
   private cricketsAudio: HTMLAudioElement;
+  private chickadeesAudio: HTMLAudioElement;
 
   private location: Location;
   private windowOpen: boolean = false;
@@ -37,6 +38,8 @@ export class AmbientProcessor {
   private doveGain: GainNode;
   private loonSource: MediaElementAudioSourceNode;
   private loonGain: GainNode;
+  private chickadeesSource: MediaElementAudioSourceNode;
+  private chickadeesGain: GainNode;
 
   // Crickets
   private cricketsSource: MediaElementAudioSourceNode;
@@ -57,6 +60,7 @@ export class AmbientProcessor {
     windowOpenCricketsHighpass: 100,
     windowOpenCricketsLowpass: 2000,
     windowOpenCricketsGain: 0.3,
+    windowOpenChickadeesGain: 0.02,
     windowOpenPan: 0.4, // to the right
     //
     outsideRainHighpass: this.highpassDisabled,
@@ -67,6 +71,7 @@ export class AmbientProcessor {
     outsideCricketsGain: 0.3,
     outsideDovesGain: 0.7,
     outsideLoonsGain: 0.3,
+    outsideChickadeesGain: 0.4,
   };
 
   constructor(
@@ -74,6 +79,7 @@ export class AmbientProcessor {
     loons: HTMLAudioElement,
     doves: HTMLAudioElement,
     crickets: HTMLAudioElement,
+    chickadees: HTMLAudioElement,
   ) {
     this.audioContext = new AudioContext();
 
@@ -83,12 +89,14 @@ export class AmbientProcessor {
     this.dovesAudio = doves;
     this.loonsAudio = loons;
     this.cricketsAudio = crickets;
+    this.chickadeesAudio = chickadees;
 
     // Audio source nodes
     this.rainSource = this.audioContext.createMediaElementSource(rain);
     this.doveSource = this.audioContext.createMediaElementSource(doves);
     this.loonSource = this.audioContext.createMediaElementSource(loons);
     this.cricketsSource = this.audioContext.createMediaElementSource(crickets);
+    this.chickadeesSource = this.audioContext.createMediaElementSource(chickadees);
 
     this.cricketsLowpassFilter = this.audioContext.createBiquadFilter();
     this.cricketsLowpassFilter.type = "lowpass";
@@ -108,6 +116,7 @@ export class AmbientProcessor {
     this.doveGain = this.audioContext.createGain();
     this.loonGain = this.audioContext.createGain();
     this.cricketsGain = this.audioContext.createGain();
+    this.chickadeesGain = this.audioContext.createGain();
 
     this.adjustFilters();
 
@@ -143,6 +152,11 @@ export class AmbientProcessor {
       .connect(this.masterGain)
       .connect(this.audioContext.destination);
 
+    this.chickadeesSource
+      .connect(this.chickadeesGain)
+      .connect(this.masterGain)
+      .connect(this.audioContext.destination);
+
     console.log("[AmbientProcessor] connected chain");
   }
 
@@ -164,6 +178,7 @@ export class AmbientProcessor {
         this.filters.windowOpenCricketsHighpass;
       this.cricketsLowpassFilter.frequency.value =
         this.filters.windowOpenCricketsLowpass;
+      this.chickadeesGain.gain.value = this.filters.windowOpenChickadeesGain;
       this.doveGain.gain.value = 0;
       this.loonGain.gain.value = 0;
     } else if (this.location == "inside") {
@@ -174,6 +189,7 @@ export class AmbientProcessor {
       this.pan.pan.value = 0;
 
       this.cricketsGain.gain.value = 0;
+      this.chickadeesGain.gain.value = 0;
       this.doveGain.gain.value = 0;
       this.loonGain.gain.value = 0;
     } else {
@@ -194,6 +210,7 @@ export class AmbientProcessor {
 
       this.doveGain.gain.value = this.filters.outsideDovesGain;
       this.loonGain.gain.value = this.filters.outsideLoonsGain;
+      this.chickadeesGain.gain.value = this.filters.outsideChickadeesGain;
     }
   }
 
@@ -226,8 +243,10 @@ export class AmbientProcessor {
       this.cricketsAudio.play();
     } else if (hour < 12) { // 6am - 12pm
       this.dovesAudio.play();
+      this.chickadeesAudio.play();
     } else if (hour < 18) { // 12pm - 6pm
       this.dovesAudio.play();
+      this.chickadeesAudio.play();
     } else { // 6pm - 12am
       this.dovesAudio.play();
       this.loonsAudio.play();
@@ -252,6 +271,7 @@ export class AmbientProcessor {
     this.dovesAudio.pause();
     this.loonsAudio.pause();
     this.cricketsAudio.pause();
+    this.chickadeesAudio.pause();
     console.log("[AmbientProcessor] stopped");
   }
 }

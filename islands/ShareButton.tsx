@@ -4,7 +4,6 @@
  */
 import { useEffect, useState } from "preact/hooks";
 import { JSX } from "preact";
-import { Button } from "../components/Button.tsx";
 
 interface ShareButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
   title?: string;
@@ -14,8 +13,8 @@ interface ShareButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
 }
 
 export default function ShareButton({
-  title = "Orthodox Lofi",
-  text = "Byzantine music to relax/study to",
+  title = "lofi byzantine music radio",
+  text = "lofi byzantine music radio",
   url,
 }: ShareButtonProps) {
   const [shared, setShared] = useState(false);
@@ -70,6 +69,7 @@ export default function ShareButton({
 
   return (
     <button
+      type="button"
       onClick={handleShare}
       aria-label="Share this page"
       data-umami-event="Share button clicked"

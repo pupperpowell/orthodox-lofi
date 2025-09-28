@@ -10,9 +10,7 @@ export default function About() {
         <h1 class="mt-12">credits</h1>
         <p>
           Thank you to all the people who encouraged me during the long
-          development process. Without your support, I would have abandoned this
-          project. Your enthusiasm (even if you secretly thought the idea was
-          questionable) means the world to me.
+          development process. Without your support and enthusiasm, I might have given up.
         </p>
         <p>
           Thank you especially to Alanna who helped me design the audio

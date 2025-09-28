@@ -109,11 +109,9 @@ framework, which uses [Preact](https://preactjs.com/) as the frontend framework,
 tying it all together. Not too long ago, I assumed most websites were built with
 vanilla HTML and Javascript, so I'm proud of everything I've learned since then.
 
-The music was sourced from archive.org and YouTube and plays on an Icecast web
-radio 24/7. The scripting language used to assemble playlists and scheduling is
-Liquidsoap. I pay roughly $10 a month in server costs, but this could be $0 if I
-hosted it on a laptop in my closet. I don't know how much bandwidth will cost
-because as of writing this, version 1 of the site has not been released yet.
+Most of the development features were completed in a week. The remaining month of development was spent trying to get audio processing effects to work on iOS. I still haven't gotten around to enabling background playback on iOS, either, although it is possible.
+
+The music was sourced from archive.org and YouTube. The web app used to be hosted on a laptop in my closet, and is now hosted on an old gaming PC I got for $150 from Facebook Marketplace.
 
 ---
 

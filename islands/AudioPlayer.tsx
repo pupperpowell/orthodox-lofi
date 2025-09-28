@@ -37,6 +37,7 @@ export default function AudioPlayer() {
   const [chantSrc, setChantSrc] = useState("");
   const [masterVolume, setMasterVolume] = useState(0.5);
   // Removed: const [windowOpen, setWindowOpen] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   // AmbientProcessor
   const [ambientProcessor, setAmbientProcessor] = useState<
@@ -60,6 +61,7 @@ export default function AudioPlayer() {
   const loonsRef = useRef<HTMLAudioElement>(null);
   const cricketsRef = useRef<HTMLAudioElement>(null);
   const dovesRef = useRef<HTMLAudioElement>(null);
+  const chickadeesRef = useRef<HTMLAudioElement>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
   const currentTrackPathRef = useRef<string>("");
@@ -70,6 +72,15 @@ export default function AudioPlayer() {
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
+
+  // Update currentTime every minute
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60 * 1000); // Every minute
+
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, []);
 
   // WEBSOCKET LOGIC
   useEffect(() => {
@@ -181,13 +192,14 @@ export default function AudioPlayer() {
     // Create the ambientProcessor if it doesn't already exist
     if (
       !ambientProcessor && rainRef.current && loonsRef.current &&
-      dovesRef.current && cricketsRef.current
+      dovesRef.current && cricketsRef.current && chickadeesRef.current
     ) {
       const processor = new AmbientProcessor(
         rainRef.current,
         loonsRef.current,
         dovesRef.current,
         cricketsRef.current,
+        chickadeesRef.current,
       );
       setAmbientProcessor(processor);
       processor.play();
@@ -261,41 +273,77 @@ export default function AudioPlayer() {
     ambientProcessor?.setVolume(value);
   };
 
-  // The updateAudioFilters function is no longer needed as setProcessingOptions handles updates,
-  // and the useEffect hook propagates them to ChantProcessor.
-  // We can remove it.
+  type AudioClip = {
+    ref: preact.RefObject<HTMLAudioElement>;
+    src: string;
+  };
+
+  const hour = new Date().getHours();
+
+  const ambientClips: AudioClip[] = [];
+
+  if (hour < 6) {
+    ambientClips.push(
+      { ref: loonsRef, src: "/ambient/loons.mp3" },
+      { ref: cricketsRef, src: "/ambient/crickets.mp3" },
+      { ref: dovesRef, src: "" },
+      { ref: chickadeesRef, src: "" }
+    );
+    console.log("it is the deep of night and early morning. even the doves have gone to bed")
+  } else if (hour < 18) {
+    ambientClips.push(
+      { ref: dovesRef, src: "/ambient/doves.mp3" },
+      { ref: chickadeesRef, src: "/ambient/chickadees.mp3" },
+      { ref: loonsRef, src: "" },
+      { ref: cricketsRef, src: "" }
+    );
+    console.log("it is daytime. songbirds chatter and doves can be heard calling out mournfully")
+  } else {
+    ambientClips.push(
+      { ref: dovesRef, src: "/ambient/doves.mp3" },
+      { ref: loonsRef, src: "/ambient/loons.mp3" },
+      { ref: cricketsRef, src: "/ambient/crickets.mp3" },
+      { ref: chickadeesRef, src: "" }
+    );
+    console.log("evening has fallen, and the loons begin their nightly cries...")
+  }
 
   return (
     <div>
+
       <audio ref={chantRef} src={chantSrc} preload="auto" />
       <audio ref={rainRef} src="/ambient/rain.mp3" preload="auto" loop />
-      <audio ref={dovesRef} src="/ambient/doves.mp3" preload="auto" loop />
-      <audio ref={loonsRef} src="/ambient/loons.mp3" preload="auto" loop />
-      <audio ref={cricketsRef} src="/ambient/crickets.mp3" preload="auto" loop />
+
+      {ambientClips.map(({ ref, src }, index) => (
+        <audio key={index} ref={ref} src={src} preload="auto" loop />
+      ))}
+
+      <div class="divider"></div>
 
       <div class="controls space-y-2">
         <button
-          class="btn btn-primary w-full rounded-full"
+          class={`btn btn-primary w-full rounded-full ${!isPlaying ? "clickable-text" : ""}`}
+          style={`height: 4rem; font-size: 2.5rem;`}
           onClick={togglePlayback}
           type="button"
         >
           {isPlaying ? "click to mute" : "click to listen"}
         </button>
 
+        <div class="flex w-full flex-col">
+          <div class="divider">slide to adjust volume</div>
+        </div>
+
         <input
           type="range"
-          class="range w-full"
+          class="range w-full range-xl"
           value={masterVolume}
           onInput={handleVolumeChange}
           step={0.001}
           min={0}
           max={0.5}
+          disabled={!isPlaying}
         />
-
-        <div class="flex w-full flex-col">
-          <div class="divider">slide to adjust volume</div>
-        </div>
-
 
       </div>
     </div>

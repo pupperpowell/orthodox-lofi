@@ -28,6 +28,7 @@ export default function WelcomeMessage() {
 
     const [timeOfDay, setTimeOfDay] = useState(getTimeOfDay());
     const [season, setSeason] = useState(getSeason());
+    const [hasBeenOutside, setHasBeenOutside] = useState(false);
 
     useEffect(() => {
         const updateTime = () => {
@@ -38,6 +39,12 @@ export default function WelcomeMessage() {
         const intervalId = setInterval(updateTime, 60000); // Update every minute
         return () => clearInterval(intervalId);
     }, []);
+
+    useEffect(() => {
+        if (isOutside && !hasBeenOutside) {
+            setHasBeenOutside(true);
+        }
+    }, [isOutside, hasBeenOutside]);
 
     const getWeatherDescription = () => {
         if (isRaining) return "It's raining. ";
@@ -58,22 +65,7 @@ export default function WelcomeMessage() {
                 >
                     {isOutside ? "outside" : "inside"}
                 </span> the church of St. George{isOutside ? "" : ", near the back"}. It's a {season} {timeOfDay}, and {" "}
-                {/* {!isOutside && (
-                    <span>
-                        The window is{" "}
-                        <span
-                            class={`clickable-text ${!appState.value.isConnected || !appState.value.isPlaying ? 'disabled' : ''}`}
-                            onClick={() => {
-                                if (appState.value.isConnected && appState.value.isPlaying) {
-                                    appState.value.toggleWindow?.();
-                                }
-                            }}
-                        >
-                            {isWindowOpen ? "open" : "closed"}
-                        </span>
-                        .{" "}
-                    </span>
-                )} */}
+
                 {isRaining ? "it's " : "the sky is "}
                 <span
                     class={`clickable-text ${!appState.value.isConnected || !appState.value.isPlaying ? 'disabled' : ''}`}
@@ -86,6 +78,30 @@ export default function WelcomeMessage() {
                     {isRaining ? "raining" : "clear"}
                 </span>.
             </h1>
+
+            {/* Window section: This should be hidden until isOutside goes from true to false at least once. */}
+            <h1 class="text-3xl font-bold mb-2">
+                {!isOutside && hasBeenOutside && (
+                    <span>
+                        There is a window to your right. It is{" "}
+                        <span
+                            class={`clickable-text ${!appState.value.isConnected || !appState.value.isPlaying ? 'disabled' : ''}`}
+                            onClick={() => {
+                                if (appState.value.isConnected && appState.value.isPlaying) {
+                                    appState.value.toggleWindow?.();
+                                }
+                            }}
+                        >
+                            {isWindowOpen ? "open" : "closed"}
+                        </span>
+                        .
+                    </span>
+                )
+                }
+
+            </h1>
+
+
             <p class="mb-2 text-xl">
                 {connectedUsers > 1 && (
                     <span>
