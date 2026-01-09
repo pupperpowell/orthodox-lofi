@@ -4,28 +4,28 @@ import AudioPlayer from "../islands/AudioPlayer.tsx";
 import WelcomeMessage from "../islands/WelcomeMessage.tsx";
 
 export default function Home() {
-  return (
-    <>
-      <Head>
-        <title>lofi byzantine music radio</title>
-        <meta name="description" content="byzantine music soundscape to relax/study/pray to" />
+	return (
+		<>
+			<Head>
+				<title>lofi byzantine music radio</title>
+				<meta name="description" content="byzantine music soundscape to relax/study/pray to" />
 
-        {/* Facebook Meta Tags */}
-        <meta property="og:url" content="https://orthodox.cafe" />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="lofi byzantine music radio" />
-        <meta property="og:description" content="byzantine music soundscape to relax/study/pray to" />
-        <meta property="og:image" content="church.jpg" />
+				{/* Facebook Meta Tags */}
+				<meta property="og:url" content="https://orthodox.cafe" />
+				<meta property="og:type" content="website" />
+				<meta property="og:title" content="lofi byzantine music radio" />
+				<meta property="og:description" content="byzantine music soundscape to relax/study/pray to" />
+				<meta property="og:image" content="church.jpg" />
 
-        {/* Twitter Meta Tags */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta property="twitter:domain" content="orthodox.cafe" />
-        <meta property="twitter:url" content="https://orthodox.cafe" />
-        <meta name="twitter:title" content="lofi byzantine music radio" />
-        <meta name="twitter:description" content="byzantine music soundscape to relax/study/pray to" />
-        <meta name="twitter:image" content="church.jpg" />
+				{/* Twitter Meta Tags */}
+				<meta name="twitter:card" content="summary_large_image" />
+				<meta property="twitter:domain" content="orthodox.cafe" />
+				<meta property="twitter:url" content="https://orthodox.cafe" />
+				<meta name="twitter:title" content="lofi byzantine music radio" />
+				<meta name="twitter:description" content="byzantine music soundscape to relax/study/pray to" />
+				<meta name="twitter:image" content="church.jpg" />
 
-        {/* <script
+				{/* <script
           defer
           src="https://umami.pw1.xyz/script.js"
           data-website-id="b99bf8e9-7ddc-4fdc-968b-fc90ac5ed4ea"
@@ -33,27 +33,21 @@ export default function Home() {
         >
         </script> */}
 
-        <script
-          defer
-          src="https://umami.pw1.xyz/script.js"
-          data-website-id="9db30029-96c3-4f08-86c1-f931c37a73f7"
-          data-domains="orthodox.cafe,www.orthodox.cafe"
-        >
-        </script>
-      </Head >
+				<script defer src="https://umami.snail.city/script.js" data-website-id="78cb72e2-e7b0-4d2c-96e9-0ca5838522b0"></script>
+			</Head >
 
-      <div>
-        <WelcomeMessage />
-        <AudioPlayer />
-      </div>
+			<div>
+				<WelcomeMessage />
+				<AudioPlayer />
+			</div>
 
-      {
-        Deno.env.get("ENVIRONMENT") == "DEV" &&
-        <span> latest commit: {" "}
-          <LatestCommit className="font-triodion inline-block" />
-        </span>
-      }
+			{
+				Deno.env.get("ENVIRONMENT") == "DEV" &&
+				<span> latest commit: {" "}
+					<LatestCommit className="font-triodion inline-block" />
+				</span>
+			}
 
-    </>
-  );
+		</>
+	);
 }
